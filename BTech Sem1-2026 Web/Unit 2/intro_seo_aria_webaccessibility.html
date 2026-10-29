@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Internet & Web Development — Interactive Lecture Notes</title>
+<style>
+:root{--navy:#14213d;--blue:#2563eb;--pale:#eff6ff;--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--bg:#f8fafc;--green:#15803d;--red:#dc2626;--amber:#d97706}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+header{background:linear-gradient(120deg,#14213d,#1d4ed8);color:white;padding:16px 26px;position:sticky;top:0;z-index:5;box-shadow:0 3px 14px #0f172a22}
+header h1{font-size:clamp(1.2rem,2vw,1.8rem);margin:0}header p{margin:4px 0 8px;color:#dbeafe;font-size:.95rem}
+.progress{display:flex;align-items:center;gap:10px;font-size:.82rem;color:#dbeafe}.progress .bar{flex:1;max-width:320px;height:8px;border-radius:99px;background:#ffffff33;overflow:hidden}.progress .bar span{display:block;height:100%;width:0;background:#4ade80;transition:width .4s}
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:calc(100vh - 130px)}
+aside{background:#fff;border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:130px;height:calc(100vh - 130px);overflow:auto}
+.search{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;margin-bottom:14px;font:inherit}
+.navgroup{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#64748b;font-weight:800;padding:12px 10px 5px}
+.navbtn{display:block;width:100%;text-align:left;background:transparent;border:0;padding:10px 11px;border-radius:8px;color:#334155;cursor:pointer;font:inherit;font-size:.92rem;margin:2px 0}
+.navbtn:hover{background:#f1f5f9}.navbtn.active{background:var(--pale);color:#1d4ed8;font-weight:700;border-left:3px solid var(--blue)}.navbtn.done::after{content:" ✓";color:var(--green);font-weight:800}
+main{padding:clamp(16px,3vw,34px);max-width:1450px;width:100%;margin:auto}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.pill{font-size:.8rem;border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;padding:5px 10px;border-radius:99px;font-weight:700}
+h2{font-size:1.8rem;line-height:1.25;margin:0 0 10px;color:#0f172a}h3{margin:22px 0 8px;color:#172554}p{margin:8px 0 13px}.lead{font-size:1.06rem;color:#475569;max-width:900px}
+.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:20px;margin:16px 0;box-shadow:0 3px 12px #0f172a08}
+.panel.viz{border:2px solid #bfdbfe;background:linear-gradient(#fff,#f8fbff)}
+.vizhead{display:flex;align-items:center;gap:8px;margin:0 0 4px;color:#1d4ed8;font-size:1.1rem}
+.hint{color:#475569;font-size:.93rem;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.mini{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:14px}.mini h3{margin:0 0 6px;font-size:1rem}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:.94rem}th,td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{background:#f1f5f9}
+.codehead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px 10px 0 0;font-size:.88rem}
+pre{margin:0;background:#0b1220;color:#e2e8f0;padding:14px;overflow:auto;border-radius:10px;white-space:pre;font-size:.86rem;line-height:1.55;tab-size:2}
+pre.hl-ok{border:2px solid #22c55e}pre.hl-bad{border:2px solid #ef4444}
+button.action{border:0;border-radius:8px;padding:9px 13px;background:var(--blue);color:white;font-weight:700;cursor:pointer;font:inherit;font-size:.88rem}
+button.action:hover{filter:brightness(.93)}button.secondary{background:#334155}button.light{background:#e2e8f0;color:#0f172a}button.action:disabled{opacity:.45;cursor:not-allowed}
+button.success{background:var(--green)}
+.editor{width:100%;min-height:230px;background:#0b1220;color:#e2e8f0;border:1px solid #334155;border-radius:0 0 10px 10px;padding:16px;font: .9rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;resize:vertical}
+.previewwrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:16px;background:white}
+.previewhead{background:#f1f5f9;padding:10px 13px;display:flex;justify-content:space-between;align-items:center;font-size:.88rem;font-weight:700}
+iframe{width:100%;height:260px;border:0;background:white;display:block}
+.note{border-left:4px solid #2563eb;background:#eff6ff;padding:12px 14px;border-radius:0 8px 8px 0;margin:14px 0}
+.warn{border-left-color:#d97706;background:#fffbeb}
+ul,ol{padding-left:23px}li{margin:5px 0}.footer{color:var(--muted);font-size:.85rem;padding:20px 0}
+code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:.9em}pre code{background:none;padding:0}
+
+/* interactive widgets */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{border:1px solid #cbd5e1;background:#fff;border-radius:99px;padding:7px 14px;cursor:pointer;font:inherit;font-size:.9rem;color:#334155}
+.tab:hover{background:#f1f5f9}.tab[aria-selected=true]{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+.two{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}
+.info{background:#fff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 16px;margin-top:12px}
+.info b.t{color:#1d4ed8}
+.chip{display:inline-block;background:#e0e7ff;color:#3730a3;border-radius:99px;padding:2px 10px;font-size:.8rem;font-weight:700;margin:2px 4px 2px 0}
+.chip.g{background:#dcfce7;color:#166534}.chip.r{background:#fee2e2;color:#991b1b}.chip.a{background:#fef3c7;color:#92400e}
+.hot{cursor:pointer;outline:none}.hot:hover,.hot:focus,.hot.sel{filter:drop-shadow(0 0 6px #2563eb)}
+.stage{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.stage svg{max-width:100%;height:auto}
+.reader{background:#111827;color:#a7f3d0;border-radius:10px;padding:12px 14px;font-family:ui-monospace,Consolas,monospace;font-size:.9rem;margin-top:10px;min-height:48px}
+.reader small{display:block;color:#94a3b8;margin-bottom:4px}
+.verdict{margin-top:8px;font-weight:700}.ok{color:var(--green)}.bad{color:var(--red)}
+label.sw{display:inline-flex;align-items:center;gap:7px;margin:4px 14px 4px 0;cursor:pointer;font-size:.93rem}
+input[type=text],textarea.plain,input.fld{width:100%;padding:9px 11px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}
+.meter{height:10px;border-radius:99px;background:#e2e8f0;overflow:hidden;margin:4px 0 8px}.meter span{display:block;height:100%;width:0;background:var(--green);transition:width .3s,background .3s}
+.small{font-size:.82rem;color:#64748b}
+.tabmock{display:flex;align-items:center;gap:8px;background:#dee3ea;padding:8px 10px 0;border-radius:10px 10px 0 0}
+.tabmock .t{background:#fff;border-radius:9px 9px 0 0;padding:7px 12px;font-size:.85rem;max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;gap:6px;align-items:center}
+.urlbar{background:#fff;border:1px solid var(--line);border-top:0;padding:7px 12px;font-size:.82rem;color:#475569;border-radius:0 0 10px 10px}
+.serp{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.serp .u{color:#166534;font-size:.82rem}.serp .tt{color:#1a0dab;font-size:1.15rem;margin:2px 0;font-weight:500}.serp .ds{color:#4d5156;font-size:.9rem}
+.phones{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.phonebox{text-align:center;width:200px}.phonebox .cap{font-size:.82rem;font-weight:700;margin-top:8px}
+.phone{width:186px;height:320px;border:8px solid #0f172a;border-radius:26px;overflow:hidden;background:#fff;position:relative;margin:auto}
+.pgw{transform-origin:0 0;font-size:16px;line-height:1.4;color:#111}
+.pgw .hd{background:#1d4ed8;color:#fff;padding:10px 14px;font-weight:700}.pgw .row{display:flex;gap:12px;padding:12px}.pgw .col{flex:1;background:#dbeafe;border-radius:8px;padding:12px;min-width:0}
+.pgw .col b{display:block;margin-bottom:4px}.pgw .btn{display:inline-block;background:#2563eb;color:#fff;border-radius:6px;padding:6px 12px;margin-top:6px}
+.fixed600{width:600px}.stack .row{flex-direction:column}
+.flow{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;margin:6px 0 12px}
+.flow .st{flex:1;min-width:140px;background:#fff;border:2px solid #cbd5e1;border-radius:12px;padding:10px 12px;cursor:pointer;text-align:center;font:inherit}
+.flow .st.on{border-color:var(--blue);background:#eff6ff}.flow .st b{display:block;font-size:1.05rem}
+.flip{perspective:800px;cursor:pointer;height:120px}.flip .in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flip.f .in{transform:rotateY(180deg)}.flip .fr,.flip .bk{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;padding:12px;display:flex;flex-direction:column;justify-content:center;font-size:.9rem}
+.flip .fr{background:#fee2e2;border:1px solid #fecaca}.flip .bk{background:#dcfce7;border:1px solid #bbf7d0;transform:rotateY(180deg)}
+.mythgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}
+.simwrap{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.simpage{padding:16px;transition:filter .3s}
+.simpage .card{border:1px solid #e2e8f0;border-radius:12px;padding:14px;display:grid;grid-template-columns:140px 1fr;gap:14px}
+.dot{display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:6px}
+.wire{border:2px solid #94a3b8;border-radius:10px;background:#fff;padding:8px;font-size:.88rem}
+.wire .reg{border:2px dashed #94a3b8;border-radius:8px;padding:8px;margin:6px 0;background:#f8fafc;cursor:pointer;transition:.2s;position:relative}
+.wire .reg:hover,.wire .reg.sel,.wire .reg.hi{border-color:var(--blue);background:#dbeafe;box-shadow:0 0 0 3px #93c5fd}
+.wire .tagname{position:absolute;top:-10px;right:8px;background:#1e3a8a;color:#fff;border-radius:6px;padding:0 6px;font-size:.72rem;font-family:ui-monospace,monospace}
+.focusdemo input{padding:8px;border:2px solid #cbd5e1;border-radius:8px;font:inherit}
+.focusdemo input:focus{outline:3px solid #f59e0b;border-color:#f59e0b}
+.mcq{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.mcq .opt{display:block;width:100%;text-align:left;border:1px solid #cbd5e1;background:#fff;border-radius:8px;padding:9px 12px;margin:6px 0;cursor:pointer;font:inherit}
+.mcq .opt:hover:not(:disabled){background:#f1f5f9}.mcq .opt.right{background:#dcfce7;border-color:#22c55e}.mcq .opt.wrong{background:#fee2e2;border-color:#ef4444}
+.bugline{display:block;width:100%;text-align:left;background:#0b1220;color:#e2e8f0;border:2px solid transparent;border-radius:6px;padding:6px 10px;margin:3px 0;cursor:pointer;font-family:ui-monospace,Consolas,monospace;font-size:.88rem}
+.bugline:hover{border-color:#60a5fa}.bugline.found{border-color:#22c55e;background:#052e16}.bugline.miss{border-color:#ef4444}
+.fix{font-family:system-ui;font-size:.85rem;color:#86efac;margin-top:4px;white-space:pre-wrap}
+.vidbox{position:relative;border-radius:10px;overflow:hidden;background:#0f172a}.vidbox svg{display:block;width:100%;height:auto}
+.cap{position:absolute;left:8%;right:8%;bottom:10px;text-align:center}
+.cap span{background:#000c;color:#fff;padding:3px 10px;border-radius:5px;font-size:.95rem}
+.ctrl{display:flex;gap:10px;align-items:center;background:#111827;color:#fff;padding:8px 10px;border-radius:0 0 10px 10px;font-size:.85rem}.ctrl input[type=range]{flex:1}
+.ctrl button{background:#334155;border:0;color:#fff;border-radius:6px;padding:5px 10px;cursor:pointer;font:inherit}.ctrl button.on{background:#2563eb}
+@keyframes bnc{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+.wb{transform-box:fill-box;transform-origin:bottom;animation:bnc 1s ease-in-out infinite}
+.mobilemenu{display:none}
+@media(max-width:800px){.layout{grid-template-columns:1fr}aside{position:relative;top:auto;height:auto;max-height:260px;border-right:0;border-bottom:1px solid var(--line)}.grid,.two,.mythgrid{grid-template-columns:1fr}header{position:relative}.simpage .card{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.wb{animation:none}*{transition:none!important}}
+@media print{header{position:static;background:#fff;color:#000;box-shadow:none}header p,.progress{color:#333}.layout{display:block}aside,.toolbar button,.previewwrap,.codehead button,.panel.viz{display:none!important}main{padding:0}.panel{break-inside:avoid;box-shadow:none}.editor{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Internet & Web Development</h1>
+  <p>Interactive B.Tech lecture notes · Multimedia · Metadata · SEO · Web Accessibility</p>
+  <div class="progress"><div class="bar"><span id="pbar"></span></div><span id="ptext">0 of 14 topics understood</span></div>
+</header>
+<div class="layout">
+<aside>
+  <input class="search" id="search" type="search" placeholder="Search topics…" aria-label="Search lecture topics">
+  <div id="nav"></div>
+</aside>
+<main>
+  <div class="toolbar"><span class="pill">B.Tech · Lecture Notes</span><div><button class="action secondary" onclick="window.print()">Print notes</button></div></div>
+  <article id="content" aria-live="polite"></article>
+  <div class="footer">Teaching resource · Every visual is built into this page and works offline. Code examples run in a sandboxed preview and do not send data to a server.</div>
+</main>
+</div>
+
+<!-- colour-blindness filter used by the accessibility simulator -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<filter id="protan"><feColorMatrix type="matrix" values="0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0"/></filter>
+</defs></svg>
+
+<script>
+/* ---------- tiny helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function escapeHTML(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
+const esc=escapeHTML;
+let cleanups=[];const onCleanup=f=>cleanups.push(f);
+function selectTabs(c,sel,fn){ $$(sel,c).forEach(b=>b.onclick=()=>{$$(sel,c).forEach(x=>x.setAttribute('aria-selected',x===b));fn(b.dataset.k)}); }
+
+/* ---------- reusable SVG pictures (no internet needed) ---------- */
+const art={
+solar:`<svg viewBox="0 0 420 220" style="width:100%;max-width:420px;border-radius:10px" aria-hidden="true"><rect width="420" height="220" fill="#0b1230"/>
+<g fill="none" stroke="#475569" stroke-dasharray="4 4"><circle cx="70" cy="110" r="80"/><circle cx="70" cy="110" r="140"/><circle cx="70" cy="110" r="200"/><circle cx="70" cy="110" r="260"/></g>
+<circle cx="70" cy="110" r="36" fill="#fbbf24"/><circle cx="70" cy="110" r="46" fill="#fbbf2433"/>
+<circle cx="150" cy="110" r="7" fill="#a8a29e"/><circle cx="210" cy="110" r="11" fill="#fdba74"/><circle cx="270" cy="110" r="12" fill="#38bdf8"/><circle cx="330" cy="110" r="9" fill="#f87171"/>
+<g fill="#cbd5e1" font-size="11" font-family="system-ui" text-anchor="middle"><text x="150" y="138">Mercury</text><text x="210" y="142">Venus</text><text x="270" y="144">Earth</text><text x="330" y="140">Mars</text><text x="70" y="172" fill="#fde68a">Sun</text></g></svg>`,
+icon:`<svg viewBox="0 0 420 220" style="width:100%;max-width:420px;border-radius:10px" aria-hidden="true"><rect width="420" height="220" fill="#eff6ff"/><rect x="130" y="60" width="160" height="100" rx="18" fill="#2563eb"/><circle cx="195" cy="108" r="22" fill="none" stroke="#fff" stroke-width="8"/><line x1="212" y1="126" x2="238" y2="150" stroke="#fff" stroke-width="9" stroke-linecap="round"/><text x="210" y="190" text-anchor="middle" font-family="system-ui" font-size="13" fill="#1e3a8a">a clickable search icon-button</text></svg>`,
+swirl:`<svg viewBox="0 0 420 220" style="width:100%;max-width:420px;border-radius:10px" aria-hidden="true"><rect width="420" height="220" fill="#faf5ff"/><g fill="none" stroke="#c084fc" stroke-width="5" stroke-linecap="round"><path d="M20 70 Q 80 20 140 70 T 260 70 T 400 70"/><path d="M20 110 Q 80 60 140 110 T 260 110 T 400 110" stroke="#a78bfa"/><path d="M20 150 Q 80 100 140 150 T 260 150 T 400 150" stroke="#e9d5ff"/></g><text x="210" y="195" text-anchor="middle" font-family="system-ui" font-size="13" fill="#6b21a8">purely decorative wave pattern</text></svg>`
+};
+
+/* ---------- visual widgets, one per topic ---------- */
+const V={};
+
+/* 1. Overview: clickable web page */
+V.overview=c=>{
+ const info={
+  multimedia:['🖼️ Multimedia','<code>&lt;img&gt; &lt;audio&gt; &lt;video&gt;</code>','Pictures, sound and video make information easier to understand, but each one needs a text alternative.','Ask yourself: how would someone who cannot see or hear this get the same information?'],
+  metadata:['🏷️ Metadata','<code>&lt;head&gt; &lt;title&gt; &lt;meta&gt;</code>','Data about the page. It is not displayed in the page body, but browsers and search engines read it.','Ask yourself: what text shows in the browser tab, and who writes it?'],
+  seo:['🔍 SEO','crawl → index → rank','Practices that help search engines find and understand your useful pages.','Ask yourself: can a search engine tell what this page is about from its title, headings and links?'],
+  a11y:['♿ Accessibility','semantic HTML · ARIA · alt · captions','Building pages that people with different abilities can perceive, understand and operate.','Ask yourself: can this page be used with only a keyboard? With a screen reader?']
+ };
+ c.innerHTML=`<p class="hint">Click (or Tab + Enter) the glowing parts of this web page to discover what each concept does.</p>
+ <div class="stage"><svg viewBox="0 0 720 320" role="group" aria-label="Clickable web page diagram">
+ <rect x="30" y="20" width="440" height="285" rx="14" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+ <rect x="30" y="20" width="440" height="40" rx="14" fill="#e2e8f0"/><rect x="30" y="44" width="440" height="16" fill="#e2e8f0"/>
+ <circle cx="50" cy="40" r="5" fill="#f87171"/><circle cx="68" cy="40" r="5" fill="#fbbf24"/><circle cx="86" cy="40" r="5" fill="#4ade80"/>
+ <g class="hot" data-k="metadata" tabindex="0" role="button" aria-label="Metadata: head, title and meta"><rect x="110" y="28" width="340" height="24" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="4 3"/><text x="280" y="45" text-anchor="middle" font-size="12" fill="#1e3a8a" font-family="ui-monospace,monospace">&lt;title&gt; + &lt;meta&gt; in &lt;head&gt;</text></g>
+ <g class="hot" data-k="multimedia" tabindex="0" role="button" aria-label="Multimedia: image, audio and video">
+  <rect x="50" y="78" width="170" height="110" rx="8" fill="#bfdbfe"/><circle cx="90" cy="108" r="13" fill="#fde047"/><polygon points="50,188 110,125 150,160 175,140 220,188" fill="#3b82f6"/>
+  <rect x="240" y="78" width="210" height="28" rx="14" fill="#fde68a"/><polygon points="256,86 256,98 266,92" fill="#92400e"/><g fill="#b45309"><rect x="285" y="88" width="4" height="8"/><rect x="293" y="84" width="4" height="16"/><rect x="301" y="89" width="4" height="6"/><rect x="309" y="85" width="4" height="14"/><rect x="317" y="88" width="4" height="8"/></g><text x="430" y="97" font-size="10" text-anchor="end" fill="#92400e">0:42</text>
+  <rect x="240" y="116" width="210" height="72" rx="8" fill="#1e293b"/><polygon points="332,138 332,166 358,152" fill="#fff"/></g>
+ <rect x="50" y="202" width="200" height="14" rx="4" fill="#0f172a"/><rect x="50" y="226" width="390" height="8" rx="4" fill="#cbd5e1"/><rect x="50" y="242" width="360" height="8" rx="4" fill="#cbd5e1"/><rect x="50" y="258" width="300" height="8" rx="4" fill="#cbd5e1"/><rect x="50" y="276" width="90" height="16" rx="8" fill="#2563eb"/>
+ <g class="hot" data-k="seo" tabindex="0" role="button" aria-label="SEO: search engines"><rect x="510" y="30" width="190" height="120" rx="12" fill="#fff" stroke="#e2e8f0"/><circle cx="570" cy="80" r="26" fill="none" stroke="#2563eb" stroke-width="9"/><line x1="590" y1="100" x2="620" y2="130" stroke="#2563eb" stroke-width="11" stroke-linecap="round"/><text x="650" y="75" font-size="13" fill="#1e3a8a" font-weight="700">Search</text><rect x="635" y="84" width="48" height="6" rx="3" fill="#cbd5e1"/><rect x="635" y="98" width="38" height="6" rx="3" fill="#cbd5e1"/></g>
+ <g class="hot" data-k="a11y" tabindex="0" role="button" aria-label="Accessibility: people using assistive technology"><rect x="510" y="170" width="190" height="135" rx="12" fill="#fff" stroke="#e2e8f0"/><circle cx="605" cy="205" r="14" fill="#2563eb"/><path d="M570 235 H640 M605 220 V262 M605 262 L585 292 M605 262 L625 292" stroke="#2563eb" stroke-width="8" stroke-linecap="round" fill="none"/><text x="605" y="300" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="700" display="none">Everyone</text></g>
+ </svg></div>
+ <div class="info" id="ovinfo" aria-live="polite"><b class="t">Start exploring →</b><p style="margin:4px 0 0">Pick any glowing area above.</p></div>`;
+ const show=k=>{const [t,tag,txt,q]=info[k];$$('.hot',c).forEach(g=>g.classList.toggle('sel',g.dataset.k===k));$('#ovinfo',c).innerHTML=`<b class="t" style="font-size:1.1rem">${t}</b> <span class="chip">${tag}</span><p style="margin:6px 0">${txt}</p><p class="small" style="margin:0">💡 ${q}</p>`};
+ $$('.hot',c).forEach(g=>{g.onclick=()=>show(g.dataset.k);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show(g.dataset.k)}}});
+};
+
+/* 2. Media types */
+V.media=c=>{
+ const wave='<g fill="#f59e0b">'+[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>`<rect class="wb" style="animation-delay:${i*.09}s" x="${40+i*30}" y="${40+((i*37)%30)}" width="16" height="${70-((i*37)%30)}" rx="6"/>`).join('')+'</g>';
+ const D={
+  text:{svg:'<rect width="420" height="170" fill="#f8fafc"/><rect x="40" y="26" width="160" height="18" rx="4" fill="#0f172a"/><g fill="#cbd5e1"><rect x="40" y="62" width="340" height="9" rx="4"/><rect x="40" y="82" width="320" height="9" rx="4"/><rect x="40" y="102" width="340" height="9" rx="4"/><rect x="40" y="122" width="200" height="9" rx="4"/></g>',tag:'<h1>Title</h1>\n<p>Paragraph text…</p>',acc:['Logical headings','Readable contrast'],q:'Text is the base layer: everything else should still make sense in text form.'},
+  image:{svg:'<rect width="420" height="170" fill="#bfdbfe"/><circle cx="90" cy="50" r="22" fill="#fde047"/><polygon points="0,170 120,70 200,130 270,80 420,170" fill="#3b82f6"/><polygon points="270,80 300,110 250,110" fill="#fff"/>',tag:'<img src="mountain.jpg"\n     alt="Snow-capped mountain\n          at sunrise"\n     width="320">',acc:['alt text','width/height set','small file size'],q:'The alt attribute is the “spoken version” of the picture.'},
+  audio:{svg:'<rect width="420" height="170" fill="#fffbeb"/>'+wave,tag:'<audio controls>\n  <source src="lecture.mp3"\n          type="audio/mpeg">\n</audio>',acc:['controls attribute','transcript nearby'],q:'Sound alone excludes people who cannot hear it, so add a transcript.'},
+  video:{svg:'<rect width="420" height="170" fill="#0f172a"/><rect x="0" y="150" width="420" height="20" fill="#1e293b"/><rect x="0" y="150" width="140" height="20" fill="#2563eb"/><polygon points="185,55 185,115 240,85" fill="#fff"/><rect x="60" y="124" width="300" height="18" rx="4" fill="#000a"/><text x="210" y="137" text-anchor="middle" fill="#fff" font-size="11" font-family="system-ui">Welcome to the web development lab.</text>',tag:'<video controls width="480">\n  <source src="lecture.mp4"\n          type="video/mp4">\n  <track kind="captions"\n         src="captions.vtt"\n         srclang="en" label="English">\n</video>',acc:['controls','captions (.vtt)','transcript / audio description'],q:'Video mixes picture and sound, so it needs both captions and, sometimes, audio description.'}
+ };
+ c.innerHTML=`<p class="hint">Choose a media type to see what it looks like, the HTML element that embeds it, and how to make it accessible.</p>
+ <div class="tabs" role="tablist">${Object.keys(D).map((k,i)=>`<button class="tab" role="tab" data-k="${k}" aria-selected="${i===0}">${{text:'📝 Text',image:'🖼️ Image',audio:'🎧 Audio',video:'🎬 Video'}[k]}</button>`).join('')}</div>
+ <div class="two"><div class="stage" id="mstage"></div><div id="minfo"></div></div>`;
+ const show=k=>{const d=D[k];$('#mstage',c).innerHTML=`<svg viewBox="0 0 420 170" style="width:100%;border-radius:10px" aria-hidden="true">${d.svg}</svg>`;
+  $('#minfo',c).innerHTML=`<b>HTML element</b><pre>${esc(d.tag)}</pre><p style="margin:10px 0 4px"><b>Make it accessible</b></p>${d.acc.map(a=>`<span class="chip g">✓ ${a}</span>`).join('')}<p class="small" style="margin-top:10px">💡 ${d.q}</p>`};
+ selectTabs(c,'.tab',show);show('text');
+};
+
+/* 3. Images & alt */
+V.alt=c=>{
+ const S=[
+  {n:'Informative',svg:art.solar,alt:'Diagram showing the Sun with Mercury, Venus, Earth and Mars orbiting it',ok:true,say:'graphic, Diagram showing the Sun with Mercury, Venus, Earth and Mars orbiting it',why:'Describes the information the image carries.'},
+  {n:'Functional',svg:art.icon,alt:'Search courses',ok:true,say:'link, Search courses',why:'Describes the action, not the picture of a magnifier.'},
+  {n:'Decorative',svg:art.swirl,alt:'',ok:true,say:'(nothing is announced — the image is skipped)',why:'alt="" lets screen readers ignore pure decoration.'},
+  {n:'Bad: filename',svg:art.solar,alt:'IMG_2043.jpg',ok:false,say:'graphic, I M G underscore 2 0 4 3 dot j p g',why:'A filename tells the listener nothing.'},
+  {n:'Bad: keyword stuffing',svg:art.solar,alt:'solar system planets space sun best planets cheap planets',ok:false,say:'graphic, solar system planets space sun best planets cheap planets',why:'Alt text is for people, not for gaming search engines.'}
+ ];
+ c.innerHTML=`<p class="hint">Pick a scenario. See the picture, what a screen reader says, and what appears if the image fails to load.</p>
+ <div class="tabs" role="tablist">${S.map((s,i)=>`<button class="tab" role="tab" data-k="${i}" aria-selected="${i===0}">${s.n}</button>`).join('')}</div>
+ <label class="sw"><input type="checkbox" id="brk"> 🚫 Pretend the image failed to load</label>
+ <div class="two"><div class="stage" id="astage"></div><div><pre id="acode"></pre><div class="reader"><small>🔊 SCREEN READER SAYS</small><span id="asay"></span></div><button class="action secondary" id="speak" style="margin-top:8px">🔊 Hear it</button><div class="verdict" id="averd"></div></div></div>`;
+ let cur=0;
+ const draw=()=>{const s=S[cur],broke=$('#brk',c).checked;
+  $('#astage',c).innerHTML=broke?`<div style="border:2px dashed #94a3b8;border-radius:10px;padding:30px 14px;color:#334155;background:#f1f5f9">🖼️✕ <i>${s.alt?esc(s.alt):'(nothing shown — fine for decoration)'}</i></div><p class="small">This is what users see when the file is missing.</p>`:s.svg;
+  $('#acode',c).textContent=`<img src="picture.png"\n     alt="${s.alt}">`;$('#acode',c).className=s.ok?'hl-ok':'hl-bad';
+  $('#asay',c).textContent=s.say;$('#averd',c).innerHTML=`<span class="${s.ok?'ok':'bad'}">${s.ok?'✅ Good':'❌ Poor'}</span> — ${s.why}`};
+ selectTabs(c,'.tab',k=>{cur=+k;draw()});$('#brk',c).onchange=draw;
+ $('#speak',c).onclick=()=>{if('speechSynthesis' in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(S[cur].say))}else alert('Speech is not supported in this browser.')};
+ onCleanup(()=>{try{speechSynthesis.cancel()}catch(e){}});draw();
+};
+
+/* 4. Audio (real, generated tone) */
+function makeWav(){const sr=8000,notes=[262,294,330,392,330,294,262],dur=.45,n=Math.floor(sr*dur*notes.length),buf=new ArrayBuffer(44+n*2),dv=new DataView(buf);
+ const w=(o,s)=>{for(let i=0;i<s.length;i++)dv.setUint8(o+i,s.charCodeAt(i))};
+ w(0,'RIFF');dv.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,sr,true);dv.setUint32(28,sr*2,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);w(36,'data');dv.setUint32(40,n*2,true);
+ const per=Math.floor(sr*dur);
+ for(let i=0;i<n;i++){const ni=Math.floor(i/per),t=(i%per)/sr,env=Math.min(1,t*60)*Math.max(0,1-t/dur*.85);dv.setInt16(44+i*2,Math.sin(2*Math.PI*notes[ni]*t)*env*12000,true)}
+ return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}))}
+V.audio=c=>{
+ const url=makeWav();onCleanup(()=>URL.revokeObjectURL(url));
+ c.innerHTML=`<p class="hint">This is a real &lt;audio&gt; element playing a short tune made by the page. Switch attributes on and off and watch the code and behaviour change.</p>
+ <div><label class="sw"><input type="checkbox" id="a-controls" checked> controls</label><label class="sw"><input type="checkbox" id="a-loop"> loop</label><label class="sw"><input type="checkbox" id="a-muted"> muted</label><label class="sw"><input type="checkbox" id="a-auto"> autoplay</label></div>
+ <div class="two"><div class="stage" style="min-height:130px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px"><audio id="aud" controls src="${url}"></audio><div id="anone" style="display:none;color:#b91c1c;font-weight:700">😶 No controls → nothing visible. Users cannot play it!</div></div><div><pre id="acode2"></pre><div class="note warn" id="aauto" style="display:none"><b>Autoplay:</b> most browsers block it, and unexpected sound is annoying and hard for screen-reader users. This demo will not actually autoplay.</div></div></div>
+ <details style="margin-top:10px"><summary><b>Transcript</b> (for people who cannot hear)</summary><p>♪ A short seven-note melody: C, D, E, G, E, D, C. ♪</p></details>`;
+ const a=$('#aud',c),upd=()=>{const f=id=>$(id,c).checked;a.controls=f('#a-controls');a.loop=f('#a-loop');a.muted=f('#a-muted');
+  $('#anone',c).style.display=f('#a-controls')?'none':'block';$('#aauto',c).style.display=f('#a-auto')?'block':'none';
+  $('#acode2',c).textContent=`<audio${f('#a-controls')?' controls':''}${f('#a-loop')?' loop':''}${f('#a-muted')?' muted':''}${f('#a-auto')?' autoplay':''}>\n  <source src="lecture.mp3" type="audio/mpeg">\n  Your browser does not support audio.\n</audio>`};
+ $$('input',c).forEach(i=>i.onchange=upd);upd();onCleanup(()=>a.pause());
+};
+
+/* 5. Video + captions */
+V.video=c=>{
+ const cues=[[0,3,'Welcome to the web development lab.'],[3,6,'[upbeat music plays]'],[6,10,'Today we add captions to our video.'],[10,14,'Captions help everyone follow along.']];
+ const ts=s=>`00:00:${String(Math.floor(s)).padStart(2,'0')}.000`;
+ c.innerHTML=`<p class="hint">Press play. Then turn the sound OFF and compare what a viewer gets with and without captions.</p>
+ <div class="two"><div>
+  <div class="vidbox"><svg viewBox="0 0 420 220" aria-hidden="true"><rect width="420" height="220" fill="#7dd3fc"/><circle id="sun" cx="40" cy="60" r="22" fill="#fde047"/><rect y="150" width="420" height="70" fill="#4ade80"/><polygon points="250,150 300,70 350,150" fill="#16a34a"/><rect id="vbird" x="0" y="0" width="0" height="0"/></svg><div class="cap"><span id="vcap" style="display:none"></span></div></div>
+  <div class="ctrl"><button id="vplay" aria-label="Play">▶</button><input type="range" id="vseek" min="0" max="14" step="0.1" value="0" aria-label="Seek"><span id="vtime">0:00 / 0:14</span><button id="vcc" aria-pressed="false">CC</button><button id="vmute" aria-pressed="false">🔊</button></div>
+  <div class="reader" style="margin-top:10px"><small>VIEWER EXPERIENCE</small><span id="vmsg"></span></div>
+ </div><div><b>captions.vtt</b> <span class="small">(WebVTT file)</span><pre id="vvtt" style="margin-top:6px"></pre>
+ <p style="margin:10px 0 4px"><b>Who benefits?</b></p><span class="chip g">Deaf / hard of hearing</span><span class="chip g">Sound off in a library</span><span class="chip g">Noisy train</span><span class="chip g">Learning a language</span></div></div>`;
+ let t=0,playing=false,cc=false,mute=false;
+ const draw=()=>{const cue=cues.find(q=>t>=q[0]&&t<q[1]);const cap=$('#vcap',c);
+  cap.style.display=cc&&cue?'inline':'none';cap.textContent=cue?cue[2]:'';
+  $('#sun',c).setAttribute('cx',40+t/14*340);$('#vseek',c).value=t;$('#vtime',c).textContent=`0:${String(Math.floor(t)).padStart(2,'0')} / 0:14`;
+  $('#vmsg',c).textContent=mute&&!cc?'🔇 Sound is off and captions are off → this viewer misses the lesson.':mute&&cc?'✅ Sound is off, but captions deliver the message'+(cue?`: “${cue[2]}”`:'.'):cc?'Hears the audio and can also read captions.':'Can hear the audio. Anyone who cannot hear gets nothing.';
+  $('#vvtt',c).innerHTML=esc('WEBVTT\n\n')+cues.map(q=>{const cur=cue===q;return `<span style="${cur?'background:#1d4ed8;display:block;border-radius:4px':'display:block'}">${esc(`${ts(q[0])} --> ${ts(q[1])}\n${q[2]}`)}</span>`}).join('\n')};
+ const id=setInterval(()=>{if(playing){t+=.1;if(t>=14){t=0;playing=false;$('#vplay',c).textContent='▶'}draw()}},100);onCleanup(()=>clearInterval(id));
+ $('#vplay',c).onclick=()=>{playing=!playing;$('#vplay',c).textContent=playing?'⏸':'▶'};
+ $('#vseek',c).oninput=e=>{t=+e.target.value;draw()};
+ $('#vcc',c).onclick=e=>{cc=!cc;e.target.classList.toggle('on',cc);e.target.setAttribute('aria-pressed',cc);draw()};
+ $('#vmute',c).onclick=e=>{mute=!mute;e.target.textContent=mute?'🔇':'🔊';e.target.classList.toggle('on',mute);e.target.setAttribute('aria-pressed',mute);draw()};
+ draw();
+};
+
+/* 6. Metadata live editor */
+V.meta=c=>{
+ c.innerHTML=`<p class="hint">Edit the title and description. Watch how the browser tab, search result and &lt;head&gt; code change instantly.</p>
+ <div class="two"><div>
+  <label><b>&lt;title&gt;</b></label><input class="fld" id="m-title" value="B.Tech Web Development Notes"><div class="meter"><span id="m-tm"></span></div><div class="small" id="m-tl"></div>
+  <label style="display:block;margin-top:12px"><b>meta description</b></label><textarea class="plain" id="m-desc" rows="3" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:8px;font:inherit">Learn HTML multimedia, metadata, SEO and accessibility.</textarea><div class="meter"><span id="m-dm"></span></div><div class="small" id="m-dl"></div>
+  <label style="display:block;margin-top:12px"><b>Visible &lt;h1&gt;</b> (different from title!)</label><input class="fld" id="m-h1" value="Web Development Notes">
+ </div><div>
+  <b>1 · Browser tab</b><div class="tabmock"><div class="t"><span>🌐</span><span id="p-tab"></span></div></div><div class="urlbar">https://college.example/web-notes</div>
+  <b style="display:block;margin-top:14px">2 · Search result</b><div class="serp"><div class="u">college.example › web-notes</div><div class="tt" id="p-ser"></div><div class="ds" id="p-ds"></div></div>
+  <b style="display:block;margin-top:14px">3 · Page content</b><div class="serp"><div style="font-size:1.5rem;font-weight:700" id="p-h1"></div><span class="small">The &lt;h1&gt; appears on the page itself, not on the tab.</span></div>
+ </div></div><pre style="margin-top:14px" id="m-code"></pre>`;
+ const f=(id)=>$(id,c).value,m=(el,len,max)=>{const e=$(el,c);e.style.width=Math.min(100,len/max*100)+'%';e.style.background=len>max?'#dc2626':len>max*.5?'#16a34a':'#d97706'};
+ const upd=()=>{const t=f('#m-title'),d=f('#m-desc'),h=f('#m-h1');
+  $('#p-tab',c).textContent=t||'Untitled';$('#p-ser',c).textContent=t.length>60?t.slice(0,57)+'…':(t||'Untitled');$('#p-ds',c).textContent=d.length>160?d.slice(0,157)+'…':(d||'(no description — search engine chooses text from the page)');$('#p-h1',c).textContent=h;
+  $('#m-tl',c).textContent=`${t.length} characters — roughly 50–60 displays fully`;$('#m-dl',c).textContent=`${d.length} characters — roughly 120–160 displays fully`;m('#m-tm',t.length,60);m('#m-dm',d.length,160);
+  $('#m-code',c).textContent=`<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>${t}</title>\n  <meta name="description" content="${d}">\n</head>\n<body>\n  <h1>${h}</h1>\n</body>`};
+ $$('input,textarea',c).forEach(i=>i.oninput=upd);upd();
+};
+
+/* 7. Viewport + charset */
+V.viewport=c=>{
+ const page=`<div class="hd">🎓 College Seminar</div><div class="row"><div class="col"><b>Schedule</b>Talks begin at 10:00 AM.<div class="btn">Register</div></div><div class="col"><b>Venue</b>Main auditorium, Block C.</div></div>`;
+ c.innerHTML=`<p class="hint">Same page, three phones. Only the third one is truly mobile-friendly.</p>
+ <div class="phones">
+  <div class="phonebox"><div class="phone"><div class="pgw" style="width:980px;transform:scale(.1735)">${page}</div></div><div class="cap"><span class="chip r">✗ No viewport meta</span><br><span class="small">Phone pretends to be a 980px desktop and zooms out. Text is tiny.</span></div></div>
+  <div class="phonebox"><div class="phone"><div class="pgw fixed600">${page}</div></div><div class="cap"><span class="chip a">⚠ Viewport, fixed layout</span><br><span class="small">Width is correct, but a 600px layout still overflows. Viewport alone ≠ responsive.</span></div></div>
+  <div class="phonebox"><div class="phone"><div class="pgw stack" style="width:170px">${page}</div></div><div class="cap"><span class="chip g">✓ Viewport + responsive CSS</span><br><span class="small">Layout adapts: columns stack.</span></div></div>
+ </div>
+ <hr style="margin:22px 0;border:0;border-top:1px solid #e2e8f0">
+ <h3 style="margin-top:0">Character encoding: try it</h3>
+ <p class="hint">Type any text. See what happens when the browser reads UTF-8 bytes with the wrong encoding.</p>
+ <input class="fld" id="cs-in" value="Café ₹ नमस्ते 😀">
+ <div class="grid" style="margin-top:10px"><div class="mini"><b class="ok">With &lt;meta charset="UTF-8"&gt;</b><div id="cs-ok" style="font-size:1.3rem;margin-top:6px"></div></div><div class="mini"><b class="bad">Wrong / missing encoding</b><div id="cs-bad" style="font-size:1.3rem;margin-top:6px;word-break:break-all"></div></div></div>`;
+ const u=()=>{const t=$('#cs-in',c).value;$('#cs-ok',c).textContent=t;$('#cs-bad',c).textContent=[...new TextEncoder().encode(t)].map(b=>String.fromCharCode(b)).join('')};
+ $('#cs-in',c).oninput=u;u();
+};
+
+/* 8. SEO pipeline */
+V.seo=c=>{
+ const N=[['Home',200,40,0],['Courses',90,120,1],['Blog',310,120,1],['HTML Tutorial',50,210,2],['CSS Guide',150,210,2],['Alt Text Post',310,210,2],['Orphan page',420,150,9]];
+ const E=[[0,1],[0,2],[1,3],[1,4],[2,5]];
+ c.innerHTML=`<p class="hint">Follow a page's journey through a search engine. Click each stage.</p>
+ <div class="flow" role="tablist"><button class="st on" data-k="0"><b>1 · Crawl</b><span class="small">discover pages</span></button><button class="st" data-k="1"><b>2 · Index</b><span class="small">understand &amp; store</span></button><button class="st" data-k="2"><b>3 · Rank &amp; serve</b><span class="small">order the results</span></button></div><div id="seov"></div>`;
+ const views=[()=>`<div class="two"><div class="stage"><svg viewBox="0 0 520 260" id="g" style="max-width:520px">${E.map(([a,b])=>`<line x1="${N[a][1]}" y1="${N[a][2]+14}" x2="${N[b][1]}" y2="${N[b][2]+14}" stroke="#94a3b8" stroke-width="2"/>`).join('')}${N.map((n,i)=>`<g id="n${i}"><rect x="${n[1]-45}" y="${n[2]-4}" width="90" height="34" rx="9" fill="#e2e8f0" stroke="#94a3b8"/><text x="${n[1]}" y="${n[2]+18}" text-anchor="middle" font-size="11" font-family="system-ui">${n[0]}</text></g>`).join('')}<text id="bot" x="200" y="12" text-anchor="middle" font-size="18" opacity="0">🕷️</text></svg></div><div><button class="action" id="go">▶ Send the crawler</button><p class="small" id="cmsg" style="margin-top:10px">The crawler starts at a known page and follows links.</p><div class="note">Pages with <b>no links pointing to them</b> (orphans) may never be discovered. Good internal linking helps crawling.</div></div></div>`,
+  ()=>`<table><tr><th>Keyword found on page</th><th>Pages stored in the index</th></tr><tr><td>html</td><td>HTML Tutorial, Courses</td></tr><tr><td>alt text</td><td>Alt Text Post, HTML Tutorial</td></tr><tr><td>css</td><td>CSS Guide</td></tr></table><div class="note">Like the index at the back of a book: the engine analyses a page, may store it, and later looks words up quickly. <b>Being crawled does not guarantee being indexed</b>; pages can be blocked (e.g. <code>noindex</code>) or judged low-value.</div>`,
+  ()=>`<div class="tabs" id="qs">${['html tutorial','alt text'].map((q,i)=>`<button class="tab" data-k="${q}" aria-selected="${i===0}">🔎 ${q}</button>`).join('')}</div><div id="res"></div><div class="note warn">No one can guarantee position #1. Ranking depends on many signals such as relevance, helpfulness, and page experience.</div>`];
+ const R={'html tutorial':[['Beginner HTML Course | Student Learning Portal',92],['HTML Basics Tutorial for Beginners',85],['Page',18]],'alt text':[['Writing Useful Alt Text | Student Learning Portal',90],['Beginner HTML Course | Student Learning Portal',55],['Page',10]]};
+ let timer;onCleanup(()=>clearInterval(timer));
+ const show=k=>{clearInterval(timer);$$('.st',c).forEach(s=>s.classList.toggle('on',s.dataset.k==k));$('#seov',c).innerHTML=views[k]();
+  if(k==0)$('#go',c).onclick=()=>{let i=0;const order=[0,1,2,3,4,5];$$('[id^=n]',c).forEach(g=>g.firstChild.setAttribute('fill','#e2e8f0'));$('#bot',c).setAttribute('opacity',1);clearInterval(timer);
+   timer=setInterval(()=>{if(i>=order.length){clearInterval(timer);$('#cmsg',c).textContent='Crawl finished. “Orphan page” was never found: nothing links to it.';return}const n=N[order[i]];$('#n'+order[i],c).firstChild.setAttribute('fill','#86efac');$('#bot',c).setAttribute('x',n[1]);$('#bot',c).setAttribute('y',n[2]+8);$('#cmsg',c).textContent='Visited: '+n[0];i++},650)};
+  if(k==2){const r=q=>{$('#res',c).innerHTML=R[q].map((x,i)=>`<div class="serp" style="margin:8px 0"><b>#${i+1}</b> <span class="tt" style="font-size:1rem">${esc(x[0])}</span><div class="meter"><span style="width:${x[1]}%"></span></div><span class="small">relevance score (illustrative): ${x[1]}</span></div>`).join('')};
+   $$('.tab',c).forEach(b=>b.onclick=()=>{$$('.tab',c).forEach(x=>x.setAttribute('aria-selected',x===b));r(b.dataset.k)});r('html tutorial')}};
+ $$('.st',c).forEach(s=>s.onclick=()=>show(s.dataset.k));show(0);
+};
+
+/* 9. On-page SEO scorer */
+V.onpage=c=>{
+ const items=[
+  ['Specific title','Page','Beginner HTML Course | Student Learning Portal'],
+  ['Useful description','(none — engine guesses a snippet)','Explore beginner HTML lessons with examples and practice tasks.'],
+  ['Readable URL','college.example/p?id=4821&x=7','college.example › courses › html-basics'],
+  ['Clear h1 heading','Welcome!','Beginner HTML Course'],
+  ['Descriptive link text','click here','Try HTML practice tasks'],
+  ['Meaningful alt text','',"Diagram of an HTML page's structure"]
+ ];
+ c.innerHTML=`<p class="hint">Switch each best practice ON and watch the search result and page improve. Your SEO score rises, but remember it never guarantees rank #1.</p>
+ <div class="two"><div>${items.map((it,i)=>`<label class="sw" style="display:flex"><input type="checkbox" data-i="${i}"> <span>${it[0]}</span></label>`).join('')}<div class="meter" style="margin-top:14px"><span id="sc-m"></span></div><b id="sc-t"></b></div>
+ <div><div class="serp"><div class="u" id="o-url"></div><div class="tt" id="o-title"></div><div class="ds" id="o-desc"></div></div>
+ <div class="serp" style="margin-top:10px"><div id="o-h1" style="font-size:1.4rem;font-weight:700"></div><p>Learn how HTML structures headings, paragraphs, images and links.</p><div id="o-img" style="margin:6px 0"></div><span id="o-link" style="color:#1a0dab;text-decoration:underline"></span></div></div></div>
+ <h3>Myth or reality? (click a card)</h3><div class="mythgrid">${[['“Repeating keywords improves ranking.”','Keyword stuffing is a poor practice.'],['“A meta description guarantees ranking.”','It summarises the page and may be used for snippets.'],['“SEO results are instant.”','Discovery and visibility changes can take time.']].map(m=>`<div class="flip" tabindex="0" role="button" aria-label="Flip card"><div class="in"><div class="fr"><b>❌ Myth</b>${m[0]}</div><div class="bk"><b>✅ Reality</b>${m[1]}</div></div></div>`).join('')}</div>`;
+ const upd=()=>{const on=$$('input[type=checkbox]',c).map(i=>i.checked),n=on.filter(Boolean).length,get=i=>items[i][on[i]?2:1];
+  $('#o-title',c).textContent=get(0);$('#o-desc',c).textContent=on[1]?items[1][2]:'No description set — a random piece of page text is shown instead…';$('#o-url',c).textContent=get(2);$('#o-h1',c).textContent=get(3);$('#o-link',c).textContent=get(4);
+  $('#o-img',c).innerHTML=on[5]?`<div style="display:flex;gap:8px;align-items:center"><svg width="80" height="46" viewBox="0 0 80 46" aria-hidden="true"><rect width="80" height="46" rx="6" fill="#dbeafe"/><rect x="10" y="8" width="60" height="6" fill="#2563eb"/><rect x="10" y="20" width="40" height="5" fill="#93c5fd"/><rect x="10" y="30" width="50" height="5" fill="#93c5fd"/></svg><span class="small">alt: “${esc(items[5][2])}”</span></div>`:`<div style="border:2px dashed #ef4444;padding:6px;border-radius:6px;color:#b91c1c;font-size:.85rem">⚠ image with missing alt text</div>`;
+  const m=$('#sc-m',c);m.style.width=n/6*100+'%';m.style.background=n<3?'#dc2626':n<6?'#d97706':'#16a34a';$('#sc-t',c).textContent=`On-page score: ${n} / 6`+(n==6?' 🎉':'')};
+ $$('input[type=checkbox]',c).forEach(i=>i.onchange=upd);upd();
+ $$('.flip',c).forEach(f=>{const t=()=>f.classList.toggle('f');f.onclick=t;f.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();t()}}});
+};
+
+/* 10. Accessibility simulator + contrast */
+V.a11y=c=>{
+ const modes={normal:['👀 Typical vision','none'],blur:['🌫️ Low vision (blur)','blur(2.4px)'],cb:['🎨 Colour blindness (red-green)','url(#protan)'],gray:['⚫ Greyscale','grayscale(1)'],low:['🌓 Low contrast / glare','contrast(.4) brightness(1.15)'],sr:['🔊 Screen reader (no screen)','']};
+ c.innerHTML=`<p class="hint">Try the same page through different eyes. Which parts become hard to use?</p>
+ <div class="tabs">${Object.entries(modes).map(([k,v],i)=>`<button class="tab" data-k="${k}" aria-selected="${i===0}">${v[0]}</button>`).join('')}</div>
+ <div class="simwrap"><div class="simpage" id="sim"><div class="card"><div>${art.solar.replace('max-width:420px','max-width:140px')}</div><div><h3 style="margin:0 0 6px">College Seminar</h3><p style="color:#9ca3af;margin:0 0 8px">Talks begin at 10:00 AM in the main auditorium. (light-grey text)</p>
+ <div>Seat A <span class="dot" style="background:#16a34a"></span> Seat B <span class="dot" style="background:#dc2626"></span> <span class="small">← only colour tells them apart!</span></div>
+ <button class="action" style="margin-top:8px">Register</button></div></div></div><div id="srv" style="display:none;padding:16px"></div></div>
+ <div class="info" id="simmsg"></div>
+ <hr style="margin:22px 0;border:0;border-top:1px solid #e2e8f0"><h3 style="margin-top:0">Contrast checker (WCAG)</h3>
+ <div class="two"><div><label>Text colour <input type="color" id="cf" value="#9ca3af"></label> &nbsp; <label>Background <input type="color" id="cb" value="#ffffff"></label><div id="cprev" style="margin-top:10px;padding:16px;border-radius:10px;border:1px solid #e2e8f0;font-size:1.2rem">The quick brown fox jumps over the lazy dog</div></div><div><div style="font-size:2rem;font-weight:800" id="cr"></div><div id="cv"></div><p class="small">AA needs 4.5:1 for normal text and 3:1 for large text. AAA needs 7:1.</p></div></div>`;
+ const msg={normal:'Everything looks fine, but that is only one way of seeing.',blur:'Small, light text is hard to read. Use relative font sizes and strong contrast.',cb:'Seats A and B look almost the same! Never rely on colour alone: add text or icons like “Available”.',gray:'Colour-only information disappears. Test your design in greyscale.',low:'The pale grey paragraph nearly vanishes. Check contrast ratios.',sr:'A screen reader cannot see the image, colours or layout. It reads the code structure and alt text. Missing alt and labels become obvious.'};
+ const set=k=>{$('#sim',c).style.display=k=='sr'?'none':'block';$('#srv',c).style.display=k=='sr'?'block':'none';$('#sim',c).style.filter=modes[k][1];$('#simmsg',c).innerHTML='💡 '+msg[k];
+  if(k=='sr')$('#srv',c).innerHTML='<div class="reader"><small>🔊 SCREEN READER OUTPUT</small>heading level 3, College Seminar<br>graphic, (no alt text provided!) → “unlabelled graphic”<br>text, Talks begin at 10:00 AM in the main auditorium.<br>text, Seat A · Seat B<br>button, Register</div>'};
+ selectTabs(c,'.tab',set);set('normal');
+ const lum=h=>{const v=[1,3,5].map(i=>parseInt(h.substr(i,2),16)/255).map(x=>x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4));return .2126*v[0]+.7152*v[1]+.0722*v[2]};
+ const cc=()=>{const f=$('#cf',c).value,b=$('#cb',c).value,L1=lum(f),L2=lum(b),r=(Math.max(L1,L2)+.05)/(Math.min(L1,L2)+.05);$('#cprev',c).style.cssText+=`;color:${f};background:${b}`;$('#cr',c).textContent=r.toFixed(2)+' : 1';
+  const p=(ok,l)=>`<span class="chip ${ok?'g':'r'}">${ok?'✓':'✗'} ${l}</span>`;$('#cv',c).innerHTML=p(r>=4.5,'AA normal text')+p(r>=3,'AA large text')+p(r>=7,'AAA normal text')};
+ $('#cf',c).oninput=$('#cb',c).oninput=cc;cc();
+};
+
+/* 11. ARIA & keyboard */
+V.aria=c=>{
+ c.innerHTML=`<p class="hint">Three mini-labs. Use your keyboard: press <kbd>Tab</kbd>, <kbd>Enter</kbd> and <kbd>Space</kbd>.</p>
+ <h3 style="margin-top:0">Lab 1 · div vs button</h3>
+ <div class="grid"><div class="mini"><b>&lt;div onclick&gt;</b><br><div id="l1d" style="display:inline-block;background:#e2e8f0;padding:8px 14px;border-radius:8px;cursor:pointer;margin:8px 0">Submit</div><div class="small">Looks like a button but…</div></div><div class="mini"><b>&lt;button&gt;</b><br><button id="l1b" class="action" style="margin:8px 0">Submit</button><div class="small">Free keyboard + role support.</div></div></div>
+ <div class="reader"><small>KEYBOARD FOCUS (press Tab from the start of this lab)</small><span id="l1s">Click here first, then press Tab.</span></div>
+ <hr style="margin:18px 0;border:0;border-top:1px solid #e2e8f0"><h3>Lab 2 · aria-expanded</h3>
+ <button id="l2b" class="action" aria-expanded="false" aria-controls="l2p">Show course details</button><div id="l2p" hidden class="mini" style="margin-top:8px">Topics: HTML, multimedia and accessibility.</div>
+ <div class="reader"><small>🔊 SCREEN READER SAYS</small><span id="l2s"></span></div>
+ <hr style="margin:18px 0;border:0;border-top:1px solid #e2e8f0"><h3>Lab 3 · aria-label for icon-only buttons</h3>
+ <label class="sw"><input type="checkbox" id="l3c"> Add <code>aria-label="Close dialog"</code></label><br><button class="action light" style="font-size:1.2rem;margin:6px 0" id="l3b">✕</button>
+ <div class="reader"><small>🔊 SCREEN READER SAYS</small><span id="l3s"></span></div>`;
+ const fs=$('#l1s',c),d=$('#l1d',c),b=$('#l1b',c);
+ d.addEventListener('click',()=>fs.textContent='Mouse click works on the div… but a keyboard user can never reach it.');
+ c.addEventListener('focusin',e=>{if(e.target===b)fs.textContent='✅ Focus landed on: button “Submit”. Enter/Space activate it.'});
+ $('#l2b',c).onclick=e=>{const x=e.target.getAttribute('aria-expanded')==='true';e.target.setAttribute('aria-expanded',String(!x));$('#l2p',c).hidden=x;e.target.textContent=x?'Show course details':'Hide course details';u2()};
+ const u2=()=>{const x=$('#l2b',c).getAttribute('aria-expanded')==='true';$('#l2s',c).textContent=`“${$('#l2b',c).textContent}, button, ${x?'expanded':'collapsed'}”`};u2();
+ const u3=()=>{const a=$('#l3c',c).checked;a?$('#l3b',c).setAttribute('aria-label','Close dialog'):$('#l3b',c).removeAttribute('aria-label');$('#l3s',c).textContent=a?'“Close dialog, button”':'“button” … (what does it do? ✕ is often read as “multiplication x” or nothing)'};$('#l3c',c).onchange=u3;u3();
+};
+
+/* 12. Semantic HTML */
+V.semantic=c=>{
+ const R={header:['banner','Top of the page: logo, site title.'],nav:['navigation','A block of main links.'],main:['main','The unique content of the page. Use only one.'],section:['region','A themed group of content, usually with a heading.'],footer:['contentinfo','Closing info: copyright, contacts.']};
+ c.innerHTML=`<p class="hint">Click a block of the page. Then flip to “div soup” to see what a screen-reader user loses.</p>
+ <label class="sw"><input type="checkbox" id="soup"> 🍲 Show as div soup (no semantics)</label>
+ <div class="two"><div class="wire" id="wf">
+  <div class="reg" data-t="header"><span class="tagname"></span>Header · College Seminar
+   <div class="reg" data-t="nav"><span class="tagname"></span>Schedule · Venue</div></div>
+  <div class="reg" data-t="main"><span class="tagname"></span>Main content
+   <div class="reg" data-t="section"><span class="tagname"></span>Schedule section</div><div class="reg" data-t="section"><span class="tagname"></span>Venue section</div></div>
+  <div class="reg" data-t="footer"><span class="tagname"></span>Footer</div></div>
+ <div><div class="reader"><small>🔊 LANDMARKS A SCREEN READER CAN JUMP TO</small><span id="lm"></span></div><div class="info" id="sinfo">Select a region.</div></div></div>
+ <hr style="margin:20px 0;border:0;border-top:1px solid #e2e8f0"><h3 style="margin-top:0">Labels & keyboard focus</h3>
+ <div class="grid focusdemo"><div class="mini"><b class="ok">✓ &lt;label for="a"&gt;</b><br><label for="fa">Student name:</label> <input id="fa" placeholder="click the label!"><p class="small">Clicking the label focuses the input; screen readers announce its name.</p></div>
+ <div class="mini"><b class="bad">✗ Plain text, no label</b><br><span>Student name:</span> <input placeholder="click the text!"><p class="small">Nothing happens, and a screen reader just says “edit text”.</p></div></div>`;
+ let soup=false,sel=null;
+ const draw=()=>{$$('.reg',c).forEach(r=>{r.querySelector('.tagname').textContent=soup?'<div>':'<'+r.dataset.t+'>'});
+  const lm=soup?'none found — the user must read the whole page line by line':Object.entries({banner:1,navigation:1,main:1,'region ×2':1,contentinfo:1}).map(e=>e[0]).join(' · ');$('#lm',c).textContent=lm;
+  if(sel){const t=sel.dataset.t;$('#sinfo',c).innerHTML=soup?`<b>&lt;div&gt;</b><p style="margin:4px 0">Tells the browser and screen reader <b>nothing</b> about purpose.</p>`:`<b>&lt;${t}&gt;</b> <span class="chip">role: ${R[t][0]}</span><p style="margin:4px 0">${R[t][1]}</p>`}};
+ $$('.reg',c).forEach(r=>r.onclick=e=>{e.stopPropagation();$$('.reg',c).forEach(x=>x.classList.remove('sel'));r.classList.add('sel');sel=r;draw()});
+ $('#soup',c).onchange=e=>{soup=e.target.checked;draw()};draw();
+};
+
+/* 13. Combined example */
+V.combined=c=>{
+ const L=[['Descriptive title + meta description','tab'],['Informative alt text on the poster','poster'],['Video has controls and a transcript','video'],['Semantic header / main / footer','frame'],['Descriptive link text','link'],['Focus is visible when tabbing','link']];
+ c.innerHTML=`<p class="hint">Hover or focus a checklist item to see where it applies on the page. Tick items as you verify them.</p>
+ <div class="two"><div class="wire" id="cw"><div class="reg" data-r="tab" style="background:#e2e8f0">🌐 Tab: <b>College Seminar Learning Page</b></div><div data-r="frame" class="reg" style="cursor:default">
+  <div class="reg" style="cursor:default"><h3 style="margin:0">College Seminar</h3><span class="small">Explore today's learning resources.</span></div>
+  <div class="reg" data-r="poster" style="cursor:default"><b>Seminar Poster</b><br><svg width="120" height="70" viewBox="0 0 120 70" aria-hidden="true"><rect width="120" height="70" rx="6" fill="#bfdbfe"/><circle cx="25" cy="20" r="8" fill="#fde047"/><polygon points="0,70 40,30 70,55 90,40 120,70" fill="#3b82f6"/></svg></div>
+  <div class="reg" data-r="video" style="cursor:default"><b>Introduction Video</b><div style="background:#0f172a;color:#fff;border-radius:6px;padding:14px;margin:4px 0;text-align:center">▶ ━━━━━ 🔊</div><span class="small">Transcript available</span></div>
+  <div class="reg" data-r="link" style="cursor:default"><a href="#" onclick="return false">View learning resources</a></div>
+  <div class="reg" style="cursor:default">Footer · Web Development Course</div></div></div>
+ <div><ul style="list-style:none;padding:0">${L.map((l,i)=>`<li><label class="sw" data-r="${l[1]}"><input type="checkbox"> ${l[0]}</label></li>`).join('')}</ul><div class="meter"><span id="cm"></span></div><b id="ct"></b></div></div>`;
+ const hi=r=>$$('#cw [data-r]',c).forEach(e=>e.classList.toggle('hi',e.dataset.r===r&&!!r));
+ $$('label[data-r]',c).forEach(l=>{l.onmouseenter=l.onfocusin=()=>hi(l.dataset.r);l.onmouseleave=l.onfocusout=()=>hi(null)});
+ const u=()=>{const n=$$('input',c).filter(i=>i.checked).length;$('#cm',c).style.width=n/6*100+'%';$('#ct',c).textContent=n===6?'🎉 Fully reviewed!':`${n} of 6 checked`};$$('input',c).forEach(i=>i.onchange=u);u();
+};
+
+/* 14. Practice: bug finder + quiz */
+V.quiz=c=>{
+ const lines=[['<head><title>Page</title></head>',1,'Title is vague.\n→ <title>College Seminar | Web Development Course</title>'],['<body>',0],['  <img src="lab.jpg">',1,'No alt attribute.\n→ <img src="lab.jpg" alt="Students working in the computer lab">'],['  <video src="lesson.mp4"></video>',1,'No controls (and no captions).\n→ <video src="lesson.mp4" controls> + <track kind="captions" …>'],['  <div onclick="submitForm()">Submit</div>',1,'A div is not keyboard-focusable and has no button role.\n→ <button type="submit">Submit</button>'],['</body>',0]];
+ const Q=[['Why is alt text important?',['To make images load faster','To give people who cannot see the image a text alternative','To repeat SEO keywords','To resize the image'],1,'Alt text conveys the purpose of the image to screen readers and appears if the image fails.'],['How are title and h1 different?',['They are identical','Title names the document (tab/search result); h1 is the main heading in the content','h1 goes in the head','Title is only for images'],1,'Different places, different jobs.'],['What is the usual order of search?',['Rank → Crawl → Index','Index → Rank → Crawl','Crawl → Index → Serve/Rank','Serve → Crawl → Rank'],2,'Pages must be found, understood, then ordered.'],['Why prefer native HTML over unnecessary ARIA?',['ARIA is banned','Native elements already include roles and keyboard behaviour','ARIA makes pages load faster','Native elements need JavaScript'],1,'ARIA does not add keyboard behaviour by itself.'],['Why are captions useful?',['Only for decoration','For people who are deaf, hard of hearing, or watching without sound','They improve image quality','They replace the video'],1,'Many people benefit, not only those with permanent hearing loss.']];
+ c.innerHTML=`<h3 style="margin-top:0">🐞 Activity 1: find the 4 problems</h3><p class="hint">Click each line of code you think is a problem.</p><div id="bugs"></div><div class="verdict" id="bugc"></div>
+ <h3>🧠 Activity 2: quick quiz</h3><div id="qz"></div><div class="info" id="qres" style="display:none"></div>`;
+ let found=0;
+ $('#bugs',c).innerHTML=lines.map((l,i)=>`<button class="bugline" data-i="${i}">${esc(l[0])}</button>`).join('');
+ const upd=()=>$('#bugc',c).textContent=`Found ${found} of 4`+(found==4?' 🎉 Well done!':'');upd();
+ $$('.bugline',c).forEach(b=>b.onclick=()=>{const l=lines[b.dataset.i];if(b.classList.contains('found')||b.dataset.done)return;b.dataset.done=1;
+  if(l[1]){b.classList.add('found');found++;b.insertAdjacentHTML('beforeend',`<div class="fix">${esc(l[2])}</div>`);upd()}else{b.classList.add('miss');setTimeout(()=>b.classList.remove('miss'),700);delete b.dataset.done}});
+ let score=0,answered=0;
+ $('#qz',c).innerHTML=Q.map((q,i)=>`<div class="mcq"><b>${i+1}. ${q[0]}</b>${q[1].map((o,j)=>`<button class="opt" data-q="${i}" data-o="${j}">${o}</button>`).join('')}<div class="small" id="ex${i}"></div></div>`).join('');
+ $$('.opt',c).forEach(b=>b.onclick=()=>{const qi=+b.dataset.q,oi=+b.dataset.o,q=Q[qi];$$(`.opt[data-q="${qi}"]`,c).forEach(x=>{x.disabled=true;if(+x.dataset.o===q[2])x.classList.add('right')});
+  if(oi===q[2])score++;else b.classList.add('wrong');$('#ex'+qi,c).textContent=(oi===q[2]?'✅ ':'❌ ')+q[3];answered++;
+  if(answered===Q.length){const r=$('#qres',c);r.style.display='block';r.innerHTML=`<b class="t" style="font-size:1.1rem">Your score: ${score} / ${Q.length}</b> ${score===Q.length?'🏆 Excellent!':score>=3?'👍 Good — review the ones you missed.':'📚 Revisit the topics and try again.'}`}});
+};
+
+/* ---------- lecture topics (original text kept; `viz` added) ---------- */
+const topics = [
+{group:"Start here",title:"Overview & Learning Outcomes",viz:'overview',desc:"An introduction to the four connected areas covered in this lesson.",body:`
+<p class="lead">Modern websites do more than display text. They combine media, document information, search-friendly structure, and accessible interaction.</p>
+<div class="grid">
+<div class="mini"><h3>Multimedia</h3><p>Images, audio and video that communicate information.</p></div>
+<div class="mini"><h3>Metadata</h3><p>Information about a document, commonly placed in the HTML head.</p></div>
+<div class="mini"><h3>SEO</h3><p>Practices that help search engines discover and understand useful pages.</p></div>
+<div class="mini"><h3>Accessibility</h3><p>Building experiences people with different abilities can perceive and operate.</p></div>
+</div>
+<h3>Learning outcomes</h3><ul><li>Embed images, audio and video in HTML.</li><li>Explain title, description, charset and viewport metadata.</li><li>Apply basic on-page SEO practices.</li><li>Use alternative text and semantic HTML.</li><li>Explain when ARIA attributes are useful.</li></ul>
+<div class="note"><b>Key idea:</b> accessibility and usability are part of good web development, not optional decoration.</div>`,code:`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Learning Page</title>
+</head>
+<body>
+  <h1>Internet & Web Development</h1>
+  <p>Today we learn multimedia, metadata, SEO and accessibility.</p>
+</body>
+</html>`},
+{group:"1 · Multimedia",title:"What is Multimedia?",viz:'media',desc:"Understand the different media types used on websites.",body:`
+<p>Multimedia means presenting information through more than one form of media.</p><table><tr><th>Type</th><th>Examples</th><th>HTML element</th></tr><tr><td>Text</td><td>Headings, paragraphs</td><td><code>&lt;h1&gt;</code>, <code>&lt;p&gt;</code></td></tr><tr><td>Image</td><td>Photographs, diagrams, logos</td><td><code>&lt;img&gt;</code></td></tr><tr><td>Audio</td><td>Podcasts, recorded lectures</td><td><code>&lt;audio&gt;</code></td></tr><tr><td>Video</td><td>Tutorials, demonstrations</td><td><code>&lt;video&gt;</code></td></tr></table>
+<div class="note"><b>Best practice:</b> choose media that supports the learning goal, optimize file size, and provide alternatives such as captions or transcripts.</div>`,code:`<h1>Welcome to the Lab</h1>
+<p>Watch the short introduction below.</p>
+<img src="https://placehold.co/320x150?text=Web+Development"
+     alt="Illustration labelled Web Development"
+     width="320">
+<p>This is a sample image. Replace it with your own image file.</p>`},
+{group:"1 · Multimedia",title:"Images & the alt Attribute",viz:'alt',desc:"Display images and provide appropriate text alternatives.",body:`
+<p>The <code>&lt;img&gt;</code> element embeds an image. The <code>src</code> attribute gives its file path and <code>alt</code> provides a text alternative.</p>
+<h3>Important rules</h3><ul><li>Informative image: describe the important information it conveys.</li><li>Functional image: describe the action or destination, such as “Browse courses”.</li><li>Decorative image: use <code>alt=""</code> so screen readers can ignore it.</li><li>Do not use a filename as the alternative text.</li><li>Do not start every description with “Image of” unless that context is useful.</li></ul>
+<div class="note warn"><b>Remember:</b> an image's alternative text depends on its purpose and surrounding content. Avoid stuffing keywords into alt text for SEO.</div>`,code:`<h2>Solar System</h2>
+<img src="https://placehold.co/420x220?text=Solar+System"
+     alt="Diagram illustrating the Sun and planets"
+     width="420">
+<p>The diagram introduces the planets in our solar system.</p>`},
+{group:"1 · Multimedia",title:"Audio in HTML",viz:'audio',desc:"Use the audio element and browser-provided playback controls.",body:`
+<p>The <code>&lt;audio&gt;</code> element embeds sound. The <code>controls</code> attribute provides native playback controls.</p><table><tr><th>Attribute</th><th>Meaning</th></tr><tr><td><code>controls</code></td><td>Show play, pause and volume controls.</td></tr><tr><td><code>loop</code></td><td>Repeat playback.</td></tr><tr><td><code>muted</code></td><td>Start muted.</td></tr><tr><td><code>autoplay</code></td><td>Request automatic playback; browsers may block it.</td></tr></table>
+<p>A valid audio file must be available at the source path. A transcript is useful for people who cannot hear the recording and for people who prefer reading.</p>`,code:`<h2>Audio Lecture</h2>
+<audio controls>
+  <source src="lecture.mp3" type="audio/mpeg">
+  Your browser does not support audio.
+</audio>
+<p>Transcript: This lecture introduces HTML multimedia.</p>
+<!-- Replace lecture.mp3 with a real audio file path. -->`},
+{group:"1 · Multimedia",title:"Video & Captions",viz:'video',desc:"Embed video and understand caption tracks.",body:`
+<p>The <code>&lt;video&gt;</code> element embeds video content. Add <code>controls</code> so users can start, pause and adjust playback.</p><p>The <code>&lt;track&gt;</code> element can link to a WebVTT caption file. Captions can include spoken dialogue and relevant sound information.</p>
+<div class="note"><b>Accessibility:</b> captions help people who are deaf or hard of hearing and people watching without sound. Audio description or a transcript may also be needed depending on the video.</div>`,code:`<video width="480" controls>
+  <source src="lecture.mp4" type="video/mp4">
+  <track src="captions.vtt"
+         kind="captions"
+         srclang="en"
+         label="English">
+  Your browser does not support video.
+</video>
+<!-- lecture.mp4 and captions.vtt must exist. -->`},
+{group:"2 · Metadata",title:"What is Metadata?",viz:'meta',desc:"Learn how a web document describes itself to browsers and services.",body:`
+<p><b>Metadata is data about data.</b> In HTML, metadata gives information about a document rather than forming the main visible page content. It is commonly placed inside <code>&lt;head&gt;</code>.</p>
+<table><tr><th>Item</th><th>Purpose</th></tr><tr><td><code>&lt;title&gt;</code></td><td>Document title shown in the browser tab and often used as a search-result title.</td></tr><tr><td><code>charset</code></td><td>Declares character encoding.</td></tr><tr><td><code>description</code></td><td>Summarizes the page for search engines and other systems.</td></tr><tr><td><code>viewport</code></td><td>Helps the layout adapt to device screen width.</td></tr><tr><td><code>author</code></td><td>Optionally identifies the author.</td></tr></table>
+<p>The <code>&lt;title&gt;</code> is not the same as the visible <code>&lt;h1&gt;</code>: the title names the document; the h1 is typically the main heading in the page content.</p>`,code:`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B.Tech Web Development Notes</title>
+  <meta name="description"
+        content="Learn HTML multimedia, metadata, SEO and accessibility.">
+  <meta name="author" content="Web Development Faculty">
+</head>
+<body>
+  <h1>Web Development Notes</h1>
+  <p>Welcome to the course.</p>
+</body>
+</html>`},
+{group:"2 · Metadata",title:"Viewport & Character Encoding",viz:'viewport',desc:"Understand two common metadata settings.",body:`
+<h3>Character encoding</h3><p><code>&lt;meta charset="UTF-8"&gt;</code> tells the browser how text characters are encoded. UTF-8 supports a broad range of languages and symbols.</p>
+<h3>Viewport</h3><p><code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code> helps mobile browsers use the device width as the layout viewport.</p>
+<div class="note warn"><b>Note:</b> viewport metadata alone does not make a website responsive. The page layout must also adapt to different screen sizes.</div>`,code:`<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>Responsive Learning Page</title>
+</head>
+<body>
+  <h1>Readable on Different Screens</h1>
+  <p>Resize the browser window to test your layout.</p>
+</body>`},
+{group:"3 · SEO",title:"What is SEO?",viz:'seo',desc:"Understand the goal of search engine optimization.",body:`
+<p><b>Search Engine Optimization (SEO)</b> means improving a website so search engines can understand its content and people can discover it through relevant searches.</p>
+<h3>Three broad search stages</h3><ol><li><b>Crawling:</b> search-engine crawlers discover and fetch pages.</li><li><b>Indexing:</b> the search engine analyzes and may store information about pages.</li><li><b>Serving and ranking:</b> the engine selects and orders results for a query.</li></ol>
+<div class="note warn">A page is not guaranteed to be crawled or indexed, and SEO cannot guarantee a first-place ranking.</div>`,code:`<head>
+  <title>HTML Basics Tutorial for Beginners</title>
+  <meta name="description"
+        content="Learn HTML elements, attributes, links and images with examples.">
+</head>
+<body>
+  <h1>HTML Basics Tutorial</h1>
+  <p>Start learning HTML with clear examples and practice tasks.</p>
+</body>`},
+{group:"3 · SEO",title:"On-page SEO Checklist",viz:'onpage',desc:"Use relevant titles, headings, descriptions and useful content.",body:`
+<ul><li><b>Specific title:</b> describe the page accurately.</li><li><b>Useful description:</b> summarize what readers will find.</li><li><b>Logical headings:</b> use h1, h2 and h3 according to content hierarchy.</li><li><b>Descriptive links:</b> make the destination clear.</li><li><b>Descriptive URLs:</b> use readable paths where practical.</li><li><b>Image optimization:</b> suitable file sizes, filenames and meaningful alt text.</li><li><b>Helpful content:</b> answer users' questions accurately.</li><li><b>Mobile usability and performance:</b> ensure the page is usable across devices.</li></ul>
+<table><tr><th>Myth</th><th>Reality</th></tr><tr><td>Repeating keywords improves ranking.</td><td>Keyword stuffing is a poor practice.</td></tr><tr><td>A description guarantees ranking.</td><td>It summarizes the page and may be used for snippets.</td></tr><tr><td>SEO results are instant.</td><td>Discovery and visibility changes can take time.</td></tr></table>`,code:`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Beginner HTML Course | Student Learning Portal</title>
+  <meta name="description"
+        content="Explore beginner HTML lessons with examples and practice tasks.">
+</head>
+<body>
+  <h1>Beginner HTML Course</h1>
+  <h2>Start with HTML Elements</h2>
+  <p>Learn how HTML structures headings, paragraphs, images and links.</p>
+  <a href="practice.html">Try HTML practice tasks</a>
+</body>
+</html>`},
+{group:"4 · Accessibility",title:"Web Accessibility",viz:'a11y',desc:"Build websites that people with different abilities can use.",body:`
+<p><b>Web accessibility</b> means designing and developing websites so people can perceive, understand, navigate and interact with them, including people with disabilities.</p>
+<h3>Examples of user needs</h3><ul><li>Screen-reader support for people who cannot see the screen.</li><li>Captions for people who cannot hear audio.</li><li>Keyboard access for people who cannot use a mouse.</li><li>Clear wording and consistent navigation for easier understanding.</li><li>Sufficient contrast for text and interface controls.</li></ul>
+<p>The Web Content Accessibility Guidelines (WCAG), published by W3C, are a widely used reference for accessibility.</p>
+<div class="note">Think about accessibility from the start: choosing semantic HTML correctly is often easier than adding accessibility fixes later.</div>`,code:`<header>
+  <h1>College Seminar</h1>
+  <nav aria-label="Main navigation">
+    <a href="#schedule">Schedule</a>
+    <a href="#venue">Venue</a>
+  </nav>
+</header>
+<main>
+  <section id="schedule">
+    <h2>Schedule</h2>
+    <p>Talks begin at 10:00 AM.</p>
+  </section>
+  <section id="venue">
+    <h2>Venue</h2>
+    <p>Main auditorium.</p>
+  </section>
+</main>`},
+{group:"4 · Accessibility",title:"ARIA Basics",viz:'aria',desc:"Use ARIA roles, properties and states when native HTML is not enough.",body:`
+<p><b>ARIA</b> stands for Accessible Rich Internet Applications. ARIA attributes provide additional information to assistive technologies, especially for custom and dynamic interfaces.</p>
+<table><tr><th>Attribute</th><th>Purpose</th></tr><tr><td><code>aria-label</code></td><td>Provides an accessible name.</td></tr><tr><td><code>aria-labelledby</code></td><td>Uses another element's text as the name.</td></tr><tr><td><code>aria-describedby</code></td><td>Connects explanatory text to a control.</td></tr><tr><td><code>aria-expanded</code></td><td>Communicates expanded/collapsed state.</td></tr><tr><td><code>aria-hidden</code></td><td>Removes content from the accessibility tree when appropriate.</td></tr><tr><td><code>role</code></td><td>Communicates an element's role.</td></tr></table>
+<div class="note warn"><b>Important:</b> ARIA does not automatically add keyboard interaction or JavaScript behavior. Prefer native HTML elements whenever possible.</div>`,code:`<h2 id="details-heading">Course Details</h2>
+<button id="toggle"
+        aria-expanded="false"
+        aria-controls="details">
+  Show course details
+</button>
+<div id="details" hidden>
+  <p>Topics: HTML, multimedia and accessibility.</p>
+</div>
+<script>
+const button = document.getElementById('toggle');
+const details = document.getElementById('details');
+
+button.addEventListener('click', () => {
+  const expanded = button.getAttribute('aria-expanded') === 'true';
+  button.setAttribute('aria-expanded', String(!expanded));
+  details.hidden = expanded;
+  button.textContent = expanded
+    ? 'Show course details'
+    : 'Hide course details';
+});
+<\/script>`},
+{group:"4 · Accessibility",title:"Semantic HTML & Keyboard Use",viz:'semantic',desc:"Choose native elements and make interaction usable without a mouse.",body:`
+<p>Semantic elements communicate purpose. Use <code>&lt;button&gt;</code> for actions, <code>&lt;a&gt;</code> for navigation, labels for form controls, and landmarks such as <code>&lt;main&gt;</code> and <code>&lt;nav&gt;</code>.</p>
+<h3>Good practices</h3><ul><li>Ensure interactive controls can be reached and operated with a keyboard.</li><li>Keep focus indicators visible.</li><li>Use descriptive link text, not just “click here”.</li><li>Associate visible labels with form controls.</li><li>Do not communicate information using color alone.</li><li>Maintain logical heading structure.</li></ul>`,code:`<form>
+  <label for="student-name">Student name:</label>
+  <input id="student-name" name="student-name" type="text">
+  <button type="submit">Register</button>
+</form>
+<p><a href="schedule.html">View the seminar schedule</a></p>`},
+{group:"5 · Practice",title:"Combined Example",viz:'combined',desc:"Review multimedia, metadata, SEO and accessibility together.",body:`
+<p>This integrated example shows the main concepts in a single document. For your own project, replace sample media paths with real files and check that captions/transcripts are provided when needed.</p>
+<h3>Review checklist</h3><ul><li>Does the document have a descriptive title?</li><li>Is the page description accurate?</li><li>Does every informative image have suitable alt text?</li><li>Can the media be operated using its controls?</li><li>Is the content organized with semantic elements?</li><li>Can the page be navigated with a keyboard?</li></ul>`,code:`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Seminar Learning Page</title>
+  <meta name="description" content="Seminar details, learning media and resources.">
+</head>
+<body>
+  <header>
+    <h1>College Seminar</h1>
+    <p>Explore today's learning resources.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Seminar Poster</h2>
+      <img src="poster.jpg" alt="Poster for the college web development seminar" width="300">
+    </section>
+    <section>
+      <h2>Introduction Video</h2>
+      <video controls width="400">
+        <source src="intro.mp4" type="video/mp4">
+        Your browser does not support video.
+      </video>
+      <p>Read the video transcript for an alternative.</p>
+    </section>
+    <section>
+      <h2>Further Reading</h2>
+      <a href="resources.html">View learning resources</a>
+    </section>
+  </main>
+  <footer><p>Web Development Course</p></footer>
+</body>
+</html>`},
+{group:"5 · Practice",title:"Classroom Tasks & Quiz",viz:'quiz',desc:"Use these activities to check understanding.",body:`
+<h3>Activity 1: Find the problems</h3>
+<pre><code>&lt;head&gt;&lt;title&gt;Page&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;img src="lab.jpg"&gt;
+  &lt;video src="lesson.mp4"&gt;&lt;/video&gt;
+  &lt;div onclick="submitForm()"&gt;Submit&lt;/div&gt;
+&lt;/body&gt;</code></pre>
+<p>Ask students to improve the title, provide suitable alt text, add video controls and replace the clickable div with a native button that has the required behavior.</p>
+<h3>Activity 2: Practical assignment</h3><ol><li>Create a college seminar webpage.</li><li>Add a descriptive title and meta description.</li><li>Add a main heading and at least two subheadings.</li><li>Add one informative image with appropriate alt text.</li><li>Add audio or video controls and a text alternative.</li><li>Add a link to another page.</li><li>Use semantic elements such as header, main, section and footer.</li><li>Test keyboard navigation and check the page on a narrow screen.</li></ol>
+<h3>Discussion questions</h3><ol><li>Why is alt text important?</li><li>How are the title and h1 different?</li><li>What are crawling, indexing and ranking?</li><li>Why should native HTML be preferred over unnecessary ARIA?</li><li>Why are captions and transcripts useful?</li></ol>`,code:`<!-- Try improving this page -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>College Seminar</title>
+  <meta name="description" content="Details and resources for our college seminar.">
+</head>
+<body>
+  <header><h1>College Seminar</h1></header>
+  <main>
+    <h2>About the Seminar</h2>
+    <p>Learn about web development.</p>
+    <img src="https://placehold.co/300x160?text=Seminar"
+         alt="Illustration representing a college seminar">
+    <p><a href="#schedule">Go to schedule</a></p>
+    <h2 id="schedule">Schedule</h2>
+    <p>10:00 AM — Introduction to the Web</p>
+  </main>
+</body>
+</html>`}
+];
+
+/* ---------- progress (saved in this browser only) ---------- */
+let done=new Set();
+try{done=new Set(JSON.parse(localStorage.getItem('webdev-notes-done')||'[]'))}catch(e){}
+const saveDone=()=>{try{localStorage.setItem('webdev-notes-done',JSON.stringify([...done]))}catch(e){}};
+function updProgress(){const n=done.size,t=topics.length;$('#pbar').style.width=n/t*100+'%';$('#ptext').textContent=`${n} of ${t} topics understood`}
+
+/* ---------- app shell ---------- */
+let activeIndex=0;
+const nav=$('#nav'), content=$('#content'), search=$('#search');
+function renderNav(){
+ const q=search.value.toLowerCase().trim();nav.innerHTML='';
+ let lastGroup='';
+ topics.forEach((t,i)=>{
+   if(q && !(t.title+' '+t.desc+' '+t.body).toLowerCase().includes(q))return;
+   if(t.group!==lastGroup){const g=document.createElement('div');g.className='navgroup';g.textContent=t.group;nav.appendChild(g);lastGroup=t.group}
+   const b=document.createElement('button');b.className='navbtn'+(i===activeIndex?' active':'')+(done.has(i)?' done':'');b.textContent=t.title;b.onclick=()=>{activeIndex=i;renderNav();renderTopic()};nav.appendChild(b);
+ });
+}
+function renderTopic(){
+ cleanups.forEach(f=>{try{f()}catch(e){}});cleanups=[];
+ const t=topics[activeIndex];
+ content.innerHTML=`<div class="toolbar"><span class="pill">${esc(t.group)}</span><span style="color:#64748b;font-size:.9rem">Topic ${activeIndex+1} of ${topics.length}</span></div>
+ <h2>${esc(t.title)}</h2><p class="lead">${esc(t.desc)}</p>
+ <section class="panel viz"><h3 class="vizhead">🎮 Explore it</h3><div id="viz"></div></section>
+ <section class="panel"><h3 style="margin-top:0">Notes</h3>${t.body}</section>
+ <section class="panel">
+   <h3 style="margin-top:0">Code example</h3>
+   <p>Review or edit the code, then select <b>Run example</b> to see the result.</p>
+   <div class="codehead"><span>HTML · Editable example</span><div><button class="action light" id="reset">Reset code</button> <button class="action" id="run">▶ Run example</button></div></div>
+   <textarea class="editor" id="editor" spellcheck="false" aria-label="Editable HTML example"></textarea>
+   <div class="previewwrap"><div class="previewhead"><span>Live preview</span><span style="color:#64748b;font-weight:400">Sandboxed output</span></div><iframe id="preview" title="HTML example preview" sandbox="allow-scripts"></iframe></div>
+   <div class="note"><b>Tip:</b> examples that reference files such as <code>lecture.mp3</code>, <code>lecture.mp4</code>, or <code>captions.vtt</code> need those files to be available in the same relative location. A missing media file will not play.</div>
+ </section>
+ <div class="toolbar"><button class="action secondary" id="prev" ${activeIndex===0?'disabled':''}>← Previous topic</button><button class="action ${done.has(activeIndex)?'success':'light'}" id="mark">${done.has(activeIndex)?'✓ Understood':'Mark as understood'}</button><button class="action" id="next" ${activeIndex===topics.length-1?'disabled':''}>Next topic →</button></div>`;
+ const editor=$('#editor');editor.value=t.code;
+ const run=()=>{$('#preview').srcdoc=editor.value};
+ $('#run').onclick=run;
+ $('#reset').onclick=()=>{editor.value=t.code;run()};
+ $('#prev').onclick=()=>{if(activeIndex>0){activeIndex--;renderNav();renderTopic();window.scrollTo({top:0,behavior:'smooth'})}};
+ $('#next').onclick=()=>{if(activeIndex<topics.length-1){activeIndex++;renderNav();renderTopic();window.scrollTo({top:0,behavior:'smooth'})}};
+ $('#mark').onclick=()=>{done.has(activeIndex)?done.delete(activeIndex):done.add(activeIndex);saveDone();updProgress();renderNav();const m=$('#mark');m.className='action '+(done.has(activeIndex)?'success':'light');m.textContent=done.has(activeIndex)?'✓ Understood':'Mark as understood'};
+ try{V[t.viz]($('#viz'))}catch(e){$('#viz').textContent='Visual could not load.'}
+ run();
+}
+search.addEventListener('input',renderNav);
+updProgress();renderNav();renderTopic();
+</script>
+</body>
+</html>
