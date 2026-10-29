@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARIA Guide — Interactive Learning</title>
+<style>
+:root{--ink:#15223a;--muted:#52627e;--line:#dce4f0;--panel:#fff;--bg:#f6f8fc;--brand:#5954f5;--brand2:#3b82f6;--soft:#eef0ff;--green:#16865b;--shadow:0 10px 30px #18294b0c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}
+.topbar{background:#10192b;color:#fff;display:flex;align-items:center;gap:22px;padding:14px 24px;position:sticky;top:0;z-index:5;box-shadow:0 4px 18px #07102325}
+.brand{display:flex;align-items:center;gap:12px;min-width:225px}.logo{height:42px;width:42px;border-radius:14px;background:linear-gradient(135deg,#7772ff,#5147e8);display:grid;place-items:center;font-size:23px}.brand strong{display:block;font-size:18px;line-height:1.2}.brand small{color:#bdc8dc}
+.search{max-width:560px;flex:1;position:relative}.search input{width:100%;background:#17243a;border:1px solid #39465c;border-radius:9px;color:#fff;padding:12px 42px 12px 42px;outline-offset:3px}.search:before{content:"⌕";position:absolute;left:14px;top:3px;font-size:28px;color:#aab6ca}.key{position:absolute;right:10px;top:8px;color:#b8c2d5;border:1px solid #43516a;border-radius:5px;padding:1px 6px;font-size:12px}.top-actions{margin-left:auto;display:flex;gap:14px}.top-actions button{border:0;background:transparent;color:#dbe4f5;padding:8px;border-radius:8px}.top-actions button:hover{background:#27354d}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 70px)}aside{padding:24px 16px;border-right:1px solid var(--line);background:#fbfcff}.side-label{font-size:11px;font-weight:800;letter-spacing:.09em;color:#64738f;margin:2px 8px 12px}.nav{display:grid;gap:5px}.nav button,.filter button{display:flex;align-items:center;gap:11px;width:100%;border:0;background:transparent;color:#344764;text-align:left;padding:10px 11px;border-radius:8px}.nav button:hover,.filter button:hover{background:#eff2ff}.nav button.active,.filter button.active{background:var(--brand);color:#fff}.side-divider{height:1px;background:var(--line);margin:20px 6px}.filter button{font-size:13px;padding:8px 11px}.count{margin-left:auto;opacity:.7}
+main{padding:30px clamp(18px,3.4vw,52px);min-width:0;max-width:1500px;width:100%;margin:auto}.hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.hero h1{font-size:clamp(27px,3vw,36px);letter-spacing:-.04em;margin:0 0 6px}.hero p{max-width:760px;color:var(--muted);margin:0}.pill{background:#e7f8ef;color:#18784f;border-radius:7px;padding:6px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin:24px 0 15px}.section-head h2{font-size:20px;letter-spacing:-.025em;margin:0}.section-head p{color:var(--muted);margin:2px 0 0;font-size:13px}.primary,.secondary{border-radius:8px;padding:10px 14px;font-weight:700;font-size:13px;border:1px solid var(--line)}.primary{background:var(--brand);border-color:var(--brand);color:#fff}.primary:hover{background:#4641df}.secondary{background:#fff;color:#334664}.secondary:hover{border-color:#a9b6d2;background:#f9faff}
+
+#attributes{display:grid;grid-template-columns:minmax(260px,.85fr) minmax(0,1.5fr);gap:14px;align-items:start}
+#attributes>.section-head{grid-column:1/-1;margin-bottom:0}
+#attributes>.demo-grid{grid-column:1;grid-row:2;display:grid;grid-template-columns:1fr;margin:0;gap:12px;position:sticky;top:92px}
+#attributes>.cards{grid-column:2;grid-row:2;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:1050px){#attributes{grid-template-columns:1fr}#attributes>.demo-grid,#attributes>.cards{grid-column:1;grid-row:auto}#attributes>.demo-grid{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){#attributes>.demo-grid{grid-template-columns:1fr}#attributes>.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.attr-card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:17px 13px 14px;text-align:center;display:flex;flex-direction:column;align-items:center;min-height:230px;box-shadow:var(--shadow);transition:.16s}.attr-card:hover,.attr-card.selected{border-color:#7773ff;box-shadow:0 0 0 1px #7773ff40,var(--shadow);transform:translateY(-2px)}.orb{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#5d5af2;color:#fff;font-size:20px;font-weight:800;margin-bottom:11px}.attr-card:nth-child(5n+2) .orb{background:#3984f6}.attr-card:nth-child(5n+3) .orb{background:#22a875}.attr-card:nth-child(5n+4) .orb{background:#eaa018}.attr-card:nth-child(5n+5) .orb{background:#e65252}.attr-card h3{font-size:13px;margin:0 0 9px;overflow-wrap:anywhere}.attr-card p{font-size:12px;color:#4d5e7b;margin:0 0 14px;flex:1}.attr-card button{width:100%;padding:8px 5px}
+.demo-grid{display:grid;grid-template-columns:minmax(250px,.8fr) minmax(0,1.2fr);gap:16px;margin:24px 0 30px}.panel{border:1px solid var(--line);background:var(--panel);border-radius:11px;overflow:hidden;box-shadow:var(--shadow)}.panel-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);font-weight:750}.panel-body{padding:17px}.panel-body h3{font-size:15px;margin:0 0 8px}.panel-body p{color:var(--muted);font-size:13px}.demo-area{min-height:90px;display:grid;place-items:center;padding:14px}.icon-btn{width:48px;height:48px;border:1px solid #b9c2d4;border-radius:9px;background:#fff;font-size:24px;color:#1c2940}.icon-btn:focus{outline:3px solid #706cff;outline-offset:3px}.success{background:#ecfaf2;border:1px solid #c7eed8;border-radius:8px;padding:11px;font-size:12px;color:#155d40;margin-top:12px}.code-top{display:flex;align-items:center;justify-content:space-between}.code{white-space:pre-wrap;overflow-wrap:anywhere;background:#f7f9fd;color:#25334d;font:12px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;padding:17px;margin:0;min-height:260px}.pink{color:#d63384}.blue{color:#2c67d9}.role-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.role-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:15px 12px;text-align:center}.role-icon{font-size:24px;margin-bottom:7px}.role-card h3{font-size:13px;margin:0 0 7px}.role-card p{font-size:12px;color:var(--muted);min-height:55px;margin:0 0 12px}footer{padding:18px 0;color:#6a7891;font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.footer a{color:#3d6ac9}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:30px}.hidden{display:none!important}
+.modal-backdrop{position:fixed;inset:0;background:#0b142a99;display:grid;place-items:center;padding:20px;z-index:10}.modal{width:min(620px,100%);max-height:85vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 25px 80px #0004}.modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.modal-head h2{font-size:20px;margin:0}.close{border:0;background:#eef1f8;border-radius:8px;width:34px;height:34px;font-size:20px}.modal-content{padding:20px}.modal-content code{background:#f0f2fb;border-radius:4px;padding:2px 5px}.quiz-option{display:block;text-align:left;width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#fff;margin:8px 0}.quiz-option:hover{border-color:var(--brand)}.feedback{margin-top:12px;padding:12px;border-radius:8px;background:#eef8f1;color:#17613e}
+body.dark{--ink:#eef3ff;--muted:#b0bdd4;--line:#34435b;--panel:#17243a;--bg:#0e1728;--soft:#252c52;color:var(--ink)}body.dark aside{background:#121e31}body.dark .nav button,body.dark .filter button{color:#d1dbed}body.dark .nav button.active,body.dark .filter button.active{color:#fff}body.dark .stat,body.dark .attr-card,body.dark .role-card,body.dark .panel,body.dark .secondary,body.dark .modal{background:var(--panel);color:var(--ink)}body.dark .code{background:#101b2d;color:#dbe7ff}body.dark .icon-btn{background:#17243a;color:#fff;border-color:#54617a}body.dark .secondary,body.dark .quiz-option{color:var(--ink);background:#17243a}body.dark .modal-head{border-color:var(--line)}body.dark .modal-content code{background:#293650}
+@media(max-width:1050px){.layout{grid-template-columns:180px minmax(0,1fr)}.cards,.role-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.brand{min-width:175px}}
+@media(max-width:720px){.topbar{padding:12px;gap:10px;flex-wrap:wrap}.brand{min-width:0;flex:1}.brand small{display:none}.search{order:3;flex-basis:100%;max-width:none}.top-actions{margin-left:0}.layout{display:block}aside{display:none}main{padding:22px 14px}.hero{display:block}.pill{display:inline-block;margin-top:12px}cards,.role-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.attr-card{min-height:220px}.demo-grid{grid-template-columns:1fr}.section-head{align-items:flex-start}.section-head .primary{max-width:135px}.footer{display:block}.footer span{display:block;margin:5px 0}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="logo" aria-hidden="true">♿</div><div><strong>ARIA Guide</strong><small>Interactive Learning</small></div></div>
+  <div class="search"><input id="search" type="search" placeholder="Search attributes, roles, examples…" aria-label="Search ARIA guide"><span class="key">Ctrl /</span></div>
+  <div class="top-actions"><button id="themeBtn" aria-pressed="false" title="Toggle dark mode">☾ <span>Dark</span></button><button id="aboutBtn">ⓘ About</button></div>
+</header>
+<div class="layout">
+<aside>
+  <div class="side-label">EXPLORE</div>
+  <nav class="nav" aria-label="Main navigation">
+    <button class="active" data-section="overview">⌂ Overview</button>
+    <button data-section="attributes">◇ Attributes</button>
+    <button data-section="roles">♧ Roles</button>
+    <button data-section="examples">⊙ Live Example</button>
+    <button data-section="cheatsheet">▤ Cheat Sheet</button>
+    <button data-section="quiz">♧ Quiz</button>
+  </nav>
+  <div class="side-divider"></div>
+  <div class="side-label">QUICK FILTER</div>
+  <div class="filter" id="filters">
+    <button class="active" data-filter="All">All <span class="count">(40)</span></button>
+    <button data-filter="Name & Label">Name &amp; Label <span class="count">(6)</span></button>
+    <button data-filter="State">State <span class="count">(11)</span></button>
+    <button data-filter="Properties">Properties <span class="count">(10)</span></button>
+    <button data-filter="Relationships">Relationships <span class="count">(7)</span></button>
+    <button data-filter="Live Regions">Live Regions <span class="count">(6)</span></button>
+  </div>
+
+</aside>
+<main id="overview">
+  <div class="hero"><div><h1>ARIA Made Simple ✨</h1><p>ARIA (Accessible Rich Internet Applications) attributes help screen readers understand web content better, especially when you build custom UI components.</p></div><span class="pill">● Beginner friendly</span></div>
+
+  <section id="attributes">
+    <div class="section-head"><div><h2>Key ARIA Attributes</h2><p id="resultSummary">Click a card to explore an example and try it live.</p></div><button class="primary" id="allAttributes">View All Attributes →</button></div>
+    <div class="demo-grid" id="examples">
+      <div class="panel" id="demo">
+        <div class="panel-head"><span>Live Example</span><span class="pill">♧ Interactive</span></div>
+        <div class="panel-body"><h3 id="demoTitle">Icon button with aria-label</h3><p id="demoDescription">Focus or activate the button to learn how a screen reader gets its accessible name.</p>
+          <div class="demo-area" id="demoArea"><button class="icon-btn" aria-label="Close dialog" title="Close dialog" id="demoClose">×</button></div>
+          <div class="success" id="demoFeedback" role="status" aria-live="polite">✓ Try it! Focus the button with Tab. Its accessible name is “Close dialog”.</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head code-top"><span>HTML Code</span><button class="secondary" id="copyCode">▢ Copy</button></div>
+        <pre class="code" id="codeBlock"><span class="pink">&lt;button</span> <span class="blue">aria-label</span>=<span style="color:#16865b">"Close dialog"</span><span class="pink">&gt;</span>
+  ×
+<span class="pink">&lt;/button&gt;</span></pre>
+      </div>
+    </div>
+    <div class="cards" id="attributeCards"></div>
+  </section>
+  <section id="roles">
+    <div class="section-head"><div><h2>Common ARIA Roles</h2><p>Roles help define what an element is or how it behaves.</p></div><button class="primary" id="allRoles">Explore All Roles →</button></div>
+    <div class="role-grid" id="roleCards"></div>
+  </section>
+  <div class="footer"><span>Made with ❤️ for accessibility</span><span>Resources: <a href="https://www.w3.org/TR/wai-aria-1.2/" target="_blank" rel="noreferrer">W3C WAI-ARIA Spec</a> · <a href="https://www.w3.org/WAI/ARIA/apg/" target="_blank" rel="noreferrer">ARIA Authoring Practices Guide</a></span></div>
+</main>
+</div>
+<div class="modal-backdrop hidden" id="modalBackdrop" role="presentation">
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head"><h2 id="modalTitle">About ARIA Guide</h2><button class="close" id="modalClose" aria-label="Close dialog">×</button></div>
+    <div class="modal-content" id="modalContent"></div>
+  </section>
+</div>
+<script>
+const attrs=[
+['aria-label','Name & Label','A name for an element when visible text is missing.','Close dialog','<button aria-label="Close dialog">×</button>','Think of it as a hidden label that explains an icon-only button.'],
+['aria-labelledby','Name & Label','Uses the text of another element as this element’s name.','Sign in','<h2 id="signin-title">Sign in</h2>\\n<form aria-labelledby="signin-title">…</form>','Useful when a heading or visible label already exists on the page.'],
+['aria-describedby','Name & Label','Connects an element to extra help or instructions.','Password help','<input aria-describedby="password-help">\\n<p id="password-help">Use 8+ characters.</p>','It adds supporting information; it does not replace the field label.'],
+['aria-hidden','Properties','Hides an element from assistive technology, not necessarily visually.','Decorative star','<span aria-hidden="true">★</span>','Use for decoration only. Never hide focusable controls or meaningful content.'],
+['aria-required','State','Announces that a field is required.','Required field','<input aria-required="true">','For standard form fields, prefer HTML required because it can also validate input.'],
+['aria-invalid','State','Indicates that a field’s current value is invalid.','Invalid email','<input type="email" aria-invalid="true">','Pair it with a clear error message and identify that message when useful.'],
+['aria-expanded','State','Reports whether a collapsible control is open or closed.','More options','<button aria-expanded="false">More options</button>','Update true/false as the menu or panel opens and closes.'],
+['aria-pressed','State','Reports whether a toggle button is on or off.','Bold toggle','<button aria-pressed="true">Bold</button>','Use for toggle buttons, not every button that is clicked.'],
+['aria-checked','State','Reports the checked state of a custom checkbox, radio, or switch.','Custom checkbox','<div role="checkbox" aria-checked="false">Email updates</div>','Native checkboxes already expose their checked state without ARIA.'],
+['aria-selected','State','Reports which option or tab is selected.','Selected tab','<button role="tab" aria-selected="true">Profile</button>','Keep the selected state in sync with the interface.'],
+['aria-current','State','Marks the item representing the current page or step.','Current page','<a href="/help" aria-current="page">Help</a>','Commonly used in navigation to identify the current page.'],
+['aria-disabled','State','Communicates that an element is unavailable.','Unavailable action','<button aria-disabled="true">Submit</button>','It does not disable the control by itself; your code must prevent the action.'],
+['aria-controls','Relationships','Identifies the element a control affects.','Menu controller','<button aria-controls="site-menu">Menu</button>','It describes a relationship; it does not open or close anything by itself.'],
+['aria-haspopup','Relationships','Indicates that a control opens a supported popup.','Open menu','<button aria-haspopup="menu">Actions</button>','Use the correct popup type, such as menu, listbox, tree, grid, or dialog.'],
+['aria-errormessage','Relationships','Links an invalid control to its error message.','Email error','<input aria-invalid="true" aria-errormessage="email-error">','Support varies; aria-describedby is also commonly used for error text.'],
+['aria-details','Relationships','Points to content with more detailed information.','Detailed explanation','<div aria-details="extra-details">Chart</div>','Use when the details are more substantial than a short description.'],
+['aria-live','Live Regions','Announces updates without moving keyboard focus.','Saved message','<p aria-live="polite">Saved successfully.</p>','Polite updates wait for a suitable moment; assertive updates can interrupt.'],
+['aria-atomic','Live Regions','Says whether the whole live region should be announced.','Whole status','<div aria-live="polite" aria-atomic="true">…</div>','Set true when users need the full message, not only the changed words.'],
+['aria-relevant','Live Regions','Specifies which types of live-region changes matter.','Relevant changes','<div aria-live="polite" aria-relevant="additions text">…</div>','Usually the default is enough; only customize it for a clear reason.'],
+['aria-busy','Live Regions','Says an area is still being updated.','Loading panel','<section aria-busy="true">Updating…</section>','Set back to false when the update is complete.'],
+['aria-roledescription','Properties','Gives a human-friendly custom description of an element’s role.','Carousel','<div role="group" aria-roledescription="slide">…</div>','It does not replace the real role and should be used sparingly.'],
+['aria-keyshortcuts','Properties','Communicates keyboard shortcuts supported by an element.','Save shortcut','<button aria-keyshortcuts="Control+S">Save</button>','You must implement the shortcut too; this attribute only describes it.'],
+['aria-orientation','Properties','Describes whether a widget is horizontal or vertical.','Vertical slider','<div role="slider" aria-orientation="vertical">…</div>','Useful for custom widgets whose orientation is not obvious.'],
+['aria-valuemin','Properties','Sets the lowest value of a custom range widget.','Volume minimum','<div role="slider" aria-valuemin="0">…</div>','Used with suitable range widgets, not ordinary text inputs.'],
+['aria-valuemax','Properties','Sets the highest value of a custom range widget.','Volume maximum','<div role="slider" aria-valuemax="100">…</div>','Communicate the actual maximum supported by the widget.'],
+['aria-valuenow','Properties','Reports the current numeric value of a range widget.','Volume value','<div role="slider" aria-valuenow="30">…</div>','Update it whenever the widget value changes.'],
+['aria-valuetext','Properties','Provides a readable version of a numeric value.','Volume level','<div role="slider" aria-valuetext="Low">…</div>','Helpful when a number alone does not explain the value.'],
+['aria-setsize','Properties','Tells users the total number of items in a set when not all are present.','List size','<div role="listitem" aria-setsize="20">…</div>','Useful for virtualized lists that render only some items.'],
+['aria-posinset','Properties','Reports an item’s position in a larger set.','Item position','<div role="listitem" aria-posinset="4">…</div>','Often paired with aria-setsize for partial lists.'],
+['aria-level','Properties','Communicates nesting level in a tree or heading-like structure.','Tree level','<div role="treeitem" aria-level="2">Folder</div>','Use only where the chosen role supports a level.'],
+['aria-multiselectable','State','Says a widget allows more than one item to be selected.','Multi-select list','<div role="listbox" aria-multiselectable="true">…</div>','Set true only if users really can select multiple options.'],
+['aria-modal','State','Indicates a dialog behaves as modal.','Modal dialog','<div role="dialog" aria-modal="true">…</div>','It does not trap focus by itself; implement modal keyboard and focus behavior.'],
+['aria-autocomplete','Properties','Describes how a text field suggests matching options.','Search suggestions','<input role="combobox" aria-autocomplete="list">','Use only for an autocomplete/combobox interaction that actually works.'],
+['aria-placeholder','Name & Label','Provides a hint for a custom input when a native placeholder is unavailable.','Search hint','<div role="textbox" aria-placeholder="Search">…</div>','Prefer the native placeholder attribute on ordinary inputs, and still provide a label.'],
+['aria-readonly','State','Indicates that a widget’s value can be read but not edited.','Read-only field','<div role="textbox" aria-readonly="true">Text</div>','For native form controls, use the HTML readonly attribute when appropriate.'],
+['aria-sort','State','Reports the sort order of a table column.','Sorted column','<th aria-sort="ascending">Name</th>','Update it when the table sort changes.'],
+];
+const roles=[
+['button','🟩','Represents an action users can activate.','<button>Save</button>'],
+['dialog','🪟','Represents a dialog or modal window.','<div role="dialog" aria-labelledby="title">…</div>'],
+['listbox','☷','Represents a list of selectable options.','<div role="listbox" aria-label="Colors">…</div>'],
+['tab','▱','Represents one tab in a tab interface.','<button role="tab" aria-selected="true">Details</button>'],
+['alert','🔔','Represents an important message that needs attention.','<p role="alert">Please fix the error.</p>'],
+['status','🟢','A non-urgent update, such as a saved confirmation.','<p role="status">Saved.</p>'],
+['switch','🔘','An on/off control.','<button role="switch" aria-checked="true">Notifications</button>'],
+['navigation','🧭','A section of navigation links.','<nav aria-label="Main">…</nav>'],
+['main','📄','The primary content of the page.','<main>Page content</main>'],
+['search','🔎','A search section or form.','<form role="search">…</form>'],
+['progressbar','⏳','Shows how much of a task is complete.','<div role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>'],
+['tabpanel','🗂️','The content panel associated with a tab.','<section role="tabpanel" aria-labelledby="tab-a">…</section>'],
+['tablist','📚','Groups related tabs together.','<div role="tablist" aria-label="Account">…</div>'],
+['checkbox','☑️','A checkable option, often custom-built.','<div role="checkbox" aria-checked="false">Subscribe</div>'],
+['alertdialog','🚨','A dialog that communicates an urgent message.','<div role="alertdialog" aria-modal="true">…</div>'],
+['region','▦','A named, meaningful section of a page.','<section role="region" aria-labelledby="news">…</section>'],
+['img','🖼️','Treats a group of elements as one image.','<div role="img" aria-label="Sunny, 25 degrees">☀️</div>'],
+['tooltip','💬','A brief contextual hint for an element.','<div role="tooltip" id="tip">Extra help</div>'],
+['tree','🌳','A hierarchical list with expandable items.','<ul role="tree">…</ul>'],
+['menu','☰','A menu of actions with application-style keyboard behavior.','<div role="menu" aria-label="Actions">…</div>']
+];
+let currentFilter='All', selected=attrs[0], searchText='';
+const $=id=>document.getElementById(id);
+function escapeHTML(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function renderAttrs(){
+ const filtered=attrs.filter(a=>(currentFilter==='All'||a[1]===currentFilter)&&a.join(' ').toLowerCase().includes(searchText.toLowerCase()));
+ $('resultSummary').textContent=`Showing ${filtered.length} attribute${filtered.length===1?'':'s'} · Select a card to view an example.`;
+ $('attributeCards').innerHTML=filtered.length?filtered.map((a,i)=>`<article class="attr-card ${a[0]===selected[0]?'selected':''}"><div class="orb" aria-hidden="true">${['A','↗','i','◉','★'][i%5]}</div><h3>${escapeHTML(a[0])}</h3><p>${escapeHTML(a[2])}</p><button class="secondary" data-attr="${escapeHTML(a[0])}">View Example</button></article>`).join(''):'<div class="empty">No matching attributes. Try another search or filter.</div>';
+ document.querySelectorAll('[data-attr]').forEach(b=>b.addEventListener('click',()=>{selectAttr(attrs.find(a=>a[0]===b.dataset.attr));$('examples').scrollIntoView({behavior:'smooth',block:'nearest'});}));
+}
+function selectAttr(a){
+ if(!a)return;selected=a;renderAttrs();
+ $('demoTitle').textContent=a[0]+' — example';$('demoDescription').textContent=a[2]+' '+a[5];
+ $('codeBlock').textContent=a[4].replace(/\\n/g,'\n');
+ $('demoArea').innerHTML=demoFor(a);
+ $('demoFeedback').textContent='✓ Try it! '+a[5];
+ $('demoFeedback').setAttribute('role','status');
+ const close=$('demoClose');if(close)close.addEventListener('click',()=>{$('demoFeedback').textContent='The demo button was activated. In a real app, this would close the dialog.';});
+}
+function demoFor(a){
+ if(a[0]==='aria-expanded')return '<button class="secondary" id="expandDemo" aria-expanded="false" aria-controls="expandContent">Show details ▾</button><div id="expandContent" class="hidden" style="padding:12px">Here are the extra details.</div>';
+ if(a[0]==='aria-pressed')return '<button class="secondary" id="toggleDemo" aria-pressed="false">Bold: off</button>';
+ if(a[0]==='aria-required')return '<label for="requiredDemo">Your name <span aria-hidden="true">*</span></label><input id="requiredDemo" required aria-required="true" placeholder="Type your name" style="margin-left:8px;max-width:170px;padding:8px;border:1px solid #bac5d8;border-radius:7px">';
+ if(a[0]==='aria-invalid')return '<label for="emailDemo">Email</label> <input id="emailDemo" type="email" aria-invalid="true" aria-describedby="errDemo" value="not-an-email" style="padding:8px;border:1px solid #dc5555;border-radius:7px;max-width:180px"><p id="errDemo" style="color:#bd3030;margin:8px 0">Enter a valid email address.</p>';
+ if(a[0]==='aria-live')return '<button class="secondary" id="liveUpdate">Add notification</button><p id="liveMessage" aria-live="polite" style="min-height:22px">No new notifications.</p>';
+ if(a[0]==='aria-checked')return '<button class="secondary" id="checkDemo" role="checkbox" aria-checked="false">□ Email updates</button>';
+ if(a[0]==='aria-hidden')return '<button class="icon-btn" aria-label="Search"><span aria-hidden="true">⌕</span></button>';
+ return '<button class="icon-btn" id="demoClose" aria-label="Close dialog" title="Close dialog">×</button>';
+}
+$('attributeCards').addEventListener('click',e=>{if(e.target.id==='expandDemo'){const open=e.target.getAttribute('aria-expanded')!=='true';e.target.setAttribute('aria-expanded',String(open));e.target.textContent=open?'Hide details ▴':'Show details ▾';$('expandContent').classList.toggle('hidden',!open);}if(e.target.id==='toggleDemo'){const on=e.target.getAttribute('aria-pressed')!=='true';e.target.setAttribute('aria-pressed',String(on));e.target.textContent='Bold: '+(on?'on':'off');e.target.style.fontWeight=on?'800':'400';}if(e.target.id==='liveUpdate'){$('liveMessage').textContent='You have a new notification.';}if(e.target.id==='checkDemo'){const on=e.target.getAttribute('aria-checked')!=='true';e.target.setAttribute('aria-checked',String(on));e.target.textContent=(on?'☑':'□')+' Email updates';}});
+$('demoArea').addEventListener('click',e=>{if(e.target.id==='expandDemo'){const open=e.target.getAttribute('aria-expanded')!=='true';e.target.setAttribute('aria-expanded',String(open));e.target.textContent=open?'Hide details ▴':'Show details ▾';$('expandContent').classList.toggle('hidden',!open);}if(e.target.id==='toggleDemo'){const on=e.target.getAttribute('aria-pressed')!=='true';e.target.setAttribute('aria-pressed',String(on));e.target.textContent='Bold: '+(on?'on':'off');e.target.style.fontWeight=on?'800':'400';}if(e.target.id==='liveUpdate')$('liveMessage').textContent='You have a new notification.';if(e.target.id==='checkDemo'){const on=e.target.getAttribute('aria-checked')!=='true';e.target.setAttribute('aria-checked',String(on));e.target.textContent=(on?'☑':'□')+' Email updates';}});
+function renderRoles(){const list=roles.filter(r=>r.join(' ').toLowerCase().includes(searchText.toLowerCase()));$('roleCards').innerHTML=list.slice(0,10).map(r=>`<article class="role-card"><div class="role-icon" aria-hidden="true">${r[1]}</div><h3>role="${r[0]}"</h3><p>${escapeHTML(r[2])}</p><button class="secondary" data-role="${r[0]}">View Example</button></article>`).join('')||'<div class="empty">No matching roles.</div>';document.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click',()=>{const r=roles.find(x=>x[0]===b.dataset.role);openModal(r[0]+' role',`<p>${escapeHTML(r[2])}</p><pre class="code">${escapeHTML(r[3])}</pre><p><strong>Remember:</strong> Native HTML elements are usually preferable when they provide the same behavior.</p>`)}));}
+function openModal(title,content){$('modalTitle').textContent=title;$('modalContent').innerHTML=content;$('modalBackdrop').classList.remove('hidden');$('modalClose').focus();}
+function closeModal(){$('modalBackdrop').classList.add('hidden');}
+$('modalClose').addEventListener('click',closeModal);$('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if((e.ctrlKey||e.metaKey)&&e.key==='/'){e.preventDefault();$('search').focus();}});
+$('search').addEventListener('input',e=>{searchText=e.target.value;renderAttrs();renderRoles();});
+$('filters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;currentFilter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));renderAttrs();});
+$('allAttributes').addEventListener('click',()=>{currentFilter='All';document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x.dataset.filter==='All'));$('search').value='';searchText='';renderAttrs();});
+$('allRoles').addEventListener('click',()=>openModal('ARIA roles library',roles.map(r=>`<h3>${escapeHTML(r[0])}</h3><p>${escapeHTML(r[2])}</p><pre class="code">${escapeHTML(r[3])}</pre>`).join('')));
+$('aboutBtn').addEventListener('click',()=>openModal('About ARIA Guide',`<p><strong>ARIA</strong> means Accessible Rich Internet Applications. It adds accessibility information to web interfaces, especially custom widgets.</p><p><strong>Golden rule:</strong> use semantic HTML first. ARIA changes what assistive technology is told; it does not automatically add keyboard interaction, validation, or behavior.</p><p>Explore the cards, search for attributes, switch themes, and try the live demos.</p><p><a href="https://www.w3.org/WAI/ARIA/apg/" target="_blank" rel="noreferrer">Open the W3C ARIA Authoring Practices Guide ↗</a></p>`));
+$('themeBtn').addEventListener('click',()=>{const on=document.body.classList.toggle('dark');$('themeBtn').setAttribute('aria-pressed',String(on));$('themeBtn').innerHTML=on?'☀ <span>Light</span>':'☾ <span>Dark</span>';});
+$('copyCode').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('codeBlock').textContent);$('copyCode').textContent='✓ Copied';setTimeout(()=>$('copyCode').textContent='▢ Copy',1300);}catch(e){const range=document.createRange();range.selectNodeContents($('codeBlock'));const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);$('copyCode').textContent='Select and copy';}});
+document.querySelectorAll('[data-section]').forEach(b=>b.addEventListener('click',()=>{const sec=b.dataset.section;if(sec==='quiz'){openQuiz();return;}if(sec==='cheatsheet'){openModal('ARIA quick cheat sheet',`<p><strong>Name:</strong> aria-label, aria-labelledby</p><p><strong>Help:</strong> aria-describedby</p><p><strong>State:</strong> aria-expanded, aria-pressed, aria-checked, aria-selected, aria-invalid</p><p><strong>Relationships:</strong> aria-controls, aria-haspopup</p><p><strong>Dynamic updates:</strong> aria-live, role="status", role="alert"</p><p>Only add ARIA when it communicates something useful that native HTML does not already provide.</p>`);return;}document.querySelectorAll('[data-section]').forEach(x=>x.classList.toggle('active',x===b));const target=sec==='overview'?'overview':sec;$ (target)?.scrollIntoView({behavior:'smooth',block:'start'});}));
+function openQuiz(){openModal('Quick ARIA quiz',`<p><strong>Question 1 of 3:</strong> Which attribute gives an icon-only button an accessible name?</p><button class="quiz-option" data-answer="wrong">aria-hidden</button><button class="quiz-option" data-answer="right">aria-label</button><button class="quiz-option" data-answer="wrong">aria-expanded</button><div id="quizFeedback" aria-live="polite"></div>`);$('modalContent').querySelectorAll('[data-answer]').forEach(b=>b.addEventListener('click',()=>{$('quizFeedback').className='feedback';$('quizFeedback').textContent=b.dataset.answer==='right'?'Correct! aria-label can provide a name when visible text is not available.':'Not quite. Try again: which attribute provides an accessible name?';if(b.dataset.answer==='right'){$('modalContent').insertAdjacentHTML('beforeend',`<hr><p><strong>Question 2:</strong> Which attribute tells users if a panel is open?</p><button class="quiz-option" data-q2="wrong">aria-current</button><button class="quiz-option" data-q2="right">aria-expanded</button><button class="quiz-option" data-q2="wrong">aria-describedby</button><div id="q2feedback" aria-live="polite"></div>`);$('modalContent').querySelectorAll('[data-q2]').forEach(x=>x.addEventListener('click',()=>{$('q2feedback').className='feedback';$('q2feedback').textContent=x.dataset.q2==='right'?'Correct! Keep aria-expanded synchronized with the panel.':'Try again. Think of expanded or collapsed.';if(x.dataset.q2==='right'){$('modalContent').insertAdjacentHTML('beforeend',`<hr><p><strong>Question 3:</strong> What should you prefer when a native HTML element already does the job?</p><button class="quiz-option" data-q3="wrong">Always add ARIA</button><button class="quiz-option" data-q3="right">Use the native HTML element</button><div id="q3feedback" aria-live="polite"></div>`);$('modalContent').querySelectorAll('[data-q3]').forEach(y=>y.addEventListener('click',()=>{$('q3feedback').className='feedback';$('q3feedback').textContent=y.dataset.q3==='right'?'Perfect! Native HTML first, ARIA when needed. You completed the quiz.':'Remember the first rule: use semantic HTML first.';}));}}));}}));}
+renderAttrs();renderRoles();selectAttr(attrs[0]);
+</script>
+</body>
+</html>
