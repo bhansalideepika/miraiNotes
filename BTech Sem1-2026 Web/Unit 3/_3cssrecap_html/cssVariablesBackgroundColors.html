@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Learn CSS by seeing the code and its output side by side: overflow, backgrounds, colours, functions, variables and Google Fonts.">
+<title>CSS Lab: See the Code, See the Output</title>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Fira+Code&display=swap");
+
+:root {
+    --primary-color: #4f46e5;
+    --secondary-color: #06b6d4;
+    --background-color: #f1f5f9;
+    --text-color: #1e293b;
+    --card-color: #ffffff;
+    --border-radius: 12px;
+    --spacing: 20px;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --dot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Ccircle cx='15' cy='15' r='8' fill='%234f46e5'/%3E%3C/svg%3E");
+}
+
+/* ===== PAGE (shared styles, written once) ===== */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+body { margin: 0; font-family: "Poppins", Arial, sans-serif; background: var(--background-color); color: var(--text-color); line-height: 1.6; }
+code, pre { font-family: "Fira Code", monospace; }
+code { background: #e0e7ff; padding: 1px 5px; border-radius: 4px; font-size: 0.85em; }
+.skip { position: absolute; left: -999px; }
+.skip:focus { left: 10px; top: 10px; background: #fff; padding: 8px; z-index: 9; }
+nav { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; padding: 10px var(--spacing); background: var(--card-color); box-shadow: var(--shadow); }
+nav strong { color: var(--primary-color); margin-right: auto; }
+nav a { color: var(--text-color); text-decoration: none; font-size: 0.9rem; }
+nav a:hover, nav a:focus-visible { color: var(--primary-color); text-decoration: underline; }
+.hero { padding: 56px var(--spacing); color: #fff; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); }
+.hero h1 { margin: 0 0 8px; font-size: clamp(1.8rem, 5vw, 3rem); }
+.hero p { max-width: 60ch; margin: 0; }
+main { max-width: 1100px; margin: 0 auto; padding: var(--spacing); }
+.card { background: var(--card-color); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: var(--spacing); margin-bottom: var(--spacing); }
+h2 { margin-top: 0; border-bottom: 3px solid var(--secondary-color); padding-bottom: 6px; }
+footer { text-align: center; padding: var(--spacing); font-size: 0.85rem; }
+
+/* ===== DEMO ROW: output on the left, its code on the right ===== */
+.demo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 10px var(--spacing); margin: 0 0 var(--spacing); padding-bottom: var(--spacing); border-bottom: 1px dashed #cbd5e1; }
+.demo figcaption { grid-column: 1 / -1; font-weight: 600; }
+.out { padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; min-height: 80px; }
+.code { margin: 0; padding: 12px; background: #0f172a; color: #e2e8f0; border-radius: 8px; font-size: 0.75rem; overflow: auto; max-height: 300px; }
+@media (max-width: 700px) { .demo { grid-template-columns: 1fr; } }
+
+/* ===== OVERFLOW ===== */
+.box { width: 220px; max-width: 100%; height: 50px; padding: 6px; border: 2px solid var(--primary-color); border-radius: 8px; background: #eef2ff; font-size: 0.85rem; }
+.o-visible { overflow: visible; }
+.o-hidden { overflow: hidden; }
+.o-scroll { overflow: scroll; }
+.o-auto { overflow: auto; }
+.o-clip { overflow: clip; }
+.o-xy { overflow-x: auto; overflow-y: hidden; white-space: nowrap; }
+.o-ellipsis { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* ===== BACKGROUNDS (one shared class, one changed property each) ===== */
+.bg { height: 110px; padding: 10px; border: 8px dashed var(--secondary-color); background-color: #e0e7ff; background-image: var(--dot); }
+.b-color { background-image: none; background-color: #fde68a; }
+.b-repeat { background-repeat: repeat; }
+.b-repeat-x { background-repeat: repeat-x; }
+.b-repeat-y { background-repeat: repeat-y; }
+.b-no-repeat { background-repeat: no-repeat; }
+.b-position { background-repeat: no-repeat; background-position: right bottom; }
+.b-cover { background-repeat: no-repeat; background-size: cover; }
+.b-contain { background-repeat: no-repeat; background-size: contain; }
+.b-size-px { background-repeat: no-repeat; background-size: 60px 40px; }
+.b-origin { background-repeat: no-repeat; background-origin: content-box; }
+.b-clip-padding { background-clip: padding-box; }
+.b-clip-content { background-clip: content-box; }
+.b-clip-text { border: none; background-image: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); background-clip: text; -webkit-background-clip: text; color: transparent; font-size: 1.6rem; font-weight: 600; }
+.b-attach { overflow: auto; background-repeat: repeat-y; background-attachment: local; }
+.b-blend { background-image: linear-gradient(var(--primary-color), var(--secondary-color)), var(--dot); background-blend-mode: multiply; }
+.b-multi { background: var(--dot) no-repeat 90% 20% / 40px, linear-gradient(135deg, #e0e7ff, #cffafe); }
+.b-short { background: #fde68a var(--dot) no-repeat center / 50%; }
+
+/* ===== COLOURS ===== */
+.checker { padding: 8px; border-radius: 8px; background: repeating-conic-gradient(#cbd5e1 0% 25%, #fff 0% 50%) 0 / 20px 20px; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.sw { height: 60px; padding: 6px; border-radius: 8px; background: var(--c); color: #000; font: 0.68rem "Fira Code", monospace; word-break: break-all; }
+.sw.light { color: #fff; }
+.sw-current { color: var(--primary-color); border: 3px solid currentColor; background: none; }
+
+/* ===== FUNCTIONS ===== */
+.f-calc { width: calc(100% - 60px); padding: 8px; border-radius: 6px; background: var(--primary-color); color: #fff; }
+.f-min { width: min(100%, 220px); padding: 8px; border-radius: 6px; background: var(--secondary-color); }
+.f-max { width: max(50%, 160px); padding: 8px; border-radius: 6px; background: #fde68a; }
+.f-clamp { font-size: clamp(0.9rem, 3vw, 1.8rem); font-weight: 600; }
+.f-mix { height: 60px; border-radius: 8px; background: color-mix(in srgb, var(--primary-color) 50%, var(--secondary-color)); }
+.t-rotate { padding: 14px; border-radius: 8px; background: #fecaca; text-align: center; transform: rotate(-4deg) scale(1.05); }
+.g { height: 70px; border-radius: 8px; }
+.g-linear { background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); }
+.g-radial { background: radial-gradient(circle, #fde68a, #f97316); }
+.g-conic { background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); }
+.g-repeat { background: repeating-linear-gradient(45deg, var(--primary-color) 0 10px, #fff 10px 20px); }
+
+/* ===== VARIABLE SCOPE ===== */
+.scoped { --card-color: var(--text-color); --text-color: #f8fafc; padding: 12px; border-radius: var(--border-radius); background: var(--card-color); color: var(--text-color); }
+.fallback { color: var(--not-defined, crimson); font-weight: 600; }
+
+/* ===== EXTRA: OVERFLOW / BACKGROUNDS ===== */
+.o-wrap { height: auto; overflow-wrap: break-word; }
+.o-resize { overflow: auto; resize: both; }
+.o-clamp { height: auto; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.b-space { background-repeat: space; }
+.b-round { background-repeat: round; }
+.b-pos-pct { background-repeat: no-repeat; background-position: 25% 75%; }
+.b-fixed { background-attachment: fixed; }
+
+/* ===== EXTRA: FUNCTIONS ===== */
+.t-move { width: 120px; padding: 10px; border-radius: 8px; background: #bbf7d0; transform: translate(20px, 8px) skew(-10deg); }
+.fx { height: 70px; border-radius: 8px; background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); }
+.fx-filter { filter: blur(1.5px) hue-rotate(90deg) saturate(2); }
+.fx-gray { filter: grayscale(100%) brightness(1.1); }
+.fx-shadow { width: 90px; height: 60px; border-radius: 10px; background: var(--primary-color); filter: drop-shadow(8px 8px 4px rgba(0, 0, 0, 0.4)); }
+.tip::after { content: " (" attr(data-tip) ")"; color: var(--primary-color); }
+.cnt { margin: 0; padding: 0; list-style: none; counter-reset: item; }
+.cnt li { counter-increment: item; }
+.cnt li::before { content: counter(item) ". "; font-weight: 600; color: var(--primary-color); }
+.pc { margin: 0; padding: 0; list-style: none; }
+.pc li { padding: 6px 10px; }
+.pc li:nth-child(odd) { background: #e0e7ff; }
+.pc li:not(:last-child) { border-bottom: 1px solid var(--secondary-color); }
+.ease { width: 70px; padding: 8px; border-radius: 8px; background: var(--secondary-color); text-align: center; transition: transform 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+.ease:hover { transform: translateX(160px); }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.cell { padding: 10px; border-radius: 8px; background: #c7d2fe; text-align: center; }
+
+/* ===== EXTRA: UNITS, EFFECTS, LAYOUT ===== */
+.bar { margin: 4px 0; padding: 4px 8px; border-radius: 6px; background: var(--secondary-color); color: #fff; font-size: 0.8rem; white-space: nowrap; overflow: hidden; }
+.u-px { width: 120px; }
+.u-pct { width: 50%; }
+.u-rem { width: 10rem; }
+.u-vw { width: 20vw; }
+.u-ch { width: 20ch; }
+.shadow { padding: 16px; border-radius: var(--border-radius); background: #fff; font-size: 1.3rem; font-weight: 600; box-shadow: 6px 6px 0 var(--secondary-color), 0 8px 20px rgba(0, 0, 0, 0.2); text-shadow: 2px 2px 3px rgba(79, 70, 229, 0.5); }
+.flex { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.flex > div { padding: 10px 14px; border-radius: 8px; background: #c7d2fe; }
+.pos-wrap { position: relative; height: 90px; border-radius: 8px; background: #e0e7ff; }
+.pos-abs { position: absolute; right: 8px; bottom: 8px; padding: 6px 10px; border-radius: 6px; background: var(--primary-color); color: #fff; }
+.btn { padding: 8px 14px; border: 0; border-radius: 8px; background: var(--primary-color); color: #fff; font: inherit; cursor: pointer; }
+.spin { width: 50px; height: 50px; border-radius: 10px; background: var(--primary-color); animation: spin 2s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.mq { padding: 12px; border-radius: 8px; background: #bbf7d0; }
+@media (max-width: 700px) { .mq { background: #fecaca; } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+
+/* ===== REFERENCES ===== */
+.refs { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--spacing); }
+.refs h3 { margin-top: 0; }
+.refs ul { margin: 0; padding-left: 1.2em; }
+.refs li { margin-bottom: 6px; }
+.refs a { color: var(--primary-color); }
+.refs a:focus-visible { outline: 3px solid var(--secondary-color); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<nav aria-label="Main">
+    <strong>CSS Lab</strong>
+    <a href="#variables">Variables</a><a href="#font">Font</a><a href="#dry">DRY</a><a href="#overflow">Overflow</a><a href="#backgrounds">Backgrounds</a><a href="#colours">Colours</a><a href="#functions">Functions</a><a href="#units">Units</a><a href="#effects">Effects</a><a href="#references">References</a>
+</nav>
+<header class="hero">
+    <h1>Learn CSS by seeing it</h1>
+    <p>Every example has its live output on the left and the exact HTML and CSS that makes it on the right.</p>
+</header>
+
+<main id="main">
+
+<section class="card" id="variables" aria-labelledby="h-var">
+    <h2 id="h-var">1. CSS variables</h2>
+    <figure class="demo">
+        <figcaption>Declare once in <code>:root</code>, use anywhere with <code>var()</code>. A second value is a fallback.</figcaption>
+        <div class="out">
+            <p class="fallback">Undefined variable, so the fallback (crimson) is used.</p>
+            <div class="scoped">Scope: this box redefines two variables only inside itself.</div>
+        </div>
+<pre class="code">:root {
+    --primary-color: #4f46e5;
+    --spacing: 20px;
+}
+.card { padding: var(--spacing); }
+
+.fallback { color: var(--not-defined, crimson); }
+
+.scoped {                      /* local override */
+    --card-color: var(--text-color);
+    --text-color: #f8fafc;
+    background: var(--card-color);
+    color: var(--text-color);
+}</pre>
+    </figure>
+    <figure class="demo">
+        <figcaption>Change a variable with JavaScript and every <code>var()</code> using it updates. Click, then watch the hero, navigation and buttons.</figcaption>
+        <div class="out"><button class="btn" id="themeBtn">Change --primary-color</button></div>
+<pre class="code">const root = document.documentElement;
+root.style.setProperty('--primary-color', 'tomato');
+
+// read a variable's current value
+getComputedStyle(root).getPropertyValue('--primary-color');</pre>
+    </figure>
+</section>
+
+<section class="card" id="font" aria-labelledby="h-font">
+    <h2 id="h-font">2. Importing a Google Font</h2>
+    <figure class="demo">
+        <figcaption><code>@import</code> must be the first rule. Add fallback fonts after the name.</figcaption>
+        <div class="out">
+            <p style="font-family:'Poppins',Arial,sans-serif;margin:0">Poppins: the quick brown fox</p>
+            <p style="font-family:'Fira Code',monospace;margin:8px 0 0">Fira Code: the quick brown fox</p>
+        </div>
+<pre class="code">@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&amp;display=swap");
+
+body { font-family: "Poppins", Arial, sans-serif; }
+code { font-family: "Fira Code", monospace; }
+
+/* Or in the HTML head: */
+&lt;link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins&amp;display=swap"&gt;
+
+/* Or load your own font file */
+@font-face {
+    font-family: "MyFont";
+    src: url("fonts/myfont.woff2") format("woff2");
+    font-display: swap;   /* show fallback text first */
+}</pre>
+    </figure>
+</section>
+
+<section class="card" id="dry" aria-labelledby="h-dry">
+    <h2 id="h-dry">3. DRY: Don&rsquo;t Repeat Yourself</h2>
+    <figure class="demo">
+        <figcaption>Repeated (left) versus DRY (right). The overflow and background examples below use the DRY style: one shared class plus tiny modifier classes.</figcaption>
+<pre class="code">.box1 { padding: 20px; border-radius: 12px; }
+.box2 { padding: 20px; border-radius: 12px; }
+.box3 { padding: 20px; border-radius: 12px; }</pre>
+<pre class="code">.box1, .box2, .box3 {
+    padding: var(--spacing);
+    border-radius: var(--border-radius);
+}
+.bg { height: 110px; }                    /* shared */
+.b-repeat-x { background-repeat: repeat-x; } /* modifier */</pre>
+    </figure>
+</section>
+
+<section class="card" id="overflow" aria-labelledby="h-over">
+    <h2 id="h-over">4. Overflow</h2>
+    <figure class="demo"><figcaption><code>visible</code> (default): content spills outside the box.</figcaption>
+        <div class="out"><div class="box o-visible">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>hidden</code>: extra content is cut off.</figcaption>
+        <div class="out"><div class="box o-hidden">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>scroll</code>: scrollbars are always shown.</figcaption>
+        <div class="out"><div class="box o-scroll">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>auto</code>: scrollbar only when needed.</figcaption>
+        <div class="out"><div class="box o-auto">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>clip</code>: like hidden, but can never be scrolled, even by code.</figcaption>
+        <div class="out"><div class="box o-clip">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>overflow-x</code> and <code>overflow-y</code> control each direction separately.</figcaption>
+        <div class="out"><div class="box o-xy">One very long single line that needs sideways scrolling to read it all.</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>text-overflow: ellipsis</code> shows &hellip; (needs hidden + nowrap).</figcaption>
+        <div class="out"><div class="box o-ellipsis">One very long single line that does not fit in the box.</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>overflow-wrap: break-word</code>: breaks a long word that has no spaces</figcaption><div class="out"><div class="box o-wrap">Supercalifragilisticexpialidocious_unbrokenword</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>resize</code> (needs overflow other than visible): drag the bottom-right corner</figcaption><div class="out"><div class="box o-resize">Drag my corner to resize me. Content scrolls when the box gets small.</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>-webkit-line-clamp</code>: cut text after N lines and add &hellip;</figcaption><div class="out"><div class="box o-clamp">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</div></div><pre class="code"></pre></figure>
+</section>
+
+<section class="card" id="backgrounds" aria-labelledby="h-bg">
+    <h2 id="h-bg">5. Background properties</h2>
+    <p>Every box shares the <code>.bg</code> rule. Each modifier changes one property.</p>
+    <figure class="demo"><figcaption><code>background-color</code></figcaption><div class="out"><div class="bg b-color"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-image</code> with <code>repeat</code> (default)</figcaption><div class="out"><div class="bg b-repeat"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>repeat-x</code>: only across</figcaption><div class="out"><div class="bg b-repeat-x"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>repeat-y</code>: only down</figcaption><div class="out"><div class="bg b-repeat-y"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>no-repeat</code>: one copy</figcaption><div class="out"><div class="bg b-no-repeat"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-position</code></figcaption><div class="out"><div class="bg b-position"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-size: cover</code> fills the box and may crop</figcaption><div class="out"><div class="bg b-cover"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-size: contain</code> fits the whole image</figcaption><div class="out"><div class="bg b-contain"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-size</code> with exact lengths</figcaption><div class="out"><div class="bg b-size-px"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-origin</code>: where the position starts counting</figcaption><div class="out"><div class="bg b-origin"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-clip: padding-box</code>: colour stops at the border</figcaption><div class="out"><div class="bg b-clip-padding"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-clip: content-box</code>: colour only behind content</figcaption><div class="out"><div class="bg b-clip-content"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-clip: text</code>: gradient shows through letters</figcaption><div class="out"><div class="bg b-clip-text">Clip to text</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-attachment</code>: scroll inside the box (<code>local</code>; others are <code>scroll</code> and <code>fixed</code>)</figcaption><div class="out"><div class="bg b-attach">Line one<br><br>Line two<br><br>Line three<br><br>Line four<br><br>The end</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-blend-mode</code>: mixes layers</figcaption><div class="out"><div class="bg b-blend"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption>Multiple backgrounds (separate with commas)</figcaption><div class="out"><div class="bg b-multi"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption>Shorthand: colour image repeat position / size</figcaption><div class="out"><div class="bg b-short"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-repeat: space</code>: copies spread out evenly, never cut</figcaption><div class="out"><div class="bg b-space"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-repeat: round</code>: copies stretch to fit exactly</figcaption><div class="out"><div class="bg b-round"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-position</code> with percentages (x then y)</figcaption><div class="out"><div class="bg b-pos-pct"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>background-attachment: fixed</code>: scroll the page, the dots stay put while the box moves over them</figcaption><div class="out"><div class="bg b-fixed"></div></div><pre class="code"></pre></figure>
+</section>
+
+<section class="card" id="colours" aria-labelledby="h-col">
+    <h2 id="h-col">6. Ways to write a colour</h2>
+    <figure class="demo">
+        <figcaption>Each swatch sets its own <code>--c</code> and the shared <code>.sw</code> class paints it. The checkerboard shows transparency.</figcaption>
+        <div class="out checker"><div class="swatches">
+            <div class="sw light" style="--c:tomato">tomato</div>
+            <div class="sw light" style="--c:rebeccapurple">rebeccapurple</div>
+            <div class="sw light" style="--c:#4f46e5">#4f46e5</div>
+            <div class="sw" style="--c:#4f4">#4f4</div>
+            <div class="sw" style="--c:#4f46e580">#4f46e580</div>
+            <div class="sw light" style="--c:rgb(79, 70, 229)">rgb(79, 70, 229)</div>
+            <div class="sw" style="--c:rgba(79, 70, 229, 0.4)">rgba(79, 70, 229, 0.4)</div>
+            <div class="sw light" style="--c:hsl(243, 75%, 59%)">hsl(243, 75%, 59%)</div>
+            <div class="sw" style="--c:hsla(188, 95%, 43%, 0.5)">hsla(188, 95%, 43%, 0.5)</div>
+            <div class="sw" style="--c:hwb(190 10% 20%)">hwb(190 10% 20%)</div>
+            <div class="sw light" style="--c:oklch(55% 0.25 290)">oklch(55% 0.25 290)</div>
+            <div class="sw" style="--c:lab(80% -40 40)">lab(80% -40 40)</div>
+            <div class="sw" style="--c:color-mix(in srgb, red 50%, blue)">color-mix(in srgb, red 50%, blue)</div>
+            <div class="sw" style="--c:transparent">transparent</div>
+            <div class="sw sw-current">currentColor</div>
+            <div class="sw light" style="--c:lch(45% 70 300)">lch(45% 70 300)</div>
+            <div class="sw" style="--c:color(display-p3 1 0.2 0.4)">color(display-p3 1 0.2 0.4)</div>
+            <div class="sw" style="--c:tomato;opacity:0.5">opacity: 0.5</div>
+        </div></div>
+<pre class="code">.sw { background: var(--c); }
+
+&lt;div class="sw" style="--c: tomato"&gt;        /* named */
+&lt;div class="sw" style="--c: #4f46e5"&gt;       /* HEX */
+&lt;div class="sw" style="--c: #4f46e580"&gt;     /* HEX + alpha */
+&lt;div class="sw" style="--c: rgb(79, 70, 229)"&gt;
+&lt;div class="sw" style="--c: rgba(79,70,229,.4)"&gt;
+&lt;div class="sw" style="--c: hsl(243,75%,59%)"&gt;
+&lt;div class="sw" style="--c: hwb(190 10% 20%)"&gt;
+&lt;div class="sw" style="--c: oklch(55% .25 290)"&gt;
+&lt;div class="sw" style="--c: lch(45% 70 300)"&gt;
+&lt;div class="sw" style="--c: color(display-p3 1 .2 .4)"&gt;
+
+/* alpha in a colour fades only that colour;
+   opacity: 0.5 fades the WHOLE element, text too */
+&lt;div class="sw" style="--c: tomato; opacity: 0.5"&gt;
+/* accent-color: var(--primary-color) colours checkboxes and radios */
+
+/* rgb: 0-255 per channel | hsl: hue 0-360,
+   saturation %, lightness % | a = alpha 0 to 1 */
+.sw-current { color: var(--primary-color);
+              border: 3px solid currentColor; }</pre>
+    </figure>
+</section>
+
+<section class="card" id="functions" aria-labelledby="h-fn">
+    <h2 id="h-fn">7. Functions in CSS</h2>
+    <figure class="demo"><figcaption><code>calc()</code>: maths with mixed units</figcaption><div class="out"><div class="f-calc">100% minus 60px</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>min()</code>: picks the smaller value</figcaption><div class="out"><div class="f-min">min(100%, 220px)</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>max()</code>: picks the larger value</figcaption><div class="out"><div class="f-max">max(50%, 160px)</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>clamp()</code>: minimum, preferred, maximum. Resize the window.</figcaption><div class="out"><div class="f-clamp">Responsive text</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>color-mix()</code>: blends two colours</figcaption><div class="out"><div class="f-mix"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>rotate()</code> and <code>scale()</code> inside <code>transform</code></figcaption><div class="out"><div class="t-rotate">Tilted</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>linear-gradient()</code></figcaption><div class="out"><div class="g g-linear"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>radial-gradient()</code></figcaption><div class="out"><div class="g g-radial"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>conic-gradient()</code></figcaption><div class="out"><div class="g g-conic"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>repeating-linear-gradient()</code></figcaption><div class="out"><div class="g g-repeat"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>translate()</code> and <code>skew()</code> inside <code>transform</code></figcaption><div class="out"><div class="t-move">Moved and skewed</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>blur()</code>, <code>hue-rotate()</code>, <code>saturate()</code> in <code>filter</code> (compare with the original conic gradient above)</figcaption><div class="out"><div class="fx fx-filter"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>grayscale()</code> and <code>brightness()</code> in <code>filter</code></figcaption><div class="out"><div class="fx fx-gray"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>drop-shadow()</code>: a shadow that follows the shape</figcaption><div class="out"><div class="fx-shadow"></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>attr()</code>: reads an HTML attribute into <code>content</code></figcaption><div class="out"><p class="tip" data-tip="hello from HTML" style="margin:0">Hover text</p></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>counter()</code>: automatic numbering with <code>counter-reset</code> and <code>counter-increment</code></figcaption><div class="out"><ol class="cnt"><li>First</li><li>Second</li><li>Third</li></ol></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption>Selector functions: <code>:nth-child()</code> and <code>:not()</code></figcaption><div class="out"><ul class="pc"><li>One</li><li>Two</li><li>Three</li><li>Four</li></ul></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>cubic-bezier()</code> timing in a <code>transition</code>. Hover over the box.</figcaption><div class="out"><div class="ease">Hover</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>repeat()</code> and the <code>fr</code> unit in a grid</figcaption><div class="out"><div class="grid3"><div class="cell">1fr</div><div class="cell">1fr</div><div class="cell">1fr</div></div></div><pre class="code"></pre></figure>
+    <p>Also used on this page: <code>var()</code>, <code>url()</code>, <code>repeat()</code> and <code>minmax()</code> (grid), <code>rgb()</code>, <code>hsl()</code>, <code>hwb()</code>, <code>oklch()</code>.</p>
+</section>
+
+<section class="card" id="units" aria-labelledby="h-units">
+    <h2 id="h-units">8. Units</h2>
+    <figure class="demo">
+        <figcaption><code>px</code> is fixed. <code>%</code> follows the parent, <code>rem</code> the root font size, <code>vw</code> the window width, <code>ch</code> the width of the digit 0. (<code>em</code> follows the element&rsquo;s own font size, <code>vh</code> the window height.) Resize the window to see which bars change.</figcaption>
+        <div class="out"><div class="bar u-px">120px</div><div class="bar u-pct">50%</div><div class="bar u-rem">10rem</div><div class="bar u-vw">20vw</div><div class="bar u-ch">20ch</div></div>
+        <pre class="code"></pre>
+    </figure>
+</section>
+
+<section class="card" id="effects" aria-labelledby="h-fx">
+    <h2 id="h-fx">9. Shadows, layout, animation and media queries</h2>
+    <figure class="demo"><figcaption><code>box-shadow</code> (can be stacked), <code>text-shadow</code> and <code>border-radius</code></figcaption><div class="out"><div class="shadow">Shadows</div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>display: flex</code> with <code>justify-content</code> and <code>align-items</code></figcaption><div class="out"><div class="flex"><div>A</div><div>B</div><div>C</div></div></div><pre class="code"></pre></figure>
+    <figure class="demo"><figcaption><code>position: relative</code> on the parent, <code>position: absolute</code> on the child</figcaption><div class="out"><div class="pos-wrap">Parent<div class="pos-abs">Child</div></div></div><pre class="code"></pre></figure>
+    <figure class="demo">
+        <figcaption><code>@keyframes</code> and <code>animation</code></figcaption>
+        <div class="out"><div class="spin"></div></div>
+<pre class="code">.spin {
+    animation: spin 2s linear infinite;  /* name, time, timing, count */
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+/* timing: ease | linear | steps(8) | cubic-bezier() */
+@media (prefers-reduced-motion: reduce) {
+    .spin { animation: none; }       /* respect user settings */
+}</pre>
+    </figure>
+    <figure class="demo">
+        <figcaption><code>@media</code> query: resize the window below 700px and this box turns red.</figcaption>
+        <div class="out"><div class="mq">Responsive box</div></div>
+<pre class="code">.mq { background: #bbf7d0; }
+
+@media (max-width: 700px) {
+    .mq { background: #fecaca; }
+}</pre>
+    </figure>
+</section>
+
+<section class="card" id="references" aria-labelledby="h-ref">
+    <h2 id="h-ref">10. References for more practice</h2>
+    <p>These are external websites. Each link opens in a new tab. Try the &ldquo;Try it Yourself&rdquo; editors on W3Schools, then compare with the examples on GeeksforGeeks.</p>
+    <div class="refs">
+        <nav aria-label="W3Schools references">
+            <h3>W3Schools</h3>
+            <ul>
+            <li><a href="https://www.w3schools.com/css/" target="_blank" rel="noopener noreferrer">CSS Tutorial (start here)</a></li>
+            <li><a href="https://www.w3schools.com/css/css_overflow.asp" target="_blank" rel="noopener noreferrer">CSS Overflow</a></li>
+            <li><a href="https://www.w3schools.com/css/css_background.asp" target="_blank" rel="noopener noreferrer">CSS Backgrounds</a></li>
+            <li><a href="https://www.w3schools.com/css/css3_backgrounds.asp" target="_blank" rel="noopener noreferrer">Backgrounds (advanced): size, origin, clip, multiple</a></li>
+            <li><a href="https://www.w3schools.com/css/css_colors.asp" target="_blank" rel="noopener noreferrer">CSS Colors</a></li>
+            <li><a href="https://www.w3schools.com/cssref/css_colors_legal.php" target="_blank" rel="noopener noreferrer">Legal colour values: HEX, RGB, HSL</a></li>
+            <li><a href="https://www.w3schools.com/css/css3_variables.asp" target="_blank" rel="noopener noreferrer">CSS Variables</a></li>
+            <li><a href="https://www.w3schools.com/css/css_font_google.asp" target="_blank" rel="noopener noreferrer">CSS Google Fonts</a></li>
+            <li><a href="https://www.w3schools.com/css/css_units.asp" target="_blank" rel="noopener noreferrer">CSS Units</a></li>
+            <li><a href="https://www.w3schools.com/cssref/css_functions.php" target="_blank" rel="noopener noreferrer">CSS Functions reference</a></li>
+            <li><a href="https://www.w3schools.com/css/css3_animations.asp" target="_blank" rel="noopener noreferrer">CSS Animations</a></li>
+            <li><a href="https://www.w3schools.com/css/css3_mediaqueries.asp" target="_blank" rel="noopener noreferrer">CSS Media Queries</a></li>
+            </ul>
+        </nav>
+        <nav aria-label="GeeksforGeeks references">
+            <h3>GeeksforGeeks</h3>
+            <ul>
+            <li><a href="https://www.geeksforgeeks.org/?p=1109182" target="_blank" rel="noopener noreferrer">CSS Tutorial (start here)</a></li>
+            <li><a href="https://www.geeksforgeeks.org/?p=207567" target="_blank" rel="noopener noreferrer">CSS Overflow</a></li>
+            <li><a href="https://www.geeksforgeeks.org/css-background" target="_blank" rel="noopener noreferrer">CSS Background property</a></li>
+            <li><a href="https://www.geeksforgeeks.org/how-to-use-the-background-property-in-css/" target="_blank" rel="noopener noreferrer">How to use the background shorthand</a></li>
+            <li><a href="https://www.geeksforgeeks.org/what-is-css-variable/" target="_blank" rel="noopener noreferrer">What is a CSS variable?</a></li>
+            <li><a href="https://www.geeksforgeeks.org/?p=256360" target="_blank" rel="noopener noreferrer">CSS var() function</a></li>
+            <li><a href="https://www.geeksforgeeks.org/?p=1041160" target="_blank" rel="noopener noreferrer">CSS Google Fonts</a></li>
+            </ul>
+        </nav>
+    </div>
+</section>
+
+</main>
+<footer>CSS Lab &middot; a classroom demo page</footer>
+
+<script>
+/* Fills every empty <pre class="code"> with the HTML of its output
+   and the CSS rules that style it, read live from this page's stylesheet. */
+const rules = [];
+(function collect(sheets) {
+    for (const s of sheets) {
+        try {
+            for (const r of s.cssRules) {
+                if (r.styleSheet) collect([r.styleSheet]);
+                else if (r.selectorText) rules.push(r);
+            }
+        } catch (e) { /* cross-origin font sheet: skip */ }
+    }
+})(document.styleSheets);
+
+document.querySelectorAll('.demo').forEach(demo => {
+    const pre = demo.querySelector('pre.code');
+    const out = demo.querySelector('.out');
+    if (!pre || !out || pre.textContent.trim()) return;
+    const used = new Set();
+    [out, ...out.querySelectorAll('*')].forEach(el => el.classList.forEach(c => used.add(c)));
+    used.delete('out');
+    const html = out.innerHTML.split('\n').map(l => l.trim()).filter(Boolean).join('\n');
+    const css = rules
+        .filter(r => r.selectorText.split(',').some(sel => [...used].some(c => new RegExp('\\.' + c + '(?![\\w-])').test(sel))))
+        .map(r => r.cssText.replace(/\{\s*/, '{\n  ').replace(/;\s*/g, ';\n  ').replace(/\s*\}\s*$/, '\n}'))
+        .join('\n\n');
+    pre.textContent = '<!-- HTML -->\n' + html + '\n\n/* CSS */\n' + css;
+});
+</script>
+<script>
+const colours = ['#4f46e5', '#e11d48', '#059669', '#d97706'];
+let ci = 0;
+document.getElementById('themeBtn').addEventListener('click', () => {
+    ci = (ci + 1) % colours.length;
+    document.documentElement.style.setProperty('--primary-color', colours[ci]);
+});
+</script>
+</body>
+</html>
