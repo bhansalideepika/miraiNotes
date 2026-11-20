@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>CSS Functions & Units Demo</title>
+
+
+
+<style>
+
+
+
+body{
+
+    font-family:Arial;
+
+    margin:20px;
+
+    background:#f5f5f5;
+
+}
+
+
+
+section{
+
+    background:white;
+
+    padding:20px;
+
+    margin-bottom:25px;
+
+    border-radius:10px;
+
+    box-shadow:0 0 5px gray;
+
+}
+
+
+
+h2{
+
+    color:#0d6efd;
+
+}
+
+
+
+.box{
+
+    height:50px;
+
+    background:steelblue;
+
+    color:white;
+
+    text-align:center;
+
+    line-height:50px;
+
+    margin:10px 0;
+
+}
+
+
+
+/* ------------ CSS Functions ------------ */
+
+
+
+.calc{
+
+    width:calc(100% - 100px);
+
+}
+
+
+
+.min{
+
+    width:min(500px,100%);
+
+}
+
+
+
+.max{
+
+    width:max(300px,50%);
+
+}
+
+
+
+.clamp{
+
+    font-size:clamp(16px,3vw,32px);
+
+    font-weight:bold;
+
+}
+
+
+
+/* ------------ CSS Units ------------ */
+
+
+
+.px{
+
+    font-size:20px;
+
+}
+
+
+
+.pt{
+
+    font-size:18pt;
+
+}
+
+
+
+.parent{
+
+    font-size:20px;
+
+}
+
+
+
+.em{
+
+    font-size:1.5em;
+
+}
+
+
+
+.rem{
+
+    font-size:2rem;
+
+}
+
+
+
+.percent{
+
+    width:60%;
+
+    background:tomato;
+
+    color:white;
+
+    padding:10px;
+
+}
+
+
+
+.vw{
+
+    font-size:3vw;
+
+}
+
+
+
+.vh{
+
+    height:30vh;
+
+    background:mediumseagreen;
+
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:22px;
+
+}
+
+
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<section>
+
+<h2>CSS Functions</h2>
+
+
+
+<div class="box calc">
+
+calc(100% - 100px)
+
+</div>
+
+
+
+<div class="box min">
+
+min(500px,100%)
+
+</div>
+
+
+
+<div class="box max">
+
+max(300px,50%)
+
+</div>
+
+
+
+<p class="clamp">
+
+This text uses clamp(16px,3vw,32px). vw : viewport width. Resize the browser to see the font size change.
+
+property: clamp(minimum, preferred, maximum);
+
+</p>
+
+
+
+</section>
+
+
+
+<section>
+
+
+
+<h2>CSS Units</h2>
+
+
+
+<p class="px">
+
+20px → Fixed pixel size
+
+</p>
+
+
+
+<p class="pt">
+
+18pt → Mainly used for printing
+
+</p>
+
+
+
+<div class="parent">
+
+Parent Font = 20px
+
+<p class="em">
+
+1.5em → 30px (1.5 × parent font size)
+
+</p>
+
+</div>
+
+
+
+<p class="rem">
+
+2rem → Relative to root font size
+
+</p>
+
+
+
+<div class="percent">
+
+Width = 60%
+
+</div>
+
+
+
+<p class="vw">
+
+3vw → Font size changes with viewport width
+
+</p>
+
+
+
+<div class="vh">
+
+Height = 30vh
+
+</div>
+
+
+
+</section>
+
+
+
+</body>
+
+</html>
