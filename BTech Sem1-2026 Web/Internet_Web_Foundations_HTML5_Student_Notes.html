@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Student exam notes covering Internet and Web Foundations, Git and GitHub, HTML5, forms, multimedia, SEO and accessibility.">
+<title>Internet, Web Foundations & HTML5 — Student Notes</title>
+<style>
+:root{--ink:#172033;--muted:#5e6b80;--brand:#2457c5;--brand2:#eaf0ff;--line:#dfe5ef;--paper:#fff;--bg:#f4f6fb;--good:#eaf7ef;--warn:#fff6df;--code:#111827}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.68 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(120deg,#142d63,#285ecb);color:white;padding:42px 24px 36px}header .wrap{max-width:1200px;margin:auto}header .eyebrow{font-size:.78rem;letter-spacing:.13em;text-transform:uppercase;opacity:.85;font-weight:700}h1{font-size:clamp(2rem,4vw,3.2rem);line-height:1.12;margin:10px 0 12px}header p{max-width:760px;margin:0;color:#e8efff;font-size:1.06rem}.meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.meta span{border:1px solid #ffffff55;border-radius:99px;padding:5px 12px;font-size:.85rem}
+.layout{max-width:1200px;margin:26px auto;padding:0 20px;display:grid;grid-template-columns:270px minmax(0,1fr);gap:24px;align-items:start}
+aside{position:sticky;top:18px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;max-height:calc(100vh - 36px);overflow:auto}
+aside h2{font-size:.92rem;margin:0 0 12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+nav a{display:block;text-decoration:none;color:#34415a;padding:7px 9px;border-radius:7px;font-size:.91rem;line-height:1.4}nav a:hover,nav a.active{background:var(--brand2);color:var(--brand);font-weight:650}.tools{display:flex;gap:8px;margin-bottom:14px}.tools input{min-width:0;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:.88rem}
+main{min-width:0}.intro,.chapter{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:28px;margin-bottom:20px;box-shadow:0 3px 14px #18294a08}
+h2{font-size:1.65rem;line-height:1.25;margin:0 0 16px;color:#17366f}h3{font-size:1.18rem;margin:25px 0 8px;color:#203b70}h4{font-size:1rem;margin:18px 0 6px}p{margin:8px 0 13px}ul,ol{padding-left:24px}li{margin:5px 0}.lead{font-size:1.08rem;color:#3e4c63}.tag{display:inline-block;background:var(--brand2);color:var(--brand);font-size:.76rem;font-weight:750;padding:3px 9px;border-radius:99px;margin-bottom:10px}
+.callout{border-left:4px solid var(--brand);background:#f1f5ff;padding:12px 15px;border-radius:0 9px 9px 0;margin:14px 0}.callout.good{border-color:#24834b;background:var(--good)}.callout.warn{border-color:#d69a16;background:var(--warn)}
+table{border-collapse:collapse;width:100%;margin:13px 0 18px;font-size:.94rem}th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}th{background:#edf2fc;color:#203b70}code{font-family:Consolas,Monaco,monospace;background:#edf1f7;padding:2px 5px;border-radius:4px;font-size:.92em}pre{background:var(--code);color:#e5edff;padding:16px;border-radius:10px;overflow:auto;line-height:1.55;font-size:.9rem}pre code{background:none;color:inherit;padding:0}.diagram{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:#f6f8fc;border:1px dashed #b9c8e4;border-radius:10px;padding:16px;margin:15px 0}.node{background:white;border:1px solid #b9c8e4;border-radius:8px;padding:10px 13px;text-align:center;font-weight:650}.arrow{color:var(--brand);font-weight:800}.small{color:var(--muted);font-size:.9rem}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.mini{border:1px solid var(--line);border-radius:10px;padding:13px;background:#fcfdff}.mini strong{color:#1f3e7b}.checklist li{list-style:"✓  ";padding-left:4px}.quiz{background:#f7f9fd;border:1px solid var(--line);padding:16px;border-radius:10px;margin-top:15px}.quiz button,.topbtn{border:0;background:var(--brand);color:white;padding:9px 13px;border-radius:8px;font-weight:650;cursor:pointer}.quiz button:hover,.topbtn:hover{background:#173f9c}.answer{display:none;margin-top:10px;background:var(--good);padding:10px;border-radius:7px}.answer.show{display:block}.chapter[hidden]{display:none}footer{text-align:center;color:var(--muted);padding:28px 15px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}aside{position:relative;top:0;max-height:none}nav{columns:2} .grid2{grid-template-columns:1fr}}
+@media(max-width:560px){header{padding:30px 18px}.layout{padding:0 12px;margin:14px auto}.intro,.chapter{padding:20px}nav{columns:1}table{display:block;overflow-x:auto;white-space:normal}}
+@media print{body{background:white;font-size:11pt}header{background:white;color:#111;padding:10px 0;border-bottom:2px solid #222}header p{color:#333}.layout{display:block;max-width:none;margin:0;padding:0}aside,.tools,.topbtn,.quiz button{display:none!important}.intro,.chapter{box-shadow:none;border:0;border-radius:0;padding:14px 0;break-inside:avoid}.chapter{break-before:page}a{color:inherit;text-decoration:none}pre{white-space:pre-wrap}footer{display:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<div class="eyebrow">Student exam notes • Internet technologies</div>
+<h1>Internet, Web Foundations<br>&amp; HTML5</h1>
+<p>A structured study guide with definitions, explanations, examples, comparison tables, command references and quick revision questions.</p>
+<div class="meta"><span>Internet &amp; Web</span><span>Git &amp; GitHub</span><span>HTML5</span><span>SEO &amp; Accessibility</span></div>
+</div></header>
+<div class="layout">
+<aside>
+<h2>Find a topic</h2>
+<div class="tools"><input id="search" type="search" placeholder="Search notes…" aria-label="Search notes"></div>
+<nav id="toc">
+<a href="#overview">How to use these notes</a>
+<a href="#internet">1. How the Internet works</a>
+<a href="#ipdns">2. IP addresses &amp; DNS</a>
+<a href="#http">3. HTTP, HTTPS &amp; status codes</a>
+<a href="#browser">4. Browsers &amp; DevTools</a>
+<a href="#cli">5. Command line basics</a>
+<a href="#git">6. Git &amp; GitHub</a>
+<a href="#html">7. HTML5 document structure</a>
+<a href="#semantic">8. Semantic HTML</a>
+<a href="#content">9. Text, links, images &amp; lists</a>
+<a href="#tables">10. HTML tables</a>
+<a href="#forms">11. Forms &amp; input types</a>
+<a href="#media">12. Multimedia</a>
+<a href="#seo">13. Metadata &amp; SEO</a>
+<a href="#accessibility">14. Accessibility, ARIA &amp; alt text</a>
+<a href="#revision">15. Exam revision</a>
+</nav>
+</aside>
+<main id="notes">
+<section class="intro" id="overview">
+<span class="tag">Start here</span><h2>How to use these notes</h2>
+<p class="lead">Study each topic in this order: understand the definition, learn how it works, compare related terms, and practise explaining the example in your own words.</p>
+<ul><li>Learn the meaning of each technical term, not only its abbreviation.</li><li>For process-based topics, remember the sequence of steps.</li><li>For HTML, understand what each element communicates and when to use it.</li><li>Use the revision questions at the end to test recall before the exam.</li></ul>
+<div class="callout"><strong>Exam tip:</strong> In a descriptive answer, write a clear definition first, explain the purpose, and then give a small example or sequence.</div>
+</section>
+
+<section class="chapter" id="internet">
+<span class="tag">Unit 1 • Internet &amp; Web Foundations</span><h2>1. How the Internet works</h2>
+<h3>What is the Internet?</h3><p>The <strong>Internet</strong> is a worldwide network of interconnected computer networks. Devices communicate over it using agreed rules called <strong>protocols</strong>. It carries many kinds of services, including the World Wide Web, email, file transfer and online calls.</p>
+<h3>Internet vs World Wide Web</h3><table><tr><th>Internet</th><th>World Wide Web (WWW)</th></tr><tr><td>The global network infrastructure connecting devices and networks.</td><td>A service that uses the Internet to access linked pages and resources through browsers.</td></tr><tr><td>Supports web, email, messaging, file transfer and more.</td><td>Uses web technologies such as URLs, HTTP/HTTPS and HTML.</td></tr></table>
+<h3>Clients and servers</h3><p>A <strong>client</strong> is a device or application that requests a resource or service. A <strong>server</strong> is a computer or software that receives requests and provides resources or services.</p>
+<div class="diagram"><div class="node">Client<br><small>Browser / user device</small></div><div class="arrow">Request →</div><div class="node">Server<br><small>Website / application</small></div><div class="arrow">← Response</div></div>
+<p><strong>Example:</strong> When a student opens a college website, the browser (client) requests the page. The web server processes the request and sends back files such as HTML, CSS, JavaScript and images. The browser displays the page.</p>
+<h3>Basic request–response sequence</h3><ol><li>The user enters a URL or clicks a link.</li><li>The browser identifies the server using the domain name and DNS.</li><li>The browser establishes a network connection with the server.</li><li>The browser sends an HTTP request.</li><li>The server processes the request and returns an HTTP response.</li><li>The browser interprets the response and renders the page. It may request additional files such as stylesheets, scripts and images.</li></ol>
+<div class="callout good"><strong>Remember:</strong> The browser is usually the client. The website's hosting computer or service runs the server software.</div>
+</section>
+
+<section class="chapter" id="ipdns">
+<span class="tag">Unit 1</span><h2>2. IP addresses and DNS</h2>
+<h3>IP address</h3><p>An <strong>IP (Internet Protocol) address</strong> is a numerical address used to identify a device or network interface so that data can be routed to the correct destination.</p>
+<table><tr><th>Type</th><th>Format</th><th>Example</th></tr><tr><td>IPv4</td><td>Four decimal numbers separated by dots; each number ranges from 0 to 255.</td><td><code>192.168.1.10</code></td></tr><tr><td>IPv6</td><td>Longer hexadecimal address separated by colons; designed to provide a much larger address space.</td><td><code>2001:db8::8a2e:370:7334</code></td></tr></table>
+<p>A public IP address is generally reachable across the Internet, subject to network and security controls. A private IP address is used inside a local network and is not directly routed across the public Internet.</p>
+<h3>Domain name</h3><p>A <strong>domain name</strong> is a human-readable name used to locate an Internet resource, such as <code>example.com</code>. It is easier to remember than a numerical IP address.</p>
+<h3>DNS (Domain Name System)</h3><p>DNS is a distributed naming system that translates domain names into information needed to locate Internet services, commonly IP addresses.</p>
+<div class="diagram"><div class="node">Browser asks for<br><code>www.example.com</code></div><div class="arrow">→</div><div class="node">DNS resolver<br>looks up the name</div><div class="arrow">→</div><div class="node">IP address<br>returned</div></div>
+<ol><li>You enter a domain name in the browser.</li><li>The device checks available local and cached DNS information.</li><li>If needed, a DNS resolver finds the required DNS record by querying the DNS system.</li><li>The resolver returns the result to the device.</li><li>The browser can now connect to the server at the resolved address.</li></ol>
+<div class="callout"><strong>Key distinction:</strong> DNS finds the address associated with a domain name. HTTP/HTTPS is then used to communicate with the web server.</div>
+</section>
+
+<section class="chapter" id="http">
+<span class="tag">Unit 1</span><h2>3. HTTP, HTTPS and status codes</h2>
+<h3>HTTP</h3><p><strong>HTTP (Hypertext Transfer Protocol)</strong> is an application-layer protocol used for communication between web clients and servers. It follows a request–response model.</p>
+<h3>HTTPS</h3><p><strong>HTTPS</strong> is HTTP protected by encryption using TLS (Transport Layer Security). It helps provide confidentiality, integrity and authentication of the server. Look for the padlock or site-information indicator in the browser, but remember that HTTPS alone does not prove a website is honest or safe in every other way.</p>
+<table><tr><th>HTTP</th><th>HTTPS</th></tr><tr><td>Communication is not protected by TLS encryption.</td><td>Communication is protected by TLS.</td></tr><tr><td>URL commonly begins with <code>http://</code>.</td><td>URL commonly begins with <code>https://</code>.</td></tr><tr><td>Does not provide TLS-based confidentiality or server authentication.</td><td>Helps protect data from being read or altered in transit and authenticates the server through its certificate.</td></tr></table>
+<h3>HTTP request</h3><p>A request is sent by a client to ask a server to perform an action or return a resource. It commonly contains:</p><ul><li><strong>Method:</strong> indicates the intended action, such as GET or POST.</li><li><strong>URL/path:</strong> identifies the resource.</li><li><strong>Headers:</strong> provide additional information, such as accepted formats or authentication details.</li><li><strong>Body:</strong> optional data sent with the request, often used with POST or PUT.</li></ul>
+<h3>Common HTTP methods</h3><table><tr><th>Method</th><th>Purpose</th><th>Example</th></tr><tr><td><code>GET</code></td><td>Retrieve a resource.</td><td>Load a product page.</td></tr><tr><td><code>POST</code></td><td>Submit data for processing or create a resource.</td><td>Submit a registration form.</td></tr><tr><td><code>PUT</code></td><td>Create or replace a resource at a known location.</td><td>Replace a profile record.</td></tr><tr><td><code>PATCH</code></td><td>Partially update a resource.</td><td>Change a profile photo field.</td></tr><tr><td><code>DELETE</code></td><td>Request deletion of a resource.</td><td>Delete a saved item.</td></tr></table>
+<h3>HTTP response</h3><p>The server's response commonly contains a status code, response headers and an optional body. The body may contain HTML, JSON, an image or another resource.</p>
+<h3>HTTP status code groups</h3><table><tr><th>Range</th><th>Meaning</th><th>Common examples</th></tr><tr><td><strong>1xx</strong></td><td>Informational — request received; processing continues.</td><td><code>100 Continue</code></td></tr><tr><td><strong>2xx</strong></td><td>Success — request was successfully received, understood and handled.</td><td><code>200 OK</code>, <code>201 Created</code>, <code>204 No Content</code></td></tr><tr><td><strong>3xx</strong></td><td>Redirection — further action is needed, often to another URL.</td><td><code>301 Moved Permanently</code>, <code>302 Found</code>, <code>304 Not Modified</code></td></tr><tr><td><strong>4xx</strong></td><td>Client error — request has a problem or cannot be fulfilled.</td><td><code>400 Bad Request</code>, <code>401 Unauthorized</code>, <code>403 Forbidden</code>, <code>404 Not Found</code></td></tr><tr><td><strong>5xx</strong></td><td>Server error — server failed to fulfil an apparently valid request.</td><td><code>500 Internal Server Error</code>, <code>502 Bad Gateway</code>, <code>503 Service Unavailable</code></td></tr></table>
+<div class="callout warn"><strong>Exam trap:</strong> 401 means authentication is required or has failed; 403 means the server understood the request but refuses access. A 404 means the requested resource was not found.</div>
+<h3>Complete example</h3><p>When a browser requests <code>https://shop.example/products</code>, it may send a <code>GET</code> request. The server may respond with <code>200 OK</code> and HTML. If the product path does not exist, it may respond with <code>404 Not Found</code>.</p>
+</section>
+
+<section class="chapter" id="browser">
+<span class="tag">Unit 1</span><h2>4. Browsers and Developer Tools</h2>
+<h3>What is a web browser?</h3><p>A <strong>web browser</strong> is application software used to access and display web resources. Examples include Google Chrome, Mozilla Firefox, Microsoft Edge, Safari and Opera.</p>
+<h3>What does a browser do?</h3><ul><li>Accepts a URL or user action.</li><li>Uses DNS and network protocols to communicate with servers.</li><li>Downloads HTML, CSS, JavaScript, images and other resources.</li><li>Parses HTML to build the DOM (Document Object Model).</li><li>Processes CSS to calculate styles and layout.</li><li>Executes JavaScript and renders the page on screen.</li><li>Provides features such as tabs, history, bookmarks, downloads and privacy controls.</li></ul>
+<h3>Browser Developer Tools (DevTools)</h3><p>Developer Tools are built-in browser utilities used to inspect, debug and analyse web pages. In most desktop browsers, press <code>F12</code> or <code>Ctrl + Shift + I</code> to open them.</p>
+<table><tr><th>Panel</th><th>What it is used for</th></tr><tr><td>Elements / Inspector</td><td>Inspect and temporarily edit HTML elements and CSS styles.</td></tr><tr><td>Console</td><td>View JavaScript errors, warnings and messages; run JavaScript commands.</td></tr><tr><td>Network</td><td>Inspect requests and responses, status codes, resource sizes and loading time.</td></tr><tr><td>Sources / Debugger</td><td>View source files, set breakpoints and debug JavaScript.</td></tr><tr><td>Application / Storage</td><td>Inspect cookies, local storage, session storage and other site data.</td></tr><tr><td>Performance</td><td>Record and investigate page performance.</td></tr></table>
+<div class="callout good"><strong>Practical exam activity:</strong> Open a website, inspect a heading in Elements, find a failed request or status code in Network, and check whether any errors appear in Console.</div>
+</section>
+
+<section class="chapter" id="cli">
+<span class="tag">Unit 1</span><h2>5. Command line basics</h2>
+<p>The <strong>command line interface (CLI)</strong> lets a user interact with an operating system by typing commands in a terminal instead of using only graphical controls.</p>
+<h3>Why use the command line?</h3><ul><li>Navigate folders and manage files.</li><li>Run development tools and scripts.</li><li>Use Git commands.</li><li>Automate repeated tasks.</li><li>Work efficiently on remote systems.</li></ul>
+<h3>Common commands</h3><table><tr><th>Command</th><th>Purpose</th><th>Example</th></tr><tr><td><code>pwd</code></td><td>Show the current directory (Linux/macOS/Git Bash).</td><td><code>pwd</code></td></tr><tr><td><code>ls</code></td><td>List files and folders (Linux/macOS/Git Bash).</td><td><code>ls</code></td></tr><tr><td><code>dir</code></td><td>List files and folders in Windows Command Prompt.</td><td><code>dir</code></td></tr><tr><td><code>cd</code></td><td>Change directory.</td><td><code>cd Documents</code></td></tr><tr><td><code>cd ..</code></td><td>Move to the parent directory.</td><td><code>cd ..</code></td></tr><tr><td><code>mkdir</code></td><td>Create a directory.</td><td><code>mkdir website</code></td></tr><tr><td><code>touch</code></td><td>Create an empty file on common Unix-like shells.</td><td><code>touch index.html</code></td></tr><tr><td><code>echo</code></td><td>Display text or write text using redirection.</td><td><code>echo Hello</code></td></tr><tr><td><code>clear</code></td><td>Clear the terminal screen (Windows Command Prompt uses <code>cls</code>).</td><td><code>clear</code></td></tr><tr><td><code>code .</code></td><td>Open the current folder in Visual Studio Code, if the command is installed.</td><td><code>code .</code></td></tr></table>
+<div class="callout"><strong>Note:</strong> Commands can differ between Windows Command Prompt, PowerShell, Git Bash, Linux and macOS. Learn the commands used in your lab environment.</div>
+<h3>Example workflow</h3><pre><code>mkdir my-website
+cd my-website
+touch index.html
+code .</code></pre>
+<p>This creates a folder, enters it, creates an HTML file and opens the folder in VS Code if the command is available.</p>
+</section>
+
+<section class="chapter" id="git">
+<span class="tag">Unit 1</span><h2>6. Version control with Git and GitHub</h2>
+<h3>Version control</h3><p><strong>Version control</strong> is a system for recording changes to files over time. It helps developers track history, restore earlier versions, collaborate and manage parallel work.</p>
+<h3>Git vs GitHub</h3><table><tr><th>Git</th><th>GitHub</th></tr><tr><td>A distributed version control system installed and used on a computer.</td><td>An online platform for hosting Git repositories and collaborating on projects.</td></tr><tr><td>Tracks file changes, commits and branches.</td><td>Provides remote repositories, pull requests, issues, reviews and collaboration tools.</td></tr><tr><td>Can work locally without an Internet connection for many operations.</td><td>Online collaboration features require network access.</td></tr></table>
+<h3>Important terms</h3><ul><li><strong>Repository (repo):</strong> a project folder tracked by Git, including its history.</li><li><strong>Working directory:</strong> the files currently being edited.</li><li><strong>Staging area:</strong> the selected changes prepared for the next commit.</li><li><strong>Commit:</strong> a saved snapshot of staged changes with a message.</li><li><strong>Branch:</strong> an independent line of development.</li><li><strong>Remote:</strong> a version of the repository hosted elsewhere, often on GitHub.</li><li><strong>Merge:</strong> combines changes from one branch into another.</li><li><strong>Pull request (PR):</strong> a GitHub proposal to review and merge changes from one branch or fork into another repository or branch.</li></ul>
+<h3>Basic Git workflow</h3><div class="diagram"><div class="node">Working<br>directory</div><div class="arrow">git add →</div><div class="node">Staging<br>area</div><div class="arrow">git commit →</div><div class="node">Local<br>repository</div><div class="arrow">git push →</div><div class="node">Remote<br>repository</div></div>
+<h3>Essential commands</h3><table><tr><th>Command</th><th>Meaning</th></tr><tr><td><code>git --version</code></td><td>Check the installed Git version.</td></tr><tr><td><code>git config --global user.name "Your Name"</code></td><td>Set the name recorded in commits.</td></tr><tr><td><code>git config --global user.email "you@example.com"</code></td><td>Set the email recorded in commits.</td></tr><tr><td><code>git init</code></td><td>Initialize a new local Git repository in the current folder.</td></tr><tr><td><code>git clone URL</code></td><td>Copy an existing remote repository to your computer, including its history.</td></tr><tr><td><code>git status</code></td><td>Show the state of the working directory and staging area.</td></tr><tr><td><code>git add index.html</code></td><td>Stage a specific file.</td></tr><tr><td><code>git add .</code></td><td>Stage changes in the current directory and its subdirectories.</td></tr><tr><td><code>git commit -m "message"</code></td><td>Save staged changes with a descriptive message.</td></tr><tr><td><code>git log --oneline</code></td><td>Display a compact commit history.</td></tr><tr><td><code>git branch</code></td><td>List local branches.</td></tr><tr><td><code>git branch feature</code></td><td>Create a branch named feature.</td></tr><tr><td><code>git switch feature</code></td><td>Switch to the feature branch.</td></tr><tr><td><code>git switch -c feature</code></td><td>Create and switch to a new branch.</td></tr><tr><td><code>git merge feature</code></td><td>Merge feature into the currently checked-out branch.</td></tr><tr><td><code>git remote -v</code></td><td>List configured remote repositories.</td></tr><tr><td><code>git push</code></td><td>Send local commits to a remote repository.</td></tr><tr><td><code>git pull</code></td><td>Fetch remote changes and integrate them into the current branch.</td></tr></table>
+<h3>Understanding init, clone, fork, push and pull</h3>
+<div class="grid2"><div class="mini"><strong>git init</strong><p>Start tracking a new local project. It creates the repository metadata in the folder.</p></div><div class="mini"><strong>git clone</strong><p>Download an existing repository to your computer. It normally configures the original repository as a remote named <code>origin</code>.</p></div><div class="mini"><strong>Fork</strong><p>Create your own GitHub-hosted copy of another user's repository under your GitHub account. Fork is a GitHub platform action, not a basic Git command.</p></div><div class="mini"><strong>git push</strong><p>Upload your local commits to a remote repository.</p></div><div class="mini"><strong>git pull</strong><p>Fetch changes from a remote and integrate them into your current local branch.</p></div><div class="mini"><strong>Pull request</strong><p>Ask repository maintainers to review and merge your proposed changes. It is created on GitHub or a similar hosting platform.</p></div></div>
+<h3>Typical collaboration workflow using a fork</h3><ol><li>Open the original project on GitHub and click <strong>Fork</strong>.</li><li>Clone your fork to your computer using <code>git clone</code>.</li><li>Create a separate branch using <code>git switch -c feature-name</code>.</li><li>Edit files and check changes using <code>git status</code>.</li><li>Stage and commit changes using <code>git add</code> and <code>git commit</code>.</li><li>Push the branch to your fork using <code>git push -u origin feature-name</code>.</li><li>Open GitHub and create a pull request from your branch to the original repository.</li><li>Respond to review feedback and update the branch if needed.</li></ol>
+<h3>Example: first local project</h3><pre><code>mkdir college-site
+cd college-site
+git init
+# Create index.html and add some content
+git status
+git add index.html
+git commit -m "Add home page"
+git switch -c about-page
+# Create about.html and add content
+git add about.html
+git commit -m "Add about page"
+git switch main
+git merge about-page</code></pre>
+<div class="callout warn"><strong>Common confusion:</strong> <code>git add</code> stages changes; it does not upload them. <code>git commit</code> saves them locally; it does not upload them. <code>git push</code> sends commits to a remote repository.</div>
+</section>
+
+<section class="chapter" id="html">
+<span class="tag">Unit 2 • HTML5</span><h2>7. HTML5 document structure</h2>
+<h3>What is HTML?</h3><p><strong>HTML (HyperText Markup Language)</strong> is the standard markup language used to describe the structure and meaning of content on web pages. HTML uses elements represented by tags. It is not a programming language.</p>
+<h3>Basic HTML5 document</h3><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;My First Web Page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Welcome to My Website&lt;/h1&gt;
+  &lt;p&gt;This is my first web page.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<h3>Purpose of important parts</h3><table><tr><th>Part</th><th>Purpose</th></tr><tr><td><code>&lt;!DOCTYPE html&gt;</code></td><td>Declares an HTML5 document and helps the browser render in standards mode.</td></tr><tr><td><code>&lt;html&gt;</code></td><td>Root element containing the entire HTML document.</td></tr><tr><td><code>lang="en"</code></td><td>Identifies the primary language of the page.</td></tr><tr><td><code>&lt;head&gt;</code></td><td>Contains metadata and links to resources; its contents are generally not displayed as page content.</td></tr><tr><td><code>&lt;meta charset="UTF-8"&gt;</code></td><td>Declares the character encoding.</td></tr><tr><td><code>&lt;meta name="viewport"&gt;</code></td><td>Helps the page adapt to the device's viewport, especially on mobile.</td></tr><tr><td><code>&lt;title&gt;</code></td><td>Sets the page title shown in the browser tab and commonly used by search engines.</td></tr><tr><td><code>&lt;body&gt;</code></td><td>Contains the visible page content.</td></tr></table>
+<h3>Elements, tags and attributes</h3><p>An <strong>element</strong> usually consists of an opening tag, content and a closing tag. An <strong>attribute</strong> provides additional information or configuration.</p><pre><code>&lt;a href="https://example.com" target="_blank"&gt;Visit Example&lt;/a&gt;</code></pre><p>Here, <code>&lt;a&gt;</code> is the element tag, <code>href</code> and <code>target</code> are attributes, and “Visit Example” is the link text.</p>
+<h3>Paired and void elements</h3><p>Most elements have opening and closing tags, for example <code>&lt;p&gt;Text&lt;/p&gt;</code>. <strong>Void elements</strong> do not wrap content and do not have closing tags, for example <code>&lt;img&gt;</code>, <code>&lt;br&gt;</code>, <code>&lt;hr&gt;</code>, <code>&lt;meta&gt;</code> and <code>&lt;input&gt;</code>.</p>
+</section>
+
+<section class="chapter" id="semantic">
+<span class="tag">Unit 2</span><h2>8. Semantic HTML elements</h2>
+<p><strong>Semantic HTML</strong> means choosing elements according to the meaning and role of the content, rather than only how the content looks.</p>
+<h3>Important semantic elements</h3><table><tr><th>Element</th><th>Purpose</th><th>Typical use</th></tr><tr><td><code>&lt;header&gt;</code></td><td>Introductory content for a page or section.</td><td>Logo, page heading or introductory content.</td></tr><tr><td><code>&lt;nav&gt;</code></td><td>A section containing major navigation links.</td><td>Main menu.</td></tr><tr><td><code>&lt;main&gt;</code></td><td>The dominant, unique content of the document.</td><td>Main article or page content.</td></tr><tr><td><code>&lt;section&gt;</code></td><td>A thematic grouping of related content, usually with a heading.</td><td>Courses section.</td></tr><tr><td><code>&lt;article&gt;</code></td><td>Self-contained content that could stand independently.</td><td>Blog post, news story or forum post.</td></tr><tr><td><code>&lt;aside&gt;</code></td><td>Related or supplementary content.</td><td>Sidebar or related links.</td></tr><tr><td><code>&lt;footer&gt;</code></td><td>Footer for a page or section.</td><td>Copyright or contact information.</td></tr><tr><td><code>&lt;figure&gt;</code></td><td>Self-contained media or illustrative content.</td><td>Image with a caption.</td></tr><tr><td><code>&lt;figcaption&gt;</code></td><td>Caption for a figure.</td><td>Image description or credit.</td></tr></table>
+<h3>Example page layout</h3><pre><code>&lt;body&gt;
+  &lt;header&gt;
+    &lt;h1&gt;Student Portal&lt;/h1&gt;
+  &lt;/header&gt;
+  &lt;nav aria-label="Main navigation"&gt;
+    &lt;a href="index.html"&gt;Home&lt;/a&gt;
+    &lt;a href="courses.html"&gt;Courses&lt;/a&gt;
+  &lt;/nav&gt;
+  &lt;main&gt;
+    &lt;section&gt;
+      &lt;h2&gt;Announcements&lt;/h2&gt;
+      &lt;article&gt;
+        &lt;h3&gt;Exam Schedule&lt;/h3&gt;
+        &lt;p&gt;The schedule is now available.&lt;/p&gt;
+      &lt;/article&gt;
+    &lt;/section&gt;
+    &lt;aside&gt;Useful student links&lt;/aside&gt;
+  &lt;/main&gt;
+  &lt;footer&gt;Copyright 2026&lt;/footer&gt;
+&lt;/body&gt;</code></pre>
+<h3>Semantic vs non-semantic elements</h3><table><tr><th>Semantic</th><th>Non-semantic / generic</th></tr><tr><td><code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;footer&gt;</code></td><td><code>&lt;div&gt;</code>, <code>&lt;span&gt;</code></td></tr><tr><td>Communicates the meaning or role of content.</td><td>Does not describe the content's purpose by itself.</td></tr></table>
+<div class="callout"><strong>Important:</strong> Use <code>&lt;div&gt;</code> and <code>&lt;span&gt;</code> when no more meaningful element fits. Do not choose a semantic element merely to get a visual style; use CSS for presentation.</div>
+</section>
+
+<section class="chapter" id="content">
+<span class="tag">Unit 2</span><h2>9. Text, links, images and lists</h2>
+<h3>Text elements</h3><table><tr><th>Element</th><th>Purpose</th></tr><tr><td><code>&lt;h1&gt;</code> to <code>&lt;h6&gt;</code></td><td>Headings from highest to lowest level. Choose levels by document structure, not appearance.</td></tr><tr><td><code>&lt;p&gt;</code></td><td>Paragraph of text.</td></tr><tr><td><code>&lt;strong&gt;</code></td><td>Indicates strong importance.</td></tr><tr><td><code>&lt;em&gt;</code></td><td>Indicates stress emphasis.</td></tr><tr><td><code>&lt;mark&gt;</code></td><td>Marks text as relevant or highlighted.</td></tr><tr><td><code>&lt;small&gt;</code></td><td>Side comments or small print.</td></tr><tr><td><code>&lt;br&gt;</code></td><td>Line break within text where a line break is meaningful.</td></tr><tr><td><code>&lt;hr&gt;</code></td><td>Thematic break between content sections.</td></tr></table>
+<h3>Links — anchor element</h3><p>The <code>&lt;a&gt;</code> element creates a hyperlink. The <code>href</code> attribute gives the destination.</p><pre><code>&lt;a href="https://www.wikipedia.org/"&gt;Visit Wikipedia&lt;/a&gt;
+&lt;a href="about.html"&gt;About Us&lt;/a&gt;
+&lt;a href="#contact"&gt;Go to Contact Section&lt;/a&gt;
+&lt;a href="mailto:help@example.com"&gt;Email Us&lt;/a&gt;</code></pre>
+<p>Links can point to external pages, pages in the same website, a location within the current page or an email address. Link text should clearly describe the destination or action.</p>
+<h3>Images</h3><p>The <code>&lt;img&gt;</code> element embeds an image. It is a void element.</p><pre><code>&lt;img src="library.jpg" alt="Students reading books in a library"
+     width="600" height="400"&gt;</code></pre>
+<ul><li><code>src</code> specifies the image file or URL.</li><li><code>alt</code> provides a text alternative for users who cannot see the image or when the image fails to load.</li><li><code>width</code> and <code>height</code> can provide image dimensions and help browsers reserve space.</li></ul>
+<h3>Lists</h3><table><tr><th>Type</th><th>Elements</th><th>Purpose</th></tr><tr><td>Unordered list</td><td><code>&lt;ul&gt;</code> and <code>&lt;li&gt;</code></td><td>Items where order is not important.</td></tr><tr><td>Ordered list</td><td><code>&lt;ol&gt;</code> and <code>&lt;li&gt;</code></td><td>Items in a sequence or ranking.</td></tr><tr><td>Description list</td><td><code>&lt;dl&gt;</code>, <code>&lt;dt&gt;</code>, <code>&lt;dd&gt;</code></td><td>Terms and their descriptions.</td></tr></table>
+<pre><code>&lt;ul&gt;
+  &lt;li&gt;HTML&lt;/li&gt;
+  &lt;li&gt;CSS&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Open the editor&lt;/li&gt;
+  &lt;li&gt;Create index.html&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;dl&gt;
+  &lt;dt&gt;HTML&lt;/dt&gt;
+  &lt;dd&gt;Structures web content.&lt;/dd&gt;
+&lt;/dl&gt;</code></pre>
+</section>
+
+<section class="chapter" id="tables">
+<span class="tag">Unit 2</span><h2>10. HTML tables</h2>
+<p>HTML tables represent data arranged in rows and columns. They should be used for tabular data, not for general page layout.</p>
+<h3>Important table elements</h3><table><tr><th>Element</th><th>Purpose</th></tr><tr><td><code>&lt;table&gt;</code></td><td>Creates the table.</td></tr><tr><td><code>&lt;caption&gt;</code></td><td>Provides a title or description for the table.</td></tr><tr><td><code>&lt;thead&gt;</code></td><td>Groups header rows.</td></tr><tr><td><code>&lt;tbody&gt;</code></td><td>Groups the main data rows.</td></tr><tr><td><code>&lt;tfoot&gt;</code></td><td>Groups footer rows, such as totals.</td></tr><tr><td><code>&lt;tr&gt;</code></td><td>Creates a table row.</td></tr><tr><td><code>&lt;th&gt;</code></td><td>Creates a header cell.</td></tr><tr><td><code>&lt;td&gt;</code></td><td>Creates a data cell.</td></tr><tr><td><code>&lt;colgroup&gt;</code> / <code>&lt;col&gt;</code></td><td>Groups columns so column-level properties can be applied.</td></tr></table>
+<h3>Example</h3><pre><code>&lt;table&gt;
+  &lt;caption&gt;Student Marks&lt;/caption&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th scope="col"&gt;Name&lt;/th&gt;
+      &lt;th scope="col"&gt;Subject&lt;/th&gt;
+      &lt;th scope="col"&gt;Marks&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th scope="row"&gt;Aarav&lt;/th&gt;
+      &lt;td&gt;Web Technology&lt;/td&gt;
+      &lt;td&gt;85&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+<h3>Rowspan and colspan</h3><ul><li><code>colspan</code> makes a cell span across multiple columns.</li><li><code>rowspan</code> makes a cell span across multiple rows.</li></ul>
+<pre><code>&lt;td colspan="2"&gt;Combined columns&lt;/td&gt;
+&lt;td rowspan="2"&gt;Combined rows&lt;/td&gt;</code></pre>
+<h3>Accessible table headers</h3><p>Use <code>&lt;th&gt;</code> for header cells. The <code>scope="col"</code> attribute identifies a column header, while <code>scope="row"</code> identifies a row header. A caption helps users understand the table's subject.</p>
+</section>
+
+<section class="chapter" id="forms">
+<span class="tag">Unit 2</span><h2>11. Forms and input types</h2>
+<h3>What is an HTML form?</h3><p>A <strong>form</strong> collects information from users and submits it for processing. Common examples include login, registration, feedback and search forms.</p>
+<h3>Basic form structure</h3><pre><code>&lt;form action="/register" method="post"&gt;
+  &lt;label for="full-name"&gt;Full Name&lt;/label&gt;
+  &lt;input type="text" id="full-name" name="fullName" required&gt;
+
+  &lt;label for="email"&gt;Email&lt;/label&gt;
+  &lt;input type="email" id="email" name="email" required&gt;
+
+  &lt;button type="submit"&gt;Register&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<h3>Important form attributes and elements</h3><table><tr><th>Item</th><th>Purpose</th></tr><tr><td><code>&lt;form&gt;</code></td><td>Container for form controls.</td></tr><tr><td><code>action</code></td><td>URL where form data is sent.</td></tr><tr><td><code>method</code></td><td>HTTP method used to submit data, commonly GET or POST.</td></tr><tr><td><code>name</code></td><td>Name used to identify submitted data. A control generally needs a name to be included in form submission.</td></tr><tr><td><code>id</code></td><td>Unique identifier; commonly connects a label to a control.</td></tr><tr><td><code>&lt;label&gt;</code></td><td>Provides a text label for a form control.</td></tr><tr><td><code>required</code></td><td>Makes a control mandatory before submission.</td></tr><tr><td><code>placeholder</code></td><td>Shows a short hint inside an empty control; it is not a replacement for a label.</td></tr><tr><td><code>value</code></td><td>Specifies the control's initial or current value.</td></tr></table>
+<h3>Common input types</h3><table><tr><th>Type</th><th>Purpose / example</th></tr><tr><td><code>text</code></td><td>Single-line text, such as a name.</td></tr><tr><td><code>email</code></td><td>Email address; browser can check basic email format.</td></tr><tr><td><code>password</code></td><td>Text entry that masks the characters on screen.</td></tr><tr><td><code>number</code></td><td>Numeric value; may use <code>min</code>, <code>max</code> and <code>step</code>.</td></tr><tr><td><code>tel</code></td><td>Telephone number; does not automatically enforce a universal phone format.</td></tr><tr><td><code>url</code></td><td>Web address; browser can check basic URL format.</td></tr><tr><td><code>date</code></td><td>Date picker or date entry.</td></tr><tr><td><code>radio</code></td><td>Choose one option from a group sharing the same name.</td></tr><tr><td><code>checkbox</code></td><td>Choose one or more independent options.</td></tr><tr><td><code>file</code></td><td>Select a file for upload.</td></tr><tr><td><code>submit</code></td><td>Submit the form.</td></tr><tr><td><code>reset</code></td><td>Reset controls to their initial values.</td></tr><tr><td><code>hidden</code></td><td>Submit a value that is not displayed as a normal control; it is not a security mechanism.</td></tr><tr><td><code>search</code></td><td>Enter a search query.</td></tr><tr><td><code>time</code></td><td>Enter a time.</td></tr><tr><td><code>color</code></td><td>Select a colour.</td></tr></table>
+<h3>Other form controls</h3><ul><li><code>&lt;textarea&gt;</code>: multi-line text input.</li><li><code>&lt;select&gt;</code> and <code>&lt;option&gt;</code>: drop-down list.</li><li><code>&lt;button&gt;</code>: clickable button; types include <code>submit</code>, <code>reset</code> and <code>button</code>.</li><li><code>&lt;fieldset&gt;</code>: groups related controls.</li><li><code>&lt;legend&gt;</code>: caption for a fieldset.</li></ul>
+<h3>GET vs POST in forms</h3><table><tr><th>GET</th><th>POST</th></tr><tr><td>Form data is commonly appended to the URL as a query string.</td><td>Form data is sent in the request body.</td></tr><tr><td>Useful for searches and requests that retrieve data.</td><td>Commonly used to submit data that changes server state or contains larger payloads.</td></tr><tr><td>Data may appear in browser history, logs and shared URLs.</td><td>Data is not normally displayed in the URL, but POST alone does not encrypt it; use HTTPS.</td></tr></table>
+<h3>HTML validation attributes</h3><ul><li><code>required</code>: field must be completed.</li><li><code>min</code> and <code>max</code>: minimum and maximum for number/date controls.</li><li><code>minlength</code> and <code>maxlength</code>: minimum and maximum text length.</li><li><code>pattern</code>: regular expression that the value must match.</li><li><code>step</code>: allowed step interval for numeric/date-time values.</li><li><code>multiple</code>: allows multiple values for supported controls, such as file and email.</li></ul>
+<div class="callout warn"><strong>Remember:</strong> Client-side validation improves usability but can be bypassed. Important data must also be validated on the server.</div>
+</section>
+
+<section class="chapter" id="media">
+<span class="tag">Unit 2</span><h2>12. Multimedia in HTML5</h2>
+<p>HTML5 provides native elements for embedding audio and video without requiring a third-party plug-in.</p>
+<h3>Audio</h3><pre><code>&lt;audio controls&gt;
+  &lt;source src="lesson.mp3" type="audio/mpeg"&gt;
+  Your browser does not support the audio element.
+&lt;/audio&gt;</code></pre>
+<h3>Video</h3><pre><code>&lt;video controls width="640" poster="preview.jpg"&gt;
+  &lt;source src="lesson.mp4" type="video/mp4"&gt;
+  Your browser does not support the video element.
+&lt;/video&gt;</code></pre>
+<h3>Common multimedia attributes</h3><table><tr><th>Attribute</th><th>Purpose</th></tr><tr><td><code>controls</code></td><td>Displays browser playback controls.</td></tr><tr><td><code>autoplay</code></td><td>Requests automatic playback; browsers often restrict autoplay, especially with sound.</td></tr><tr><td><code>muted</code></td><td>Starts media without sound.</td></tr><tr><td><code>loop</code></td><td>Repeats media after it ends.</td></tr><tr><td><code>poster</code></td><td>Specifies a preview image for a video before playback.</td></tr><tr><td><code>preload</code></td><td>Hints how much media data the browser should load before playback.</td></tr></table>
+<h3>Captions and accessible media</h3><p>Provide captions for spoken content in videos. The <code>&lt;track&gt;</code> element can attach timed text, such as captions or subtitles.</p><pre><code>&lt;video controls&gt;
+  &lt;source src="class.mp4" type="video/mp4"&gt;
+  &lt;track src="captions-en.vtt" kind="captions"
+         srclang="en" label="English" default&gt;
+&lt;/video&gt;</code></pre>
+<div class="callout good"><strong>Accessibility tip:</strong> Do not rely on audio alone to communicate important information. Provide captions or a transcript where appropriate, and make media controls usable with a keyboard.</div>
+</section>
+
+<section class="chapter" id="seo">
+<span class="tag">Unit 2</span><h2>13. Metadata and SEO basics</h2>
+<h3>What is metadata?</h3><p><strong>Metadata</strong> is information about a web page that describes the document, rather than being the main visible content. Much of a page's metadata is placed inside the <code>&lt;head&gt;</code> element.</p>
+<h3>What is SEO?</h3><p><strong>SEO (Search Engine Optimisation)</strong> is the practice of improving a website so that search engines can understand its content and users can discover useful pages through search results. Good SEO also depends on useful content, site quality, performance and accessibility.</p>
+<h3>Useful metadata and HTML practices</h3><table><tr><th>Item</th><th>Purpose</th><th>Example</th></tr><tr><td>Page title</td><td>Describes the page; appears in browser tabs and can appear as the search-result title.</td><td><code>&lt;title&gt;HTML Notes for Students&lt;/title&gt;</code></td></tr><tr><td>Meta description</td><td>Short summary that may be used as the search-result snippet.</td><td><code>&lt;meta name="description" content="Learn HTML basics."&gt;</code></td></tr><tr><td>Viewport</td><td>Helps the layout use the device viewport correctly.</td><td><code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code></td></tr><tr><td>Character encoding</td><td>Declares how characters are encoded.</td><td><code>&lt;meta charset="UTF-8"&gt;</code></td></tr><tr><td>Heading structure</td><td>Organises content into meaningful sections.</td><td><code>&lt;h1&gt;HTML Basics&lt;/h1&gt;</code></td></tr><tr><td>Image alt text</td><td>Provides a text alternative and helps describe image content.</td><td><code>alt="Students using laptops"</code></td></tr><tr><td>Descriptive links</td><td>Helps users and search engines understand link destinations.</td><td><code>&lt;a href="fees.html"&gt;View course fees&lt;/a&gt;</code></td></tr></table>
+<h3>Example head section</h3><pre><code>&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;HTML5 Study Notes | Student Portal&lt;/title&gt;
+  &lt;meta name="description"
+        content="Exam notes on HTML5, forms, tables and accessibility."&gt;
+&lt;/head&gt;</code></pre>
+<h3>Basic good practices</h3><ul><li>Write a unique, meaningful title for each important page.</li><li>Use headings in a logical hierarchy.</li><li>Write useful, original content for people.</li><li>Use descriptive URLs and meaningful link text.</li><li>Add appropriate alt text to informative images.</li><li>Make pages mobile-friendly, fast and easy to navigate.</li><li>Use semantic HTML and ensure important content is accessible.</li></ul>
+<div class="callout"><strong>Important:</strong> A meta description can influence the snippet shown in search results, but search engines may choose a different snippet. Adding a keyword repeatedly does not guarantee a higher ranking.</div>
+</section>
+
+<section class="chapter" id="accessibility">
+<span class="tag">Unit 2</span><h2>14. Web accessibility, ARIA and alt text</h2>
+<h3>What is web accessibility?</h3><p><strong>Web accessibility</strong> means designing and developing websites so that people with different abilities can perceive, understand, navigate and interact with them. Accessibility benefits users with permanent, temporary or situational limitations.</p>
+<h3>Why is accessibility important?</h3><ul><li>Allows more people to use websites independently.</li><li>Supports keyboard users and people using assistive technologies such as screen readers.</li><li>Improves clarity, navigation and overall usability.</li><li>Helps make digital information more inclusive.</li></ul>
+<h3>WCAG principles — POUR</h3><table><tr><th>Principle</th><th>Meaning</th><th>Example</th></tr><tr><td><strong>Perceivable</strong></td><td>Information and interface components must be presented in ways users can perceive.</td><td>Provide text alternatives for meaningful images and captions for videos.</td></tr><tr><td><strong>Operable</strong></td><td>Interface components and navigation must be usable.</td><td>All functionality should be available using a keyboard.</td></tr><tr><td><strong>Understandable</strong></td><td>Information and operation of the interface must be understandable.</td><td>Use clear instructions and identify form errors.</td></tr><tr><td><strong>Robust</strong></td><td>Content should work reliably with browsers and assistive technologies.</td><td>Use valid, semantic HTML and appropriate accessible names and roles.</td></tr></table>
+<h3>Alt text</h3><p>The <code>alt</code> attribute on an image provides a text alternative. Screen readers can announce this text instead of the image.</p>
+<table><tr><th>Image situation</th><th>What to do</th><th>Example</th></tr><tr><td>Informative image</td><td>Describe the information the image communicates.</td><td><code>alt="Solar panels installed on a school rooftop"</code></td></tr><tr><td>Functional image used as a link or button</td><td>Describe the action or destination.</td><td><code>alt="Open student dashboard"</code></td></tr><tr><td>Decorative image</td><td>Use empty alt text so assistive technology can ignore it.</td><td><code>alt=""</code></td></tr><tr><td>Complex chart or diagram</td><td>Provide a concise alt text and a fuller explanation in nearby text or a linked description.</td><td><code>alt="Bar chart comparing annual enrolment"</code></td></tr></table>
+<div class="callout warn"><strong>Do not:</strong> use file names such as <code>IMG_1234.jpg</code> as alt text, or repeat “image of” unnecessarily. Do not leave alt text out when an informative image needs a text alternative.</div>
+<h3>ARIA fundamentals</h3><p><strong>ARIA (Accessible Rich Internet Applications)</strong> is a set of attributes that can add accessibility information such as roles, names, states and properties to web interfaces. ARIA can help assistive technologies understand custom interface components.</p>
+<h4>Common ARIA attributes</h4><table><tr><th>Attribute</th><th>Purpose</th><th>Example</th></tr><tr><td><code>aria-label</code></td><td>Provides an accessible name when visible text does not provide a suitable name.</td><td><code>&lt;button aria-label="Close menu"&gt;×&lt;/button&gt;</code></td></tr><tr><td><code>aria-labelledby</code></td><td>Uses the text of another element as the accessible name.</td><td><code>aria-labelledby="search-title"</code></td></tr><tr><td><code>aria-describedby</code></td><td>Associates extra descriptive text with a control.</td><td><code>aria-describedby="password-help"</code></td></tr><tr><td><code>aria-hidden</code></td><td>Hides content from the accessibility tree when appropriate.</td><td><code>aria-hidden="true"</code></td></tr><tr><td><code>aria-expanded</code></td><td>Communicates whether a control's expandable content is open or closed.</td><td><code>aria-expanded="false"</code></td></tr><tr><td><code>aria-controls</code></td><td>Identifies the element controlled by the current element.</td><td><code>aria-controls="menu-panel"</code></td></tr></table>
+<h3>Example: accessible search form</h3><pre><code>&lt;form role="search" action="/search"&gt;
+  &lt;label for="site-search"&gt;Search this website&lt;/label&gt;
+  &lt;input type="search" id="site-search" name="q"&gt;
+  &lt;button type="submit"&gt;Search&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<h3>Native HTML first — ARIA second</h3><p>Use a native HTML element whenever it provides the required behaviour. For example, use <code>&lt;button&gt;</code> for an action and <code>&lt;a&gt;</code> for navigation. Do not turn a generic <code>&lt;div&gt;</code> into a button with ARIA alone: ARIA does not automatically add keyboard interaction, focus behaviour or built-in functionality.</p>
+<div class="callout good"><strong>Golden rule:</strong> “No ARIA is better than bad ARIA.” Prefer semantic HTML, add ARIA only when it communicates something native HTML does not already provide, and test with a keyboard and assistive technology.</div>
+<h3>Other practical accessibility checks</h3><ul class="checklist"><li>Every form field has a clear, associated label.</li><li>All interactive controls can be reached and used with a keyboard.</li><li>Focus is visible when navigating with a keyboard.</li><li>Text has sufficient contrast against its background.</li><li>Headings follow a meaningful order.</li><li>Links and buttons have clear names.</li><li>Errors are explained in text, not only by colour.</li><li>Videos have captions when they contain speech or meaningful audio.</li></ul>
+</section>
+
+<section class="chapter" id="revision">
+<span class="tag">Final preparation</span><h2>15. Exam revision and self-test</h2>
+<h3>Quick revision checklist</h3><ul class="checklist"><li>I can explain the difference between the Internet and the WWW.</li><li>I can describe the client–server request–response cycle.</li><li>I can explain IP addresses, domain names and DNS.</li><li>I can distinguish HTTP from HTTPS.</li><li>I can identify common HTTP status code groups and examples.</li><li>I know the purpose of browser DevTools panels.</li><li>I can use basic terminal navigation and file commands.</li><li>I can explain Git vs GitHub and the purpose of init, clone, fork, commit, branch, push, pull and pull requests.</li><li>I can write a valid HTML5 document structure.</li><li>I can select appropriate semantic elements.</li><li>I can create links, images, lists and accessible data tables.</li><li>I can create forms using suitable input types and validation attributes.</li><li>I can embed audio, video and captions.</li><li>I can explain title, meta description and basic SEO practices.</li><li>I can explain POUR, alt text and the purpose and limits of ARIA.</li></ul>
+<h3>Practice questions</h3>
+<div class="quiz"><p><strong>1. What is the main role of DNS?</strong></p><button onclick="toggleAnswer(this)">Show answer</button><div class="answer">DNS looks up information associated with a domain name, commonly resolving it to an IP address so the client can locate the server.</div></div>
+<div class="quiz"><p><strong>2. Which HTTP status code usually means that a page was not found?</strong></p><button onclick="toggleAnswer(this)">Show answer</button><div class="answer"><strong>404 Not Found.</strong> It is a client-error (4xx) status code.</div></div>
+<div class="quiz"><p><strong>3. What is the difference between git add and git commit?</strong></p><button onclick="toggleAnswer(this)">Show answer</button><div class="answer"><code>git add</code> stages selected changes. <code>git commit</code> records the staged changes in the local repository's history.</div></div>
+<div class="quiz"><p><strong>4. Is a fork the same as git clone?</strong></p><button onclick="toggleAnswer(this)">Show answer</button><div class="answer">No. A fork creates a hosted copy under your GitHub account. Clone copies a repository to your local computer.</div></div>
+<div class="quiz"><p><strong>5. Which element contains the visible content of an HTML page?</strong></p><button onclick="toggleAnswer(this)">Show answer</button><div class="answer">The <code>&lt;body&gt;</code> element.</div></div>
+<div class="quiz"><p><strong>6. Which semantic element should contain the page's main unique content?</strong></p><button onclick="toggleAnswer(this)">Show answer</button><div class="answer">The <code>&lt;main&gt;</code> element.</div></div>
+<div class="quiz"><p><strong>7. What is the purpose of the name attribute in a form control?</strong></p><button onclick="toggleAnswer(this)">Show answer</button><div class="answer">It provides the field name used when the control's value is included in submitted form data.</div></div>
+<div class="quiz"><p><strong>8. Which input type is suitable for an email address?</strong></p><button onclick="toggleAnswer(this)">Show answer</button><div class="answer"><code>type="email"</code>. It provides browser-level basic email-format validation.</div></div>
+<div class="quiz"><p><strong>9. What does alt="" mean for an image?</strong></p><button onclick="toggleAnswer(this)">Show answer</button><div class="answer">The image is treated as decorative and can be skipped by assistive technologies.</div></div>
+<div class="quiz"><p><strong>10. A site works with a mouse but its menu cannot be used with a keyboard. Which WCAG principle is affected?</strong></p><button onclick="toggleAnswer(this)">Show answer</button><div class="answer"><strong>Operable.</strong> Users must be able to operate interface components using available input methods, including a keyboard.</div></div>
+<div class="callout"><strong>Last-minute strategy:</strong> Practise writing the HTML skeleton and a small form from memory. Also rehearse the Git workflow aloud: status → add → commit → push, and be able to explain what each step does.</div>
+<button class="topbtn" onclick="window.print()">Print / Save as PDF</button>
+</section>
+</main>
+</div>
+<footer>Student study notes • Review examples in your own editor and practise the commands in a test repository.</footer>
+<script>
+function toggleAnswer(button){const answer=button.nextElementSibling;const open=answer.classList.toggle('show');button.textContent=open?'Hide answer':'Show answer';}
+const search=document.getElementById('search');
+const chapters=[...document.querySelectorAll('main > section')];
+search.addEventListener('input',()=>{
+ const q=search.value.trim().toLowerCase();
+ chapters.forEach(section=>{section.hidden=!!q&&!section.innerText.toLowerCase().includes(q);});
+});
+const links=[...document.querySelectorAll('#toc a')];
+const sections=links.map(a=>document.querySelector(a.getAttribute('href')));
+if('IntersectionObserver' in window){
+ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+  if(entry.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+entry.target.id));}
+ }),{rootMargin:'-15% 0px -75% 0px'});
+ sections.forEach(s=>s&&observer.observe(s));
+}
+</script>
+</body>
+</html>
