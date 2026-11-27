@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mirai Notes | Web Development</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6fb;
+    color: #222;
+}
+
+header {
+    background: #172554;
+    color: white;
+    padding: 35px 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 10px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+#search {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.section {
+    margin-bottom: 30px;
+}
+
+.section h2 {
+    color: #172554;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 15px;
+}
+
+.page-link {
+    display: block;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #172554;
+    border: 1px solid #e2e8f0;
+    transition: 0.2s;
+}
+
+.page-link:hover {
+    background: #dbeafe;
+    transform: translateY(-3px);
+}
+
+.page-link h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.page-link p {
+    color: #64748b;
+    font-size: 13px;
+    word-break: break-word;
+}
+
+#status {
+    color: #64748b;
+    margin: 15px 0;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #64748b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Mirai Notes</h1>
+    <p>Web Development Learning Resources</p>
+</header>
+
+<div class="container">
+
+    <h2>Explore Learning Materials</h2>
+    <p id="status">Loading HTML pages...</p>
+
+    <input
+        type="text"
+        id="search"
+        placeholder="Search HTML pages..."
+    >
+
+    <div id="content"></div>
+
+</div>
+
+<footer>
+    Mirai Notes | Learning by Building
+</footer>
+
+<script>
+
+const username = "bhansalideepika";
+const repository = "miraiNotes";
+const branch = "main";
+
+const apiURL =
+`https://api.github.com/repos/${username}/${repository}/git/trees/${branch}?recursive=1`;
+
+let allPages = [];
+
+async function loadPages() {
+
+    const status = document.getElementById("status");
+
+    try {
+
+        const response = await fetch(apiURL);
+
+        if (!response.ok) {
+            throw new Error("Unable to load repository");
+        }
+
+        const data = await response.json();
+
+        allPages = data.tree.filter(file =>
+            file.type === "blob" &&
+            file.path.toLowerCase().endsWith(".html") &&
+            file.path.toLowerCase() !== "index.html"
+        );
+
+        status.textContent =
+            `${allPages.length} HTML pages available`;
+
+        displayPages(allPages);
+
+    } catch (error) {
+
+        status.textContent =
+            "Unable to load pages. Please check your internet connection.";
+
+        console.error(error);
+    }
+}
+
+function displayPages(pages) {
+
+    const content = document.getElementById("content");
+    content.innerHTML = "";
+
+    if (pages.length === 0) {
+        content.innerHTML = "<p>No matching pages found.</p>";
+        return;
+    }
+
+    const groups = {};
+
+    pages.forEach(file => {
+
+        const parts = file.path.split("/");
+
+        const folder = parts.length > 1
+            ? parts.slice(0, -1).join("/")
+            : "Main Folder";
+
+        if (!groups[folder]) {
+            groups[folder] = [];
+        }
+
+        groups[folder].push(file);
+    });
+
+    Object.keys(groups).sort().forEach(folder => {
+
+        const section = document.createElement("section");
+        section.className = "section";
+
+        const heading = document.createElement("h2");
+        heading.textContent = folder;
+
+        const grid = document.createElement("div");
+        grid.className = "grid";
+
+        groups[folder].forEach(file => {
+
+            const link = document.createElement("a");
+
+            link.className = "page-link";
+            link.href = "./" + file.path.split("/")
+                .map(encodeURIComponent).join("/");
+            link.target = "_blank";
+
+            const title = file.path.split("/").pop()
+                .replace(/\.html$/i, "")
+                .replace(/[-_]/g, " ");
+
+            const h3 = document.createElement("h3");
+            h3.textContent = title;
+
+            const p = document.createElement("p");
+            p.textContent = file.path;
+
+            link.appendChild(h3);
+            link.appendChild(p);
+
+            grid.appendChild(link);
+
+        });
+
+        section.appendChild(heading);
+        section.appendChild(grid);
+
+        content.appendChild(section);
+
+    });
+}
+
+document.getElementById("search").addEventListener(
+    "input", function () {
+
+        const keyword = this.value.toLowerCase();
+
+        const filtered = allPages.filter(file =>
+            file.path.toLowerCase().includes(keyword)
+        );
+
+        displayPages(filtered);
+    }
+);
+
+loadPages();
+
+</script>
+
+</body>
+</html>
