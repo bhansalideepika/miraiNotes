@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Student notes for Day 35 (CSS organization, BEM-lite) and Day 36 (ship check: Grid project and GitHub Pages), with interactive practice.">
+<title>CSS notes: organize and ship (Day 35 and 36)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;800&display=swap">
+<style>
+/* ===== TOKENS (light first, dark redefined below) ===== */
+:root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    color-scheme: light;
+    --bg: #f5f8ff;
+    --surface: #ffffff;
+    --ink: #14213d;
+    --muted: #46557a;
+    --line: #d3dcef;
+    --chip: #e4eafa;
+    --code-bg: #101a33;
+    --code-ink: #eaf0ff;
+    --code-prop: #7ee7c4;
+    --code-val: #ffd37a;
+    --code-sel: #ff9db5;
+    --code-com: #8d9cc6;
+    --flex: #ef476f;
+    --grid: #3fb0e0;
+    --colour: #ffc233;
+    --media: #2fc79a;
+    --flex-soft: #ffe1e8;
+    --grid-soft: #dcf1fa;
+    --colour-soft: #fff0c4;
+    --media-soft: #d6f5ea;
+    --on-accent: #14213d;
+    --focus: #14213d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0d1427;
+        --surface: #16203a;
+        --ink: #eaf0ff;
+        --muted: #a9b6d8;
+        --line: #2f3f6c;
+        --chip: #26335a;
+        --code-bg: #080d1c;
+        --flex-soft: #4a1f2e;
+        --grid-soft: #123a4a;
+        --colour-soft: #4a3a0c;
+        --media-soft: #0f3d31;
+        --focus: #ffffff;
+    }
+}
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0d1427;
+    --surface: #16203a;
+    --ink: #eaf0ff;
+    --muted: #a9b6d8;
+    --line: #2f3f6c;
+    --chip: #26335a;
+    --code-bg: #080d1c;
+    --flex-soft: #4a1f2e;
+    --grid-soft: #123a4a;
+    --colour-soft: #4a3a0c;
+    --media-soft: #0f3d31;
+    --focus: #ffffff;
+}
+
+/* ===== BASE ===== */
+*, *::before, *::after { box-sizing: inherit; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 1.0625rem/1.65 "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    background: var(--surface);
+    z-index: 10;
+}
+h1, h2, h3, h4 { font-family: "Baloo 2", "Nunito", system-ui, sans-serif; font-weight: 800; line-height: 1.1; margin: 0; }
+p { margin: 0 0 1rem; max-width: 68ch; }
+code, pre { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+code { background: var(--chip); padding: 1px 7px; border-radius: 6px; font-size: 0.88em; font-weight: 700; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.wrap { width: min(1120px, 100% - 2.5rem); margin-inline: auto; }
+.c-flex { --c: var(--flex); --accent: var(--flex); --soft: var(--flex-soft); }
+.c-grid { --c: var(--grid); --accent: var(--grid); --soft: var(--grid-soft); }
+.c-colour { --c: var(--colour); --accent: var(--colour); --soft: var(--colour-soft); }
+.c-media { --c: var(--media); --accent: var(--media); --soft: var(--media-soft); }
+
+/* ===== TOP BAR ===== */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--surface); border-bottom: 3px solid var(--ink); }
+.bar .wrap { display: flex; align-items: center; gap: 14px; padding-block: 8px; }
+.brand { font: 800 1.35rem "Baloo 2", sans-serif; white-space: nowrap; }
+.bar nav { display: flex; gap: 6px; overflow-x: auto; flex: 1; padding: 2px; }
+.bar nav a { flex: none; padding: 4px 14px; border: 2px solid var(--ink); border-radius: 999px; background: var(--c); color: var(--on-accent); font-weight: 800; font-size: 0.92rem; text-decoration: none; }
+.bar nav a:hover { text-decoration: underline; }
+.theme-btn { flex: none; min-height: 40px; padding: 4px 14px; border: 2px solid var(--ink); border-radius: 999px; background: var(--surface); color: var(--ink); font: 700 0.88rem "Nunito", sans-serif; cursor: pointer; }
+
+/* ===== HERO ===== */
+.hero { padding-block: clamp(2.5rem, 7vw, 5rem) 1rem; }
+.hero h1 { font-size: clamp(2.8rem, 9vw, 5.6rem); letter-spacing: -0.01em; margin-bottom: 0.8rem; }
+.lead { font-size: clamp(1.1rem, 2.4vw, 1.4rem); line-height: 1.5; max-width: 44ch; color: var(--muted); margin-bottom: 2rem; }
+.tiles { display: flex; flex-wrap: wrap; gap: 18px; list-style: none; margin: 0; padding: 0; }
+.tiles li { flex: 1 1 280px; }
+.tile { display: flex; flex-direction: column; gap: 2px; height: 100%; padding: 1.1rem 1.25rem 1.25rem; border: 3px solid var(--ink); border-radius: 22px; background: var(--c); color: var(--on-accent); text-decoration: none; box-shadow: 5px 5px 0 var(--ink); transition: transform 0.15s, box-shadow 0.15s; }
+.tile:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
+.tile:focus-visible { outline-offset: 6px; }
+.tile-ico { font-size: 2.1rem; line-height: 1.2; }
+.tile strong { font: 800 1.7rem/1.1 "Baloo 2", sans-serif; }
+.tile span:last-child { font-weight: 700; line-height: 1.35; }
+
+/* ===== LESSON LAYOUT ===== */
+.lesson { margin-block: clamp(3.5rem, 8vw, 6rem); }
+.lesson-head { display: flex; align-items: center; gap: 16px; margin-bottom: 1.6rem; }
+.badge { flex: none; display: grid; place-items: center; width: 68px; height: 68px; font-size: 2.2rem; border: 3px solid var(--ink); border-radius: 20px; background: var(--accent); box-shadow: 4px 4px 0 var(--ink); }
+.lesson h2 { font-size: clamp(2rem, 5vw, 3.1rem); }
+.sub { margin: 2px 0 0; color: var(--muted); font-size: 1.1rem; }
+.day-tag { display: inline-block; margin-right: 8px; padding: 0 12px; border: 2px solid var(--ink); border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 800; font-size: 0.85rem; }
+.notes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 2rem 2.5rem; margin-bottom: 2rem; }
+.notes > * { min-width: 0; }
+.idea { padding: 1rem 1.2rem; background: var(--soft); border-left: 10px solid var(--accent); border-radius: 6px 18px 18px 6px; font-size: 1.1rem; }
+.steps { padding-left: 1.3rem; margin: 0 0 1rem; }
+.steps li { margin-bottom: 0.35rem; }
+.props { display: grid; }
+.prop { padding: 0.7rem 0; border-bottom: 2px dashed var(--line); }
+.prop:first-child { padding-top: 0; }
+.prop p { margin: 0.3rem 0 0; }
+.mission { margin-top: 1.2rem; padding: 0.7rem 1rem; border: 3px solid var(--ink); border-radius: 14px; background: var(--surface); }
+.mission summary { cursor: pointer; font-weight: 800; }
+.mission p { margin: 0.6rem 0 0; }
+
+/* ===== LABS ===== */
+.lab { margin-bottom: 1.6rem; padding: clamp(1rem, 3vw, 1.5rem); background: var(--surface); border: 3px solid var(--ink); border-radius: 22px; box-shadow: 7px 7px 0 var(--accent); }
+.lab h3 { font-size: 1.5rem; margin-bottom: 0.9rem; }
+.ref-h { font: 800 1.3rem "Baloo 2", sans-serif; margin: 1.4rem 0 0.2rem; }
+.controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px 24px; margin-bottom: 14px; }
+.ctl { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.lbl { font-weight: 800; font-size: 0.95rem; display: flex; justify-content: space-between; gap: 8px; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button, .btn { min-height: 40px; padding: 4px 13px; border: 2px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font: 700 0.86rem ui-monospace, "SF Mono", Menlo, Consolas, monospace; cursor: pointer; }
+.btn { font-family: "Nunito", sans-serif; font-size: 0.95rem; }
+.seg button:hover, .btn:hover { border-color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--ink); }
+.check { display: flex; align-items: flex-start; gap: 10px; font-weight: 700; min-height: 40px; padding: 4px 0; }
+.check input { flex: none; width: 22px; height: 22px; margin-top: 2px; accent-color: var(--accent); }
+.stage { padding: 12px; background: var(--soft); border: 2px dashed var(--ink); border-radius: 14px; }
+.say { margin: 0.9rem 0 0; padding: 0.6rem 0.9rem; max-width: none; background: var(--soft); border-left: 8px solid var(--accent); border-radius: 4px 12px 12px 4px; }
+pre.code { margin: 0.9rem 0 0; padding: 14px 16px; overflow-x: auto; background: var(--code-bg); color: var(--code-ink); border-radius: 12px; font-size: 0.9rem; line-height: 1.6; tab-size: 2; }
+pre.code .p { color: var(--code-prop); }
+pre.code .v { color: var(--code-val); }
+pre.code .s { color: var(--code-sel); }
+pre.code .c { color: var(--code-com); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.4rem; align-items: start; }
+.two > * { min-width: 0; }
+.table-wrap { overflow-x: auto; margin: 0.5rem 0 0; }
+table.ref { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 0.96rem; }
+.ref th, .ref td { padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; border-bottom: 2px dashed var(--line); }
+.ref th { background: var(--soft); border-bottom: 3px solid var(--ink); font-weight: 800; }
+.ref td:first-child { min-width: 9rem; }
+
+/* BEM preview card (always light so it reads in dark mode too) */
+.dpaper { padding: 16px; border-radius: 10px; background: #ffffff; color: #14213d; }
+.dcard { max-width: 340px; padding: 16px; border: 3px solid #14213d; border-radius: 14px; background: #ffffff; color: #14213d; }
+.dcard h4 { margin: 0 0 6px; font: 800 1.3rem "Baloo 2", sans-serif; }
+.dcard p { margin: 0 0 12px; }
+.dcard button { padding: 6px 14px; border: 2px solid #14213d; border-radius: 999px; background: #ffc233; color: #14213d; font: 800 0.95rem "Nunito", sans-serif; cursor: pointer; }
+.dcard[data-mod="featured"] { border-color: #e59a00; box-shadow: 6px 6px 0 #14213d; }
+.dcard[data-mod="compact"] { padding: 8px; font-size: 0.9rem; }
+.dcard[data-mod="dark"] { background: #14213d; color: #ffffff; }
+.dcard[data-mod="dark"] button { border-color: #ffffff; }
+
+/* pills */
+.pill { display: inline-block; padding: 0 10px; border: 2px solid var(--on-accent); border-radius: 999px; color: var(--on-accent); font-weight: 800; font-size: 0.8rem; white-space: nowrap; }
+.pill.ok { background: var(--media); }
+.pill.bad { background: var(--flex); }
+.pill.mid { background: var(--colour); }
+.ref td code { display: inline-block; margin: 1px 2px; }
+
+/* tick lists */
+.tick { margin: 0 0 0.8rem; padding: 0; list-style: none; }
+progress.prog { display: block; width: 100%; height: 14px; margin-bottom: 4px; accent-color: var(--accent); }
+
+/* quiz */
+.q-meta { display: flex; justify-content: space-between; gap: 10px; max-width: none; font-weight: 800; }
+.q-card { display: grid; place-items: center; min-height: 110px; margin: 0.4rem 0 1rem; padding: 1rem; overflow-x: auto; border: 3px solid var(--ink); border-radius: 18px; background: var(--soft); }
+.q-card code { padding: 4px 16px; border-radius: 12px; font-size: clamp(1.2rem, 4.5vw, 1.9rem); }
+.q-card pre.code { width: 100%; margin: 0; }
+.q-btns { display: flex; flex-wrap: wrap; gap: 12px; }
+.q-btns button { flex: 1 1 150px; min-height: 52px; padding: 8px 16px; border: 3px solid var(--ink); border-radius: 16px; color: var(--on-accent); font: 800 1.05rem "Nunito", sans-serif; cursor: pointer; box-shadow: 4px 4px 0 var(--ink); }
+.q-btns button:disabled { cursor: default; opacity: 0.55; box-shadow: none; }
+.q-btns button.picked { opacity: 1; outline: 4px solid var(--ink); outline-offset: 3px; }
+.ch-ok, .ch-c { background: var(--media); }
+.ch-bad { background: var(--flex); }
+.ch-a { background: var(--grid); }
+.ch-b { background: var(--colour); }
+
+footer { padding-block: 2.5rem 3rem; border-top: 3px solid var(--ink); background: var(--surface); }
+footer p { margin: 0 0 0.4rem; }
+
+@media (max-width: 820px) {
+    .notes, .two { grid-template-columns: 1fr; }
+    .bar .wrap { gap: 8px; }
+    .brand { font-size: 1.15rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+    <div class="wrap">
+        <span class="brand">CSS: organize + ship</span>
+        <nav aria-label="Jump to a lesson">
+            <a class="c-grid" href="#css-organization">Day 35</a>
+            <a class="c-flex" href="#ship-check">Day 36</a>
+        </nav>
+        <button class="theme-btn" id="theme" type="button">Dark mode</button>
+    </div>
+</div>
+
+<header class="hero wrap">
+    <h1>Tidy it. Ship it.</h1>
+    <p class="lead">Week 6 student notes. First organize your CSS so it is easy to read. Then put your Grid project online and get it ready for review.</p>
+    <ul class="tiles">
+        <li><a class="tile c-grid" href="#css-organization"><span class="tile-ico" aria-hidden="true">🗂️</span><strong>Day 35: CSS organization</strong><span>BEM-lite naming, file split and comments. Refactor your project CSS.</span></a></li>
+        <li><a class="tile c-flex" href="#ship-check"><span class="tile-ico" aria-hidden="true">🚢</span><strong>Day 36: Ship check</strong><span>On-spot Eval 6. Grid project and Pages, reviewed on your live URL.</span></a></li>
+    </ul>
+</header>
+
+<main class="wrap">
+
+<!-- ================= DAY 35: CSS ORGANIZATION ================= -->
+<section class="lesson c-grid" id="css-organization" aria-labelledby="h-org">
+    <div class="lesson-head">
+        <span class="badge" aria-hidden="true">🗂️</span>
+        <div><h2 id="h-org">CSS organization: BEM-lite</h2><p class="sub"><span class="day-tag">Day 35 · Week 6</span> Naming, file split and comments.</p></div>
+    </div>
+
+    <div class="notes">
+        <div>
+            <p class="idea"><strong>The big idea.</strong> A messy room works fine until you need to find something. One huge CSS file is the same. <strong>Organizing</strong> your CSS means three habits: clear <em>names</em>, the right <em>files</em>, and helpful <em>comments</em>. Then you, or a teammate, can find any rule in seconds.</p>
+            <p><strong>Classwork task:</strong> refactor your project CSS. Split the styles into files, use consistent names, and leave no abandoned rules.</p>
+            <p><strong>Homework:</strong> do the same refactor on your resume.</p>
+            <details class="mission">
+                <summary>Mission: measure the mess first</summary>
+                <p>Open your project CSS and count three things: how many class names look different from each other, how many rules no HTML uses, and how many comments explain <em>why</em>. Write the numbers down, then count again after your refactor.</p>
+            </details>
+        </div>
+        <div class="props">
+            <div class="prop"><code>refactor</code><p>Make the code tidier <strong>without changing how the page looks</strong>. Same page, better code.</p></div>
+            <div class="prop"><code>Naming</code><p>BEM-lite: <code>.block</code>, <code>.block__element</code>, <code>.block--modifier</code>. Name things by what they <em>are</em>.</p></div>
+            <div class="prop"><code>File split</code><p><code>base.css</code> for the basics, <code>layout.css</code> for page structure, <code>components.css</code> for reusable pieces.</p></div>
+            <div class="prop"><code>Comments</code><p>Short section headings, and notes that say <em>why</em>, not <em>what</em>.</p></div>
+            <div class="prop"><code>Abandoned rule</code><p>CSS that nothing uses any more. Delete it. Git remembers it if you ever need it back.</p></div>
+        </div>
+    </div>
+
+    <div class="lab">
+        <h3>Why organize? Look at a messy file</h3>
+        <p>Here is a realistic student file. It works, but it is hard to read, hard to change and full of traps. Read it first, then check the list of problems underneath. At the end of this lesson you will turn it into three tidy files (the <a href="#refactor-demo">worked example</a>).</p>
+<pre class="code" data-css>body { font-family: Arial; margin: 0; color: #222; }
+#header { background: #14213d; color: white; padding: 20px; }
+.box1 { width: 300px; float: left; margin: 10px; border: 1px solid #ccc; padding: 10px; }
+.box1 h3 { color: #14213d; font-size: 20px; }
+.box1.special { border: 3px solid gold; }
+.red-text { color: red; }
+.old-banner { background: yellow; padding: 8px; }
+.big-button { background: tomato; color: white; padding: 8px 16px; border: 0; }
+.box1 .big-button:hover { background: darkred; }
+/* .box2 { width: 200px; } */
+.footer { clear: both; text-align: center; padding: 16px; }
+@media (max-width: 600px) {
+  .box1 { width: 100%; float: none; margin: 10px 0; }
+}</pre>
+        <div class="table-wrap">
+            <table class="ref">
+                <thead><tr><th scope="col">Problem</th><th scope="col">Where</th><th scope="col">Why it hurts</th></tr></thead>
+                <tbody>
+                    <tr><td>Vague names</td><td><code>.box1</code>, <code>.big-button</code></td><td>A number or a size does not say what the thing is. In a month you will not remember what <code>.box1</code> was for.</td></tr>
+                    <tr><td>Name describes the look</td><td><code>.red-text</code></td><td>If you change red to orange, the name now lies.</td></tr>
+                    <tr><td>An id used for styling</td><td><code>#header</code></td><td>An id is very strong, so it is hard to override later, and it can be used only once per page.</td></tr>
+                    <tr><td>Long selectors</td><td><code>.box1 .big-button:hover</code></td><td>The button only works inside <code>.box1</code>, and the selector is stronger than it needs to be.</td></tr>
+                    <tr><td>Abandoned rules</td><td><code>.red-text</code>, <code>.old-banner</code></td><td>No HTML uses them. They waste your reading time and may style the wrong thing later.</td></tr>
+                    <tr><td>Commented-out code</td><td><code>/* .box2 ... */</code></td><td>Clutter. Git already remembers old code.</td></tr>
+                    <tr><td>Layout mixed with looks</td><td><code>.box1</code> (width, float, margin, border)</td><td>Size and position are tangled with colours and borders, so you cannot reuse the card somewhere else.</td></tr>
+                    <tr><td>Repeated values</td><td><code>#14213d</code> twice</td><td>Change one and forget the other, and your colours no longer match. A variable fixes this.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="lab">
+        <h3>Naming: BEM-lite</h3>
+        <p>BEM stands for <strong>Block, Element, Modifier</strong>. “Lite” means we keep only the easy parts. Pick a block name and a modifier and watch the class names and the code change.</p>
+        <div class="props" style="margin-bottom:1rem">
+            <div class="prop"><code>.card</code><p><strong>Block.</strong> A part that can stand on its own.</p></div>
+            <div class="prop"><code>.card__title</code><p><strong>Element.</strong> A part that lives inside a block. Join it with <strong>two underscores</strong>.</p></div>
+            <div class="prop"><code>.card--featured</code><p><strong>Modifier.</strong> A variation of the block. Join it with <strong>two hyphens</strong>, and always use it together with the block class.</p></div>
+        </div>
+        <div class="controls">
+            <div class="ctl"><span class="lbl">Block name</span><div class="seg" id="bem-block" role="group" aria-label="Block name" data-opts="card|profile|panel"></div></div>
+            <div class="ctl"><span class="lbl">Modifier</span><div class="seg" id="bem-mod" role="group" aria-label="Modifier" data-opts="none|featured|compact|dark"></div></div>
+        </div>
+        <div class="stage">
+            <div class="dpaper"><article class="dcard" id="bem-card" data-mod="none"><h4>Ada Lovelace</h4><p>Wrote the first program.</p><button type="button">Read more</button></article></div>
+        </div>
+        <p style="margin:1rem 0 0.2rem"><strong>HTML</strong></p>
+        <pre class="code" id="bem-html"></pre>
+        <p style="margin:1rem 0 0.2rem"><strong>CSS</strong></p>
+        <pre class="code" id="bem-css"></pre>
+        <p class="say"><strong>BEM-lite rules:</strong> lowercase letters, hyphens inside words (<code>.site-header</code>), name by purpose and not by looks, only one level of element, style with classes (not ids), and a modifier never stands alone.</p>
+    </div>
+
+    <div class="lab">
+        <h3>How to choose names: block, element or modifier?</h3>
+        <p>Look at one piece of your page and ask three questions:</p>
+        <ol class="steps">
+            <li><strong>Could this piece live somewhere else on the page, or on another page, and still make sense?</strong> If yes, it is a <strong>block</strong>. Examples: <code>.card</code>, <code>.btn</code>, <code>.site-header</code>, <code>.nav</code>.</li>
+            <li><strong>Does it only make sense inside one block?</strong> If yes, it is an <strong>element</strong> of that block: <code>.card__title</code>, <code>.nav__link</code>. A card title with no card is just a heading.</li>
+            <li><strong>Does the block come in a different version?</strong> A bigger one, a highlighted one, a dark one? Each version is a <strong>modifier</strong>: <code>.card--featured</code>, <code>.btn--large</code>.</li>
+        </ol>
+        <p>Block names are <em>nouns</em> (what it is). Modifier names are <em>adjectives</em> (how this version is different). Use the same words everywhere, so a teammate can guess a class name before reading the CSS.</p>
+        <div class="two">
+            <div><p style="margin:0"><strong>Example: a navigation bar</strong></p>
+<pre class="code">.nav                 block
+.nav__list           element
+.nav__item           element
+.nav__link           element
+.nav__link--active   modifier of the link</pre></div>
+            <div><p style="margin:0"><strong>The same names in HTML</strong></p>
+<pre class="code">&lt;nav class=&quot;nav&quot;&gt;
+  &lt;ul class=&quot;nav__list&quot;&gt;
+    &lt;li class=&quot;nav__item&quot;&gt;
+      &lt;a class=&quot;nav__link nav__link--active&quot;
+         href=&quot;index.html&quot;&gt;Home&lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;</pre></div>
+        </div>
+        <p class="say"><strong>Why “lite”?</strong> Full BEM has extra rules: deeper nesting, prefixes like <code>c-</code> and <code>l-</code>, and “mixes”. BEM-lite drops all of that. You keep <em>block</em>, <em>element</em> and <em>modifier</em>, with only one level of element. That is enough for a school project.</p>
+    </div>
+
+    <div class="lab">
+        <h3>Why flat class names win: a little about specificity</h3>
+        <p>When two rules try to style the same element, the browser must pick one. It uses <strong>specificity</strong>, which is a score for how strong a selector is. It counts three things, strongest first:</p>
+        <div class="table-wrap">
+            <table class="ref">
+                <thead><tr><th scope="col">Strength</th><th scope="col">What counts</th><th scope="col">Examples</th><th scope="col">Score (ids, classes, tags)</th></tr></thead>
+                <tbody>
+                    <tr><td>Strongest</td><td>ids</td><td><code>#header</code></td><td><code>1,0,0</code></td></tr>
+                    <tr><td>Middle</td><td>classes, attributes, pseudo-classes</td><td><code>.card</code>, <code>[type=text]</code>, <code>:hover</code></td><td><code>0,1,0</code></td></tr>
+                    <tr><td>Weakest</td><td>tag names</td><td><code>h3</code>, <code>p</code>, <code>a</code></td><td><code>0,0,1</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="margin-top:1rem">The browser compares scores from left to right. An id beats any number of classes, and a class beats any number of tags. If two scores are <strong>equal</strong>, the rule written <strong>later</strong> wins.</p>
+        <div class="table-wrap">
+            <table class="ref">
+                <thead><tr><th scope="col">Selector</th><th scope="col">Score</th><th scope="col">Comment</th></tr></thead>
+                <tbody>
+                    <tr><td><code>.card__title</code></td><td><code>0,1,0</code></td><td>One class. Easy to override when you need to.</td></tr>
+                    <tr><td><code>.card h3</code></td><td><code>0,1,1</code></td><td>Looks small but is stronger than a single class.</td></tr>
+                    <tr><td><code>.box1 .big-button:hover</code></td><td><code>0,3,0</code></td><td>Two classes plus <code>:hover</code>. Hard to beat later.</td></tr>
+                    <tr><td><code>#header</code></td><td><code>1,0,0</code></td><td>Beats any number of classes.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="say"><strong>The BEM-lite trick:</strong> every selector is <em>one class</em>, so every rule scores <code>0,1,0</code>. Then only the order of your rules decides, and you control the order. No surprises, and no need for <code>!important</code>.</p>
+        <h4 class="ref-h">Predict the winner</h4>
+        <p>Each question shows two rules that style the same element. Which one wins?</p>
+        <div id="sq"></div>
+    </div>
+
+    <div class="lab">
+        <h3>Common naming mistakes and how to fix them</h3>
+        <div class="table-wrap">
+            <table class="ref">
+                <thead><tr><th scope="col">Mistake</th><th scope="col">Why it hurts</th><th scope="col">Fix</th></tr></thead>
+                <tbody>
+                    <tr><td><code>.card__body__title</code></td><td>Too deep. If you move the body, the name breaks.</td><td><code>.card__title</code></td></tr>
+                    <tr><td><code>&lt;div class=&quot;card--featured&quot;&gt;</code></td><td>A modifier alone only adds a tweak. The base card styles are missing.</td><td><code>class=&quot;card card--featured&quot;</code></td></tr>
+                    <tr><td><code>.red-text</code></td><td>Describes the look, so the name lies when the colour changes.</td><td><code>.text--warning</code> or <code>.alert</code></td></tr>
+                    <tr><td><code>.card .title</code></td><td>Only works inside a card, and is stronger than needed.</td><td><code>.card__title</code></td></tr>
+                    <tr><td><code>#header { ... }</code></td><td>Ids are too strong and can be used only once.</td><td><code>.site-header</code></td></tr>
+                    <tr><td><code>div &gt; div:nth-child(3)</code></td><td>Breaks as soon as the HTML order changes.</td><td>Give the element a class.</td></tr>
+                    <tr><td><code>.box2</code>, <code>.btn-1</code></td><td>A number says nothing about purpose.</td><td>Name what it is for.</td></tr>
+                    <tr><td><code>!important</code> everywhere</td><td>Hides the real problem. Soon you need another <code>!important</code> to beat it.</td><td>Fix the selector or the order of your rules.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="lab">
+        <h3>Naming check: good name or needs fixing?</h3>
+        <div id="nq"></div>
+    </div>
+
+    <div class="lab">
+        <h3>File split: three files, three jobs</h3>
+        <div class="table-wrap">
+            <table class="ref">
+                <thead><tr><th scope="col">File</th><th scope="col">Its job</th><th scope="col">What goes inside</th></tr></thead>
+                <tbody>
+                    <tr><td><code>base.css</code></td><td>The foundations. Applies to the whole site.</td><td>Variables in <code>:root</code>, the <code>box-sizing</code> reset, body font and colours, headings, links and images (plain tags).</td></tr>
+                    <tr><td><code>layout.css</code></td><td>The skeleton. Where the big parts sit.</td><td>The page grid, containers, header, main and footer placement, spacing between sections, and media queries that move or stack big parts.</td></tr>
+                    <tr><td><code>components.css</code></td><td>Reusable pieces.</td><td>Cards, buttons, nav links, badges, forms: anything with a BEM-lite block name.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="two" style="margin-top:1rem">
+            <div><p style="margin:0"><strong>Folder layout</strong></p>
+<pre class="code">project/
+├── index.html
+└── css/
+    ├── base.css
+    ├── layout.css
+    └── components.css</pre></div>
+            <div><p style="margin:0"><strong>Link them in this order</strong></p>
+<pre class="code">&lt;link rel=&quot;stylesheet&quot; href=&quot;css/base.css&quot;&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;css/layout.css&quot;&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;css/components.css&quot;&gt;</pre></div>
+        </div>
+        <p class="say">Order matters. A later file can override an earlier one, so put foundations first, then layout, then components.</p>
+    </div>
+
+    <div class="lab">
+        <h3>Which file? Ask three questions</h3>
+        <ol class="steps">
+            <li><strong>Is it a variable, a reset, or a style for a plain tag that applies to the whole site?</strong> Put it in <code>base.css</code>.</li>
+            <li><strong>Does it decide where the big parts of the page sit, how wide they are, or how they stack on small screens?</strong> Put it in <code>layout.css</code>.</li>
+            <li><strong>Is it a named, reusable piece with its own look</strong> (card, button, nav, form)? Put it in <code>components.css</code>, together with its elements, its modifiers and its own small-screen tweaks.</li>
+        </ol>
+        <p>Not sure? Ask: “If I copy this piece to another page, which rules must come with it?” Those rules belong in <code>components.css</code>.</p>
+        <h4 class="ref-h">Link or @import?</h4>
+        <p>Use one <code>&lt;link&gt;</code> tag per file in the <code>&lt;head&gt;</code>, in the order base, layout, components. You can also write <code>@import</code> inside CSS, but then the browser must download the first file before it even finds the next one, which is slower. Stick with <code>&lt;link&gt;</code>.</p>
+        <h4 class="ref-h">Keeping each file tidy</h4>
+        <ul class="steps">
+            <li>Keep a steady order inside a file: variables first, then plain tags, then classes.</li>
+            <li>Put a component’s own small-screen tweak <em>next to that component</em>, not in a faraway file.</li>
+            <li>One component per section, each with a banner comment.</li>
+            <li>When a file grows very long, split components into more files later (for example <code>card.css</code> and <code>button.css</code>). Three files are enough for now.</li>
+        </ul>
+    </div>
+
+    <div class="lab">
+        <h3>Sort it: which file does this rule belong in?</h3>
+        <div id="fq"></div>
+    </div>
+
+    <div class="lab">
+        <h3>Comments: say why, not what</h3>
+        <div class="two">
+            <div><p style="margin:0"><strong>Helpful</strong></p>
+<pre class="code" data-css>/* ===== Components: card ===== */
+
+.card {
+  padding: 16px;
+  border-radius: 12px;
+}
+
+/* Featured cards get a thick border so they stand out in the grid. */
+.card--featured {
+  border-width: 4px;
+}</pre></div>
+            <div><p style="margin:0"><strong>Not helpful</strong></p>
+<pre class="code" data-css>/* set padding to 16px */
+.card {
+  padding: 16px;
+}
+
+/* .old-card { color: red; } */
+/* TODO fix this??? */
+.box1 { margin: 0; }</pre></div>
+        </div>
+        <ul class="steps" style="margin-top:1rem">
+            <li>Start each section with a short heading comment, like <code>/* ===== Layout: header ===== */</code>.</li>
+            <li>Explain <em>why</em> a rule exists. The code already shows <em>what</em> it does.</li>
+            <li>Do not leave old code commented out. Delete it. Git remembers.</li>
+            <li>If you must leave a note for later, make it specific: <code>/* TODO: stack cards under 600px */</code>.</li>
+        </ul>
+        <p class="say"><strong>Comment syntax:</strong> CSS only understands <code>/* ... */</code>. A comment can run over many lines. A JavaScript-style <code>// comment</code> does <em>not</em> work in CSS, and it can break the rule that comes right after it.</p>
+        <p><strong>Good reasons to comment:</strong> the start of a section, a “magic number” (why exactly <code>56px</code>?), a workaround for a browser problem, and a decision that is easy to break (such as “this rule must stay after <code>.card</code>”).</p>
+    </div>
+
+    <div class="lab">
+        <h3>No abandoned rules</h3>
+        <p>An abandoned rule is CSS that nothing uses any more. It makes you read more, and it can surprise you later by styling the wrong thing. Here is how to find them:</p>
+        <ol class="steps">
+            <li>Take each class name in your CSS and search for it in your HTML. In VS Code, press <code>Ctrl + Shift + F</code> (Windows) or <code>Cmd + Shift + F</code> (Mac) to search every file.</li>
+            <li>No match? The rule is probably abandoned. Delete it. Git keeps the old version.</li>
+            <li>Be careful with rules that look unused. They might style something that only appears on another page, on hover, or on a small screen.</li>
+            <li>Chrome DevTools can help. Open <strong>Coverage</strong> from the “More tools” menu, reload the page, and unused CSS is marked in red. It only knows about the page you loaded.</li>
+            <li>Look at the page before and after. It must look exactly the same. That is what makes it a refactor.</li>
+        </ol>
+    </div>
+
+    <div class="lab" id="refactor-demo">
+        <h3>Worked example: refactor a messy project, step by step</h3>
+        <p>We refactor the messy file from the start of this lesson. At the end the page must <strong>look the same</strong>. Follow the steps, then use the buttons to read every file.</p>
+        <ol class="steps">
+            <li><strong>Save a snapshot.</strong> Commit your work with <code>git commit</code> and take a screenshot. This is your “before”.</li>
+            <li><strong>Make the three files</strong> inside a <code>css/</code> folder, and link them in order in the HTML.</li>
+            <li><strong>Move each rule</strong> into the right file using the three questions.</li>
+            <li><strong>Rename classes.</strong> Change the HTML and the CSS <em>together</em>, so nothing breaks. Use find and replace in your editor.</li>
+            <li><strong>Delete</strong> rules that no HTML uses, and delete commented-out code.</li>
+            <li><strong>Add comments:</strong> a banner for each section, and a note wherever the reason is not obvious.</li>
+            <li><strong>Compare</strong> the page with your screenshot, and fix any difference.</li>
+            <li><strong>Commit</strong> with a clear message, such as <code>refactor: split css into base, layout and components</code>.</li>
+        </ol>
+        <div class="controls"><div class="ctl"><span class="lbl">Look at this file</span><div class="seg" id="rf-tabs" role="group" aria-label="Choose a file"></div></div></div>
+        <pre class="code" id="rf-code"></pre>
+        <p class="say" id="rf-note" aria-live="polite"></p>
+
+        <h4 class="ref-h">The renaming map</h4>
+        <div class="table-wrap">
+            <table class="ref">
+                <thead><tr><th scope="col">Before</th><th scope="col">After</th><th scope="col">Why</th></tr></thead>
+                <tbody>
+                    <tr><td><code>#header</code></td><td><code>.site-header</code></td><td>A class instead of an id, and the name says what it is.</td></tr>
+                    <tr><td><code>&lt;div class=&quot;footer&quot;&gt;</code></td><td><code>&lt;footer class=&quot;site-footer&quot;&gt;</code></td><td>A real <code>footer</code> tag helps screen readers, and the name follows BEM-lite.</td></tr>
+                    <tr><td><code>.box1</code></td><td><code>.card</code></td><td>A number says nothing. A card is what it is.</td></tr>
+                    <tr><td><code>.box1 h3</code></td><td><code>.card__title</code></td><td>One class, so it does not depend on the tag or the parent.</td></tr>
+                    <tr><td><code>.special</code></td><td><code>.card--featured</code></td><td>A modifier: a variation of the card.</td></tr>
+                    <tr><td><code>.big-button</code></td><td><code>.btn</code></td><td>Role, not size. It is a block of its own.</td></tr>
+                    <tr><td><code>.box1 .big-button:hover</code></td><td><code>.btn:hover</code></td><td>The button works anywhere, not only inside a card.</td></tr>
+                    <tr><td><code>.red-text</code>, <code>.old-banner</code></td><td><span class="pill bad">deleted</span></td><td>No HTML uses them.</td></tr>
+                    <tr><td><code>/* .box2 ... */</code></td><td><span class="pill bad">deleted</span></td><td>Dead code. Git remembers it.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="say"><strong>What changed:</strong> the files, the names, the variables, and a new <code>main</code> wrapper so the cards can sit in a flex row. <strong>What did not change:</strong> the look of the page. If you are not sure that floats and flexbox look identical on your own project, keep your old layout rule and only rename it.</p>
+    </div>
+
+    <div class="lab">
+        <h3>Homework hint: naming your resume</h3>
+        <p>A resume has natural blocks. Draw a box around each part on paper, then name each box. Here is one possible plan:</p>
+        <div class="table-wrap">
+            <table class="ref">
+                <thead><tr><th scope="col">Part of the resume</th><th scope="col">Block and elements</th><th scope="col">Modifier idea</th></tr></thead>
+                <tbody>
+                    <tr><td>Name and title at the top</td><td><code>.resume-header</code>, <code>.resume-header__name</code>, <code>.resume-header__title</code></td><td></td></tr>
+                    <tr><td>A section such as Experience</td><td><code>.section</code>, <code>.section__heading</code></td><td><code>.section--highlight</code></td></tr>
+                    <tr><td>One job</td><td><code>.job</code>, <code>.job__title</code>, <code>.job__company</code>, <code>.job__dates</code></td><td><code>.job--current</code></td></tr>
+                    <tr><td>Skills list</td><td><code>.skill-list</code>, <code>.skill-list__item</code></td><td><code>.skill-list__item--expert</code></td></tr>
+                    <tr><td>Contact links</td><td><code>.contact</code>, <code>.contact__link</code></td><td></td></tr>
+                    <tr><td>Footer</td><td><code>.site-footer</code></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="say">Your names can be different. What matters is that they are consistent: the same word means the same thing everywhere.</p>
+    </div>
+
+    <div class="lab">
+        <h3>Classwork checklist: refactor your project CSS</h3>
+        <ul class="tick" data-tick="cw" data-done="All done. Compare before and after, then commit.">
+            <li><label class="check"><input type="checkbox"><span>I made <code>base.css</code>, <code>layout.css</code> and <code>components.css</code> and linked them in that order.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>Variables, resets and plain element styles are in <code>base.css</code>.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>Page structure (grid, containers, big media queries) is in <code>layout.css</code>.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>Every reusable piece (card, button, nav link) is in <code>components.css</code>.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>All class names follow BEM-lite: <code>.block</code>, <code>.block__element</code>, <code>.block--modifier</code>.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>Each section has a short heading comment, and I deleted commented-out old code.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>I deleted rules that no HTML uses, and the page looks the same as before.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>I committed with a clear message, like <code>refactor: split css into base, layout and components</code>.</span></label></li>
+        </ul>
+        <progress class="prog" data-prog="cw" max="8" value="0" aria-label="Classwork progress"></progress>
+        <p class="say" data-out="cw" aria-live="polite"></p>
+    </div>
+
+    <div class="lab">
+        <h3>Homework checklist: same refactor on your resume</h3>
+        <ul class="tick" data-tick="hw" data-done="Resume refactor complete. Push it and check that the live page still works.">
+            <li><label class="check"><input type="checkbox"><span>I created <code>base.css</code>, <code>layout.css</code> and <code>components.css</code> for the resume and linked them in order.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>I moved every rule into the right file.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>I renamed classes to BEM-lite (for example <code>.resume__section</code>, <code>.skill--highlight</code>).</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>I added section comments and deleted dead code.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>I removed unused rules, and the resume looks the same as before.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>I committed and pushed, and the live resume still works.</span></label></li>
+        </ul>
+        <progress class="prog" data-prog="hw" max="6" value="0" aria-label="Homework progress"></progress>
+        <p class="say" data-out="hw" aria-live="polite"></p>
+    </div>
+</section>
+
+<!-- ================= DAY 36: SHIP CHECK ================= -->
+<section class="lesson c-flex" id="ship-check" aria-labelledby="h-ship">
+    <div class="lesson-head">
+        <span class="badge" aria-hidden="true">🚢</span>
+        <div><h2 id="h-ship">Ship check</h2><p class="sub"><span class="day-tag">Day 36 · On-spot Eval 6 · Week 6</span> Grid project + Pages.</p></div>
+    </div>
+
+    <div class="notes">
+        <div>
+            <p class="idea"><strong>The big idea.</strong> “Shipping” means your project works for someone else, on the internet, and not only on your own laptop. Today your faculty opens your live URL and browses your Grid project. Be your own first reviewer.</p>
+            <p><strong>Classwork:</strong> faculty browses your live URL and scores it with a rubric on <strong>layout</strong>, <strong>a11y</strong> and <strong>git hygiene</strong>.</p>
+            <p><strong>Homework:</strong> fix the blocking issues.</p>
+            <p class="say" style="margin-top:0">The real marks and wording come from your faculty’s rubric. The checklist below is practice material built around those three areas, so nothing surprises you.</p>
+        </div>
+        <div class="props">
+            <div class="prop"><code>Live URL</code><p>The address on the internet where your site lives, like <code>https://your-username.github.io/your-repo/</code>. A file on your own computer does not count.</p></div>
+            <div class="prop"><code>Layout</code><p>Does the Grid layout work, and does it still work on a phone?</p></div>
+            <div class="prop"><code>a11y</code><p>Short for <em>accessibility</em> (11 letters between the a and the y). Can everyone use the site, including people who use only a keyboard or a screen reader?</p></div>
+            <div class="prop"><code>Git hygiene</code><p>A clean repository and clear commit messages.</p></div>
+            <div class="prop"><code>Blocking issue</code><p>A problem that stops someone from using or reviewing your site, like a dead link, missing styles or a page that breaks on a phone.</p></div>
+        </div>
+    </div>
+
+    <div class="lab">
+        <h3>Put your project on GitHub Pages</h3>
+        <ol class="steps">
+            <li>Push your project to a repository on GitHub. The main page must be called <code>index.html</code>.</li>
+            <li>Open the repository, then go to <strong>Settings</strong> and then <strong>Pages</strong>.</li>
+            <li>Under “Build and deployment”, set the source to <strong>Deploy from a branch</strong>. Choose your <code>main</code> branch and the <code>/ (root)</code> folder, then press <strong>Save</strong>.</li>
+            <li>Wait a minute or two, then open <code>https://your-username.github.io/your-repo/</code>.</li>
+            <li>Open that link in a <strong>private window</strong> to see what faculty sees. Menu names on GitHub may look slightly different.</li>
+        </ol>
+        <p class="say">GitHub Pages is case-sensitive. <code>Style.css</code> and <code>style.css</code> are different files, and a mismatch is a classic reason for a site with no styles.</p>
+    </div>
+
+    <div class="lab">
+        <h3>If your live URL is broken: symptoms and fixes</h3>
+        <div class="table-wrap">
+            <table class="ref">
+                <thead><tr><th scope="col">What you see</th><th scope="col">Likely cause</th><th scope="col">How to fix it</th></tr></thead>
+                <tbody>
+                    <tr><td>“404: There isn’t a GitHub Pages site here”</td><td>Pages is not switched on, the branch or folder is wrong, or it is still deploying.</td><td>Check Settings, then Pages. Wait a couple of minutes. You can watch the deployment on the repository’s Actions tab.</td></tr>
+                    <tr><td>The README text shows instead of your site</td><td>There is no <code>index.html</code> in the root folder.</td><td>Rename your main file to <code>index.html</code> (all lowercase) and put it in the root.</td></tr>
+                    <tr><td>The page appears with no styles</td><td>The CSS path is wrong, or the capital letters do not match.</td><td>Open DevTools and look for a red 404 on the <code>.css</code> file. Make the path and the case match exactly.</td></tr>
+                    <tr><td>Images are missing</td><td>Wrong path, different capital letters, or spaces in the file name.</td><td>Rename <code>My Photo.JPG</code> to <code>my-photo.jpg</code> and update the HTML.</td></tr>
+                    <tr><td>It works on my laptop but not online</td><td>The path starts with <code>/</code> or <code>C:\</code>, or the case differs (Windows ignores case, GitHub does not).</td><td>Use relative paths like <code>css/base.css</code>. A path that starts with <code>/</code> points at the root of the whole site, not your repository folder.</td></tr>
+                    <tr><td>You still see the old version</td><td>The new version has not finished deploying, or your browser kept a saved copy.</td><td>Wait, then hard refresh with <code>Ctrl + Shift + R</code>, or open a private window.</td></tr>
+                    <tr><td>Other pages give a 404</td><td>The link points to the wrong file name or path.</td><td>Link to <code>about.html</code> exactly as the file is named, for example <code>&lt;a href=&quot;about.html&quot;&gt;</code>.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="lab">
+        <h3>Layout: how to test your Grid project</h3>
+        <ol class="steps">
+            <li>Open your live page and press <code>F12</code> to open DevTools. Turn on the <strong>device toolbar</strong> (<code>Ctrl + Shift + M</code> on Windows, <code>Cmd + Shift + M</code> on Mac, in Chrome and Edge).</li>
+            <li>Test at three widths: <strong>360px</strong> (phone), <strong>768px</strong> (tablet) and <strong>1280px</strong> (laptop).</li>
+            <li>At each width check four things: no sideways scrollbar, nothing overlapping, text readable without zooming, and images inside their boxes.</li>
+            <li>In the Elements panel, find the <strong>grid</strong> badge next to your grid container and click it. DevTools draws the grid lines over the page, so you can see the tracks and gaps.</li>
+        </ol>
+        <div class="table-wrap">
+            <table class="ref">
+                <thead><tr><th scope="col">What you see</th><th scope="col">Usual cause</th><th scope="col">Fix</th></tr></thead>
+                <tbody>
+                    <tr><td>A sideways scrollbar on a phone</td><td>Something is wider than the screen: a fixed <code>width: 500px</code>, a big image, or a long word.</td><td>Use <code>max-width: 100%</code>, and use <code>fr</code> or <code>minmax()</code> instead of fixed pixels.</td></tr>
+                    <tr><td>Squashed grid columns on a phone</td><td>Too many fixed columns for a narrow screen.</td><td>Use <code>repeat(auto-fit, minmax(240px, 1fr))</code>, or a media query that switches to one column.</td></tr>
+                    <tr><td>Long content pushes a grid item out of its cell</td><td>Grid items have <code>min-width: auto</code> by default, so they will not shrink below their content.</td><td>Add <code>min-width: 0</code> to the grid item.</td></tr>
+                    <tr><td>Images stretch or spill out</td><td>No sizing rule for images.</td><td><code>img { max-width: 100%; height: auto; }</code></td></tr>
+                    <tr><td>Fine on a laptop, tiny and zoomed out on a phone</td><td>The viewport meta tag is missing.</td><td>Add <code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;</code> to the <code>&lt;head&gt;</code>.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="two" style="margin-top:1rem">
+            <div><p style="margin:0"><strong>A grid that adapts by itself</strong></p>
+<pre class="code" data-css>.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}</pre></div>
+            <div><p style="margin:0"><strong>A page layout that stacks on phones</strong></p>
+<pre class="code" data-css>.page {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-areas:
+    "head head"
+    "side main"
+    "foot foot";
+  gap: 16px;
+}
+@media (max-width: 700px) {
+  .page {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "head"
+      "main"
+      "side"
+      "foot";
+  }
+}</pre></div>
+        </div>
+    </div>
+
+    <div class="lab">
+        <h3>Accessibility (a11y): what to check and how</h3>
+        <p>Accessibility means everyone can use your site, including people who use only a keyboard, a screen reader or a very small screen. Here is each check with a way to test it.</p>
+        <div class="table-wrap">
+            <table class="ref">
+                <thead><tr><th scope="col">Check</th><th scope="col">How to test it</th><th scope="col">What good looks like</th></tr></thead>
+                <tbody>
+                    <tr><td>Language and title</td><td>View the page source.</td><td><code>&lt;html lang=&quot;en&quot;&gt;</code> and a short <code>&lt;title&gt;Meet the Team&lt;/title&gt;</code>.</td></tr>
+                    <tr><td>Landmarks</td><td>Look for <code>header</code>, <code>nav</code>, <code>main</code> and <code>footer</code> in your HTML.</td><td>Real tags instead of anonymous <code>div</code>s. Use only one <code>main</code> per page.</td></tr>
+                    <tr><td>Headings</td><td>Read the headings as an outline.</td><td>One <code>h1</code>, then <code>h2</code>, then <code>h3</code>, with no jumps. Choose a heading by its structure, and use CSS for its size.</td></tr>
+                    <tr><td>Images</td><td>Check every <code>img</code> for an <code>alt</code> attribute.</td><td>A real picture: <code>alt=&quot;Five students at a table&quot;</code>. Decoration only: <code>alt=&quot;&quot;</code>. Do not start with “image of”.</td></tr>
+                    <tr><td>Colour contrast</td><td>In DevTools, click a colour swatch in the Styles panel. It shows the contrast ratio.</td><td>At least <strong>4.5 to 1</strong> for normal text. At least <strong>3 to 1</strong> for large text (about 24px, or 18.66px bold).</td></tr>
+                    <tr><td>Keyboard</td><td>Put the mouse aside and press <code>Tab</code> through the page.</td><td>Every link and button can be reached, in a sensible order, and you can always see where focus is.</td></tr>
+                    <tr><td>Link text</td><td>Read each link’s words on their own.</td><td>“Read the Grid guide”, not “click here”.</td></tr>
+                    <tr><td>Form fields (if you have any)</td><td>Click a label. The field should get focus.</td><td><code>&lt;label for=&quot;email&quot;&gt;Email&lt;/label&gt;</code> and <code>&lt;input id=&quot;email&quot; type=&quot;email&quot;&gt;</code>.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="two" style="margin-top:1rem">
+            <div><p style="margin:0"><strong>Keep a visible focus outline</strong></p>
+<pre class="code" data-css>/* Never write "outline: none" without a replacement. */
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}</pre></div>
+            <div><p style="margin:0"><strong>Run an automatic check</strong></p>
+<pre class="code">DevTools, then Lighthouse tab,
+tick "Accessibility",
+press "Analyze page load",
+then fix every issue it lists.</pre></div>
+        </div>
+        <p class="say">Automatic tools only find some problems. Always do the keyboard test by hand, and read your headings and link text as a person would.</p>
+    </div>
+
+    <div class="lab">
+        <h3>Git hygiene: what a clean repository looks like</h3>
+        <p>Git hygiene is a habit: small commits, clear messages and no junk. This is the daily loop:</p>
+<pre class="code">git status                          see what changed
+git add .                           stage all changes (or name one file)
+git commit -m "fix: stack grid on phones"
+git push                            send your commits to GitHub
+git log --oneline                   list your recent commits</pre>
+        <ul class="steps" style="margin-top:1rem">
+            <li><strong>Commit small.</strong> One idea per commit. The CSS split is one commit, and each bug fix is its own commit.</li>
+            <li><strong>Push</strong> at least at the end of every class, so a laptop problem never loses your work.</li>
+            <li><strong>Never commit secrets</strong> such as passwords or API keys. If you did, change the secret. Deleting the file is not enough, because Git history keeps it.</li>
+            <li><strong>Keep junk out</strong> with a <code>.gitignore</code> file, and compress large images.</li>
+            <li><strong>Write a README.</strong> It is the front page of your repository on GitHub.</li>
+        </ul>
+        <div class="two">
+            <div><p style="margin:0"><strong>A starter <code>.gitignore</code></strong></p>
+<pre class="code">.DS_Store
+Thumbs.db
+node_modules/
+.env
+*.zip</pre></div>
+            <div><p style="margin:0"><strong>A starter <code>README.md</code></strong></p>
+<pre class="code"># Meet the Team
+
+Live site: https://your-username.github.io/your-repo/
+
+A responsive team page built with CSS Grid.
+
+## What I used
+- HTML5 landmarks and CSS Grid
+- BEM-lite names, CSS split into
+  base, layout and components
+
+## Run it locally
+Open index.html in a browser.</pre></div>
+        </div>
+    </div>
+
+    <div class="lab">
+        <h3>Practice ship check: tick what is true</h3>
+        <p class="say" id="ship-summary" aria-live="polite" style="margin-top:0"></p>
+
+        <h4 class="ref-h">Live URL (check this first)</h4>
+        <ul class="tick" data-tick="live" data-ship data-done="Live URL checks done.">
+            <li><label class="check"><input type="checkbox"><span>The URL opens in a private (incognito) window.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>I am sharing the Pages link, not a file path from my computer.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>Styles and images load, and the DevTools Console shows no 404 errors.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>File names match exactly, including capital letters.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>Paths are relative, like <code>css/base.css</code>, not <code>C:\Users\...</code>.</span></label></li>
+        </ul>
+        <progress class="prog" data-prog="live" max="5" value="0" aria-label="Live URL progress"></progress>
+        <p class="say" data-out="live"></p>
+
+        <h4 class="ref-h">Layout</h4>
+        <ul class="tick" data-tick="lay" data-ship data-done="Layout checks done.">
+            <li><label class="check"><input type="checkbox"><span>The page layout uses CSS Grid (with Flexbox where it helps).</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>There is no sideways scrolling at 360px wide (check in DevTools device mode).</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>A media query changes the layout on small screens.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>Nothing overlaps, gets cut off or spills out of its box.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>Gaps and spacing look consistent.</span></label></li>
+        </ul>
+        <progress class="prog" data-prog="lay" max="5" value="0" aria-label="Layout progress"></progress>
+        <p class="say" data-out="lay"></p>
+
+        <h4 class="ref-h">Accessibility (a11y)</h4>
+        <ul class="tick" data-tick="a11y" data-ship data-done="Accessibility checks done.">
+            <li><label class="check"><input type="checkbox"><span><code>&lt;html lang=&quot;en&quot;&gt;</code> is set, and the page has a <code>&lt;title&gt;</code>.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>I used landmarks: <code>header</code>, <code>nav</code>, <code>main</code> and <code>footer</code>.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>There is one <code>h1</code>, and headings go in order (h1, h2, h3).</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>Every meaningful image has <code>alt</code> text. Decorative images use an empty <code>alt</code>.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>Text contrast is at least 4.5 to 1 (the DevTools colour picker shows the ratio).</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>I can use everything with only the Tab key, and I can see where focus is.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>Link text makes sense on its own. No “click here”.</span></label></li>
+        </ul>
+        <progress class="prog" data-prog="a11y" max="7" value="0" aria-label="Accessibility progress"></progress>
+        <p class="say" data-out="a11y"></p>
+
+        <h4 class="ref-h">Git hygiene</h4>
+        <ul class="tick" data-tick="git" data-ship data-done="Git checks done.">
+            <li><label class="check"><input type="checkbox"><span>Commit messages are clear, like <code>fix: stack grid on phones</code>.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>No junk files are committed (<code>.DS_Store</code>, <code>node_modules</code>, zip files, passwords).</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>The README explains the project and includes the live URL.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span><code>git status</code> is clean and everything is pushed.</span></label></li>
+            <li><label class="check"><input type="checkbox"><span>The repository is public and GitHub Pages is switched on.</span></label></li>
+        </ul>
+        <progress class="prog" data-prog="git" max="5" value="0" aria-label="Git hygiene progress"></progress>
+        <p class="say" data-out="git"></p>
+    </div>
+
+    <div class="lab">
+        <h3>Commit messages that help</h3>
+        <div class="two">
+            <div><p style="margin:0"><strong>Helpful</strong></p>
+<pre class="code">refactor: split css into base, layout and components
+fix: stack grid columns under 700px
+docs: add live URL to README</pre></div>
+            <div><p style="margin:0"><strong>Not helpful</strong></p>
+<pre class="code">fix
+asdf
+final final 2
+stuff</pre></div>
+        </div>
+        <p class="say">A good message says <em>what changed</em> in a few words. Start it with a word like <code>fix</code>, <code>feat</code>, <code>refactor</code> or <code>docs</code>.</p>
+    </div>
+
+    <div class="lab">
+        <h3>Which issue first? A guide to blocking issues</h3>
+        <p>After the review you will have a list of problems. Do not fix them in a random order. Sort them like this:</p>
+        <div class="table-wrap">
+            <table class="ref">
+                <thead><tr><th scope="col">Priority</th><th scope="col">What it means</th><th scope="col">Examples</th></tr></thead>
+                <tbody>
+                    <tr><td><span class="pill bad">Fix first</span></td><td>Blocking: it stops someone from seeing or using the site.</td><td>The live URL gives a 404. CSS or images do not load. The page is unusable on a phone. The links to the main pages are broken.</td></tr>
+                    <tr><td><span class="pill mid">Fix next</span></td><td>The site works, but a rubric area loses marks.</td><td>Missing <code>alt</code> text, low contrast, no visible focus outline, unclear commit messages, no README.</td></tr>
+                    <tr><td><span class="pill ok">Polish later</span></td><td>Small improvements.</td><td>Spacing details, nicer names, extra comments.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="say">This is general guidance. Your faculty’s feedback is the final word on what counts as blocking.</p>
+    </div>
+
+    <div class="lab">
+        <h3>Homework: fix the blocking issues</h3>
+        <ol class="steps">
+            <li>Read the feedback from faculty. Write down every issue that blocks someone from using or reviewing the site. Fix those first.</li>
+            <li>Fix one issue at a time. Test it on your computer.</li>
+            <li>Commit each fix with a clear message, then push.</li>
+            <li>Wait a minute or two for Pages to update. Then reload with a hard refresh (<code>Ctrl + Shift + R</code> on Windows, <code>Cmd + Shift + R</code> on Mac).</li>
+            <li>Open the live URL in a private window and check that the issue is really gone.</li>
+        </ol>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <div class="wrap">
+        <p><strong>Ready?</strong> Organize first, test your live URL in a private window, then ship.</p>
+        <p style="color:var(--muted)">Made for students and the faculty reviewing their work.</p>
+    </div>
+</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/* ---------- tiny CSS colouriser ---------- */
+function hlDecl(d) {
+    return d.replace(/([a-z-]+)(\s*:\s*)([^;]*)(;?)/gi, (m, p, c, v, e) =>
+        '<span class="p">' + p + '</span>' + c + '<span class="v">' + v + '</span>' + e);
+}
+function hl(src) {
+    return esc(src).split('\n').map(line => {
+        if (/^\s*\/\*/.test(line)) return '<span class="c">' + line + '</span>';
+        const open = line.indexOf('{');
+        if (open > -1) {
+            const close = line.lastIndexOf('}');
+            const sel = line.slice(0, open);
+            if (close > open) return '<span class="s">' + sel + '</span>{' + hlDecl(line.slice(open + 1, close)) + '}' + line.slice(close + 1);
+            return '<span class="s">' + sel + '</span>{' + line.slice(open + 1);
+        }
+        if (/^\s*\}/.test(line)) return line;
+        return hlDecl(line);
+    }).join('\n');
+}
+document.querySelectorAll('pre[data-css]').forEach(p => { p.innerHTML = hl(p.textContent); });
+
+/* ---------- theme button ---------- */
+const root = document.documentElement;
+const themeBtn = $('#theme');
+const darkQ = matchMedia('(prefers-color-scheme: dark)');
+const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : darkQ.matches;
+function syncTheme() { themeBtn.textContent = isDark() ? 'Light mode' : 'Dark mode'; }
+themeBtn.addEventListener('click', () => { root.dataset.theme = isDark() ? 'light' : 'dark'; syncTheme(); });
+darkQ.addEventListener('change', syncTheme);
+syncTheme();
+
+/* ---------- helpers ---------- */
+function shuffle(a) {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+}
+function makeSeg(id, val, cb) {
+    const el = $(id);
+    el.dataset.opts.split('|').forEach(v => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.dataset.v = v; b.textContent = v;
+        b.setAttribute('aria-pressed', v === val ? 'true' : 'false');
+        el.appendChild(b);
+    });
+    el.addEventListener('click', e => {
+        const b = e.target.closest('button'); if (!b) return;
+        el.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+        cb(b.dataset.v);
+    });
+}
+
+/* ================= BEM-LITE BUILDER ================= */
+const BM = { block: 'card', mod: 'none' };
+const MODCSS = {
+    featured: ['border-color: #e59a00;', 'box-shadow: 6px 6px 0 #14213d;'],
+    compact: ['padding: 8px;', 'font-size: 0.9rem;'],
+    dark: ['background: #14213d;', 'color: #ffffff;']
+};
+const dq = s => '"' + s + '"';
+function bem() {
+    const b = BM.block, m = BM.mod;
+    $('#bem-card').dataset.mod = m;
+    const cls = b + (m !== 'none' ? ' ' + b + '--' + m : '');
+    $('#bem-html').textContent = '<article class=' + dq(cls) + '>\n  <h4 class=' + dq(b + '__title') + '>Ada Lovelace</h4>\n  <p class=' + dq(b + '__text') + '>Wrote the first program.</p>\n  <button class=' + dq(b + '__button') + '>Read more</button>\n</article>';
+    let css = '.' + b + ' {\n  padding: 16px;\n  border: 3px solid #14213d;\n  border-radius: 14px;\n}\n.' + b + '__title { font-size: 1.3rem; }\n.' + b + '__text { margin: 0 0 12px; }\n.' + b + '__button { padding: 6px 14px; }';
+    if (m !== 'none') css += '\n.' + b + '--' + m + ' {\n  ' + MODCSS[m].join('\n  ') + '\n}';
+    $('#bem-css').innerHTML = hl(css);
+}
+makeSeg('#bem-block', 'card', v => { BM.block = v; bem(); });
+makeSeg('#bem-mod', 'none', v => { BM.mod = v; bem(); });
+bem();
+
+/* ================= GENERIC QUIZ ================= */
+function makeQuiz(rootId, cfg) {
+    const rootEl = $(rootId);
+    const promptEl = cfg.multiline ? '<pre class="code qz-prompt"></pre>' : '<code class="qz-prompt"></code>';
+    rootEl.innerHTML = '<div class="qz-play"><p class="q-meta"><span class="qz-count"></span><span class="qz-score"></span></p><div class="q-card">' + promptEl + '</div><div class="q-btns"></div><p class="say qz-say" aria-live="polite">Pick an answer.</p><button class="btn qz-next" type="button" hidden style="margin-top:12px">Next</button></div><div class="qz-end" hidden><p class="say qz-endmsg" aria-live="polite"></p><button class="btn qz-again" type="button" style="margin-top:12px">Play again</button></div>';
+    const el = s => rootEl.querySelector(s);
+    const btns = el('.q-btns');
+    cfg.choices.forEach(c => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = c.cls; b.dataset.k = c.key; b.textContent = c.label;
+        btns.appendChild(b);
+    });
+    let qs = [], qi = 0, score = 0, miss = [], locked = false;
+    function show() {
+        const fin = qi >= qs.length;
+        el('.qz-play').hidden = fin;
+        el('.qz-end').hidden = !fin;
+        if (fin) {
+            let msg = 'You scored ' + score + ' out of ' + qs.length + '. ';
+            msg += score === qs.length ? cfg.top : score >= qs.length * 0.6 ? 'Good work. Look again at the ones you missed.' : 'Keep practising. Read the notes above and try again.';
+            if (miss.length) msg += ' Review: ' + miss.join('; ') + '.';
+            el('.qz-endmsg').textContent = msg;
+            return;
+        }
+        locked = false;
+        el('.qz-count').textContent = 'Question ' + (qi + 1) + ' of ' + qs.length;
+        el('.qz-score').textContent = 'Score: ' + score;
+        if (cfg.multiline) el('.qz-prompt').innerHTML = hl(qs[qi][0]); else el('.qz-prompt').textContent = qs[qi][0];
+        el('.qz-say').textContent = 'Pick an answer.';
+        btns.querySelectorAll('button').forEach(b => { b.disabled = false; b.classList.remove('picked'); });
+        el('.qz-next').hidden = true;
+    }
+    function answer(key) {
+        if (locked) return;
+        locked = true;
+        const item = qs[qi];
+        const right = key === item[1];
+        if (right) score++; else miss.push(item[3] || item[0]);
+        const correct = cfg.choices.find(c => c.key === item[1]).label;
+        el('.qz-score').textContent = 'Score: ' + score;
+        el('.qz-say').textContent = (right ? 'Correct! ' : 'Not quite. The answer is “' + correct + '”. ') + item[2];
+        btns.querySelectorAll('button').forEach(b => { b.disabled = true; if (b.dataset.k === key) b.classList.add('picked'); });
+        el('.qz-next').textContent = qi === qs.length - 1 ? 'See my score' : 'Next question';
+        el('.qz-next').hidden = false;
+        el('.qz-next').focus();
+    }
+    btns.addEventListener('click', e => { const b = e.target.closest('button'); if (b) answer(b.dataset.k); });
+    el('.qz-next').addEventListener('click', () => { qi++; show(); });
+    function start() { qs = shuffle(cfg.pool).slice(0, cfg.count); qi = 0; score = 0; miss = []; show(); }
+    el('.qz-again').addEventListener('click', start);
+    start();
+}
+
+makeQuiz('#nq', {
+    count: 8,
+    top: 'Naming expert!',
+    choices: [{ key: 'ok', label: 'Good name', cls: 'ch-ok' }, { key: 'bad', label: 'Needs fixing', cls: 'ch-bad' }],
+    pool: [
+        ['.card__title', 'ok', 'Block card, element title. Two underscores join them.'],
+        ['.Card_Title', 'bad', 'Use lowercase and two underscores: .card__title.'],
+        ['.card__body__title', 'bad', 'Too deep. BEM-lite keeps one level: .card__title.'],
+        ['.btn--danger', 'ok', 'Block btn with a danger modifier. It says what the button is for.'],
+        ['.red-button', 'bad', 'It describes how it looks. If the colour changes, the name lies. Try .btn--danger.'],
+        ['#header', 'bad', 'Style with classes, not ids. Try .site-header.'],
+        ['.nav__link--active', 'ok', 'Element link inside nav, with an active modifier.'],
+        ['.box1', 'bad', 'A number says nothing about purpose. Name what the box is for.'],
+        ['.siteHeader', 'bad', 'Use hyphens inside a word, not camelCase: .site-header.'],
+        ['.card--featured', 'ok', 'Block card with a featured modifier.']
+    ]
+});
+
+makeQuiz('#fq', {
+    count: 8,
+    multiline: true,
+    top: 'File-sorting expert!',
+    choices: [{ key: 'base', label: 'base.css', cls: 'ch-a' }, { key: 'layout', label: 'layout.css', cls: 'ch-b' }, { key: 'components', label: 'components.css', cls: 'ch-c' }],
+    pool: [
+        [':root {\n  --primary-color: #4f46e5;\n}', 'base', 'Variables live in base.css so every other file can use them.', ':root variables'],
+        ['* {\n  box-sizing: border-box;\n}', 'base', 'A reset is a foundation for the whole site.', 'box-sizing reset'],
+        ['body {\n  font-family: Georgia, serif;\n  color: #14213d;\n}', 'base', 'Body font and colour set the default for everything.', 'body font'],
+        ['a {\n  color: inherit;\n}', 'base', 'A plain tag style that applies everywhere is a base rule.', 'link colour'],
+        ['.page {\n  display: grid;\n  grid-template-columns: 220px 1fr;\n}', 'layout', 'The page grid decides where the big parts sit.', '.page grid'],
+        ['.container {\n  width: min(1100px, 100% - 2rem);\n  margin-inline: auto;\n}', 'layout', 'A container controls page width. That is structure.', '.container'],
+        ['@media (max-width: 700px) {\n  .page { grid-template-columns: 1fr; }\n}', 'layout', 'This media query stacks a big part of the page, so it is layout.', 'page media query'],
+        ['.site-footer {\n  grid-column: 1 / -1;\n}', 'layout', 'It says where the footer sits in the page grid.', '.site-footer placement'],
+        ['.card {\n  padding: 16px;\n  border-radius: 12px;\n}', 'components', 'A card is a reusable piece.', '.card'],
+        ['.btn--danger {\n  background: tomato;\n}', 'components', 'A modifier of a button is a component rule.', '.btn--danger'],
+        ['.nav__link:hover {\n  text-decoration: underline;\n}', 'components', 'A nav link and its hover style belong to the nav component.', '.nav__link:hover'],
+        ['.card__title {\n  font-size: 1.3rem;\n}', 'components', 'An element of the card block stays with the card.', '.card__title']
+    ]
+});
+
+/* ================= WORKED REFACTOR TABS ================= */
+const RF = {
+    'style.css (before)': { type: 'css', note: 'Everything is in one file: variables are missing, names are vague, and layout, looks and dead code are mixed together.', code:
+`body { font-family: Arial; margin: 0; color: #222; }
+#header { background: #14213d; color: white; padding: 20px; }
+.box1 { width: 300px; float: left; margin: 10px; border: 1px solid #ccc; padding: 10px; }
+.box1 h3 { color: #14213d; font-size: 20px; }
+.box1.special { border: 3px solid gold; }
+.red-text { color: red; }
+.old-banner { background: yellow; padding: 8px; }
+.big-button { background: tomato; color: white; padding: 8px 16px; border: 0; }
+.box1 .big-button:hover { background: darkred; }
+/* .box2 { width: 200px; } */
+.footer { clear: both; text-align: center; padding: 16px; }
+@media (max-width: 600px) {
+  .box1 { width: 100%; float: none; margin: 10px 0; }
+}` },
+    'index.html (before)': { type: 'html', note: 'The HTML uses an id and vague class names. Notice that no element uses red-text or old-banner, so those rules are abandoned.', code:
+`<div id="header">Team Page</div>
+
+<div class="box1">
+  <h3>Ada</h3>
+  <p>First programmer.</p>
+  <button class="big-button">Read more</button>
+</div>
+
+<div class="box1 special">
+  <h3>Grace</h3>
+  <p>Pioneered compilers.</p>
+  <button class="big-button">Read more</button>
+</div>
+
+<div class="footer">Team 2026</div>` },
+    'base.css': { type: 'css', note: 'Variables and defaults for the whole site. The colours that appeared twice are now variables, so you change them in one place.', code:
+`/* ===== Base: variables and plain tag defaults ===== */
+
+:root {
+  --ink: #222;
+  --brand: #14213d;
+  --accent: tomato;
+  --accent-dark: darkred;
+  --border: #ccc;
+  --space: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: var(--ink);
+}` },
+    'layout.css': { type: 'css', note: 'Where the big parts sit: header, the row of cards, footer. The card row now wraps with flexbox, so the old clear: both is no longer needed.', code:
+`/* ===== Layout: where the big parts sit ===== */
+
+.site-header {
+  padding: 20px;
+  background: var(--brand);
+  color: white;
+}
+
+/* Cards sit in a row and wrap to the next line when there is no room. */
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.site-footer {
+  padding: var(--space);
+  text-align: center;
+}` },
+    'components.css': { type: 'css', note: 'Reusable pieces with all their parts. The card keeps its own small-screen rule next to it. Notice .card--featured comes after .card, so it wins.', code:
+`/* ===== Components ===== */
+
+/* --- Card --- */
+.card {
+  width: 300px;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+}
+
+.card__title {
+  font-size: 20px;
+  color: var(--brand);
+}
+
+/* Featured cards get a thick gold border so they stand out.
+   Keep this AFTER .card: same strength, so the later rule wins. */
+.card--featured {
+  border: 3px solid gold;
+}
+
+/* On phones the card fills the whole row. */
+@media (max-width: 600px) {
+  .card {
+    width: 100%;
+    margin: 10px 0;
+  }
+}
+
+/* --- Button --- */
+.btn {
+  padding: 8px 16px;
+  border: 0;
+  background: var(--accent);
+  color: white;
+}
+
+.btn:hover {
+  background: var(--accent-dark);
+}` },
+    'index.html (after)': { type: 'html', note: 'The classes now say what each piece is, and real header, main and footer tags give the page landmarks. The three link tags go in the head, in order.', code:
+`<!-- in the <head>, in this order -->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+
+<!-- in the <body> -->
+<header class="site-header">Team Page</header>
+
+<main class="card-grid">
+  <article class="card">
+    <h3 class="card__title">Ada</h3>
+    <p>First programmer.</p>
+    <button class="btn">Read more</button>
+  </article>
+
+  <article class="card card--featured">
+    <h3 class="card__title">Grace</h3>
+    <p>Pioneered compilers.</p>
+    <button class="btn">Read more</button>
+  </article>
+</main>
+
+<footer class="site-footer">Team 2026</footer>` }
+};
+const RFK = Object.keys(RF);
+function rf(key) {
+    const f = RF[key];
+    const pre = $('#rf-code');
+    if (f.type === 'css') pre.innerHTML = hl(f.code); else pre.textContent = f.code;
+    $('#rf-note').textContent = f.note;
+}
+$('#rf-tabs').dataset.opts = RFK.join('|');
+makeSeg('#rf-tabs', RFK[0], rf);
+rf(RFK[0]);
+
+/* ================= SPECIFICITY QUIZ ================= */
+makeQuiz('#sq', {
+    count: 5,
+    multiline: true,
+    top: 'Specificity master!',
+    choices: [{ key: 'r1', label: 'Rule 1 wins', cls: 'ch-a' }, { key: 'r2', label: 'Rule 2 wins', cls: 'ch-b' }],
+    pool: [
+        ['/* HTML: <div class="card"><button class="btn btn--danger"> */\n.card .btn { background: gray; }   /* rule 1 */\n.btn--danger { background: tomato; } /* rule 2 */', 'r1', 'Rule 1 is two classes (0,2,0). Rule 2 is one class (0,1,0). The bigger score wins, even though rule 2 is written later.', 'descendant selector'],
+        ['/* HTML: <button class="btn btn--danger"> */\n.btn { background: gray; }           /* rule 1 */\n.btn--danger { background: tomato; } /* rule 2 */', 'r2', 'Both are 0,1,0, so the later rule wins. That is why modifiers go after their block.', 'modifier after block'],
+        ['/* HTML: <button class="btn btn--danger"> */\n.btn--danger { background: tomato; } /* rule 1 */\n.btn { background: gray; }           /* rule 2 */', 'r2', 'Equal scores, so the later rule wins, and the plain .btn rule overrides the modifier. Always put modifiers after the block.', 'modifier before block'],
+        ['/* HTML: <header id="header" class="site-header"> */\n#header { color: red; }             /* rule 1 */\n.site-header { color: blue; }      /* rule 2 */', 'r1', 'An id (1,0,0) beats a class (0,1,0), even when the class rule is later. That is why BEM-lite avoids ids.', 'id beats class'],
+        ['/* HTML: <nav class="nav"><a class="nav__link"> */\n.nav a { color: blue; }            /* rule 1 */\n.nav__link { color: green; }       /* rule 2 */', 'r1', '.nav a is a class plus a tag (0,1,1), which is stronger than one class (0,1,0). Prefer .nav__link on its own.', 'class plus tag'],
+        ['/* HTML: <p class="note"> */\np { color: black; }                /* rule 1 */\n.note { color: purple; }           /* rule 2 */', 'r2', 'A class (0,1,0) beats a tag (0,0,1), whatever the order.', 'class beats tag']
+    ]
+});
+
+/* ================= TICK LISTS ================= */
+const ticks = [...document.querySelectorAll('.tick')];
+function updateTicks() {
+    ticks.forEach(list => {
+        const id = list.dataset.tick;
+        const boxes = [...list.querySelectorAll('input[type=checkbox]')];
+        const n = boxes.filter(b => b.checked).length;
+        const prog = document.querySelector('[data-prog=' + id + ']');
+        const out = document.querySelector('[data-out=' + id + ']');
+        if (prog) { prog.max = boxes.length; prog.value = n; }
+        if (out) out.textContent = n + ' of ' + boxes.length + ' done.' + (n === boxes.length ? ' ' + (list.dataset.done || '') : '');
+    });
+    const ship = ticks.filter(l => l.hasAttribute('data-ship'));
+    let total = 0, done = 0;
+    ship.forEach(l => { const bs = l.querySelectorAll('input[type=checkbox]'); total += bs.length; done += [...bs].filter(b => b.checked).length; });
+    const out = $('#ship-summary');
+    if (out) {
+        const ratio = total ? done / total : 0;
+        let msg = done + ' of ' + total + ' ticked. ';
+        msg += done === 0 ? 'Start with the live URL checks. If the URL does not open, nothing else can be reviewed.'
+            : ratio < 0.5 ? 'Good start. Keep going, and finish the live URL group first.'
+            : ratio < 1 ? 'Almost there. Finish the unticked items before faculty opens your site.'
+            : 'Ready to ship! Open your live URL one last time in a private window.';
+        out.textContent = msg;
+    }
+}
+document.addEventListener('change', e => { if (e.target.matches('.tick input')) updateTicks(); });
+updateTicks();
+</script>
+</body>
+</html>
