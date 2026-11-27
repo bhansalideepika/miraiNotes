@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Kid-friendly notes on CSS Flexbox, Grid, Colour and Media queries, with live toys that show the code changing.">
+<title>CSS notes for curious kids: Flexbox, Grid, Colour and Media queries</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;800&display=swap">
+<style>
+/* ===== TOKENS (light first, dark redefined below) ===== */
+:root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    color-scheme: light;
+    --bg: #f5f8ff;
+    --surface: #ffffff;
+    --ink: #14213d;
+    --muted: #46557a;
+    --line: #d3dcef;
+    --chip: #e4eafa;
+    --code-bg: #101a33;
+    --code-ink: #eaf0ff;
+    --code-prop: #7ee7c4;
+    --code-val: #ffd37a;
+    --code-sel: #ff9db5;
+    --code-com: #8d9cc6;
+    --flex: #ef476f;
+    --grid: #3fb0e0;
+    --colour: #ffc233;
+    --media: #2fc79a;
+    --flex-soft: #ffe1e8;
+    --grid-soft: #dcf1fa;
+    --colour-soft: #fff0c4;
+    --media-soft: #d6f5ea;
+    --on-accent: #14213d;
+    --focus: #14213d;
+    --checker: repeating-conic-gradient(#c9d2e8 0% 25%, #ffffff 0% 50%) 0 / 16px 16px;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0d1427;
+        --surface: #16203a;
+        --ink: #eaf0ff;
+        --muted: #a9b6d8;
+        --line: #2f3f6c;
+        --chip: #26335a;
+        --code-bg: #080d1c;
+        --flex-soft: #4a1f2e;
+        --grid-soft: #123a4a;
+        --colour-soft: #4a3a0c;
+        --media-soft: #0f3d31;
+        --focus: #ffffff;
+        --checker: repeating-conic-gradient(#3a4a78 0% 25%, #1f2a4d 0% 50%) 0 / 16px 16px;
+    }
+}
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0d1427;
+    --surface: #16203a;
+    --ink: #eaf0ff;
+    --muted: #a9b6d8;
+    --line: #2f3f6c;
+    --chip: #26335a;
+    --code-bg: #080d1c;
+    --flex-soft: #4a1f2e;
+    --grid-soft: #123a4a;
+    --colour-soft: #4a3a0c;
+    --media-soft: #0f3d31;
+    --focus: #ffffff;
+    --checker: repeating-conic-gradient(#3a4a78 0% 25%, #1f2a4d 0% 50%) 0 / 16px 16px;
+}
+
+/* ===== BASE ===== */
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 1.0625rem/1.65 "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    background: var(--surface);
+    z-index: 10;
+}
+h1, h2, h3, .display { font-family: "Baloo 2", "Nunito", system-ui, sans-serif; font-weight: 800; line-height: 1.1; margin: 0; }
+p { margin: 0 0 1rem; max-width: 68ch; }
+code, pre, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+code { background: var(--chip); padding: 1px 7px; border-radius: 6px; font-size: 0.88em; font-weight: 700; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.wrap { width: min(1120px, 100% - 2.5rem); margin-inline: auto; }
+img, svg { max-width: 100%; }
+
+/* ===== TOP BAR ===== */
+.bar {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 20;
+    background: var(--surface);
+    border-bottom: 3px solid var(--ink);
+}
+.bar .wrap { display: flex; align-items: center; gap: 14px; padding-block: 8px; }
+.brand { font: 800 1.35rem "Baloo 2", sans-serif; white-space: nowrap; }
+.bar nav { display: flex; gap: 6px; overflow-x: auto; flex: 1; padding: 2px; }
+.bar nav a {
+    flex: none;
+    padding: 4px 14px;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    background: var(--c);
+    color: var(--on-accent);
+    font-weight: 800;
+    text-decoration: none;
+    font-size: 0.92rem;
+}
+.bar nav a:hover { text-decoration: underline; }
+.theme-btn {
+    flex: none;
+    min-height: 40px;
+    padding: 4px 14px;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    background: var(--surface);
+    color: var(--ink);
+    font: 700 0.88rem "Nunito", sans-serif;
+    cursor: pointer;
+}
+.c-flex { --c: var(--flex); --accent: var(--flex); --soft: var(--flex-soft); }
+.c-grid { --c: var(--grid); --accent: var(--grid); --soft: var(--grid-soft); }
+.c-colour { --c: var(--colour); --accent: var(--colour); --soft: var(--colour-soft); }
+.c-media { --c: var(--media); --accent: var(--media); --soft: var(--media-soft); }
+
+/* ===== HERO ===== */
+.hero { padding-block: clamp(2.5rem, 7vw, 5rem) 1rem; }
+.hero h1 { font-size: clamp(2.8rem, 9vw, 5.6rem); letter-spacing: -0.01em; margin-bottom: 0.8rem; }
+.lead { font-size: clamp(1.1rem, 2.4vw, 1.4rem); line-height: 1.5; max-width: 40ch; color: var(--muted); margin-bottom: 2rem; }
+.tiles { display: flex; flex-wrap: wrap; gap: 18px; list-style: none; margin: 0; padding: 0; }
+.tiles li { flex: 1 1 220px; }
+.tile {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 100%;
+    padding: 1.1rem 1.25rem 1.25rem;
+    border: 3px solid var(--ink);
+    border-radius: 22px;
+    background: var(--c);
+    color: var(--on-accent);
+    text-decoration: none;
+    box-shadow: 5px 5px 0 var(--ink);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.tile:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
+.tile:focus-visible { outline-offset: 6px; }
+.tile-ico { font-size: 2.1rem; line-height: 1.2; }
+.tile strong { font: 800 1.75rem/1.1 "Baloo 2", sans-serif; }
+.tile span:last-child { font-weight: 700; line-height: 1.35; }
+.peek { margin-top: 1.4rem; max-width: 640px; }
+.peek summary { cursor: pointer; font-weight: 800; padding: 4px 0; }
+
+/* ===== LESSON LAYOUT ===== */
+.lesson { margin-block: clamp(3.5rem, 8vw, 6rem); }
+.lesson-head { display: flex; align-items: center; gap: 16px; margin-bottom: 1.6rem; }
+.badge {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 68px;
+    height: 68px;
+    font-size: 2.2rem;
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    background: var(--accent);
+    box-shadow: 4px 4px 0 var(--ink);
+}
+.lesson h2 { font-size: clamp(2rem, 5vw, 3.1rem); }
+.sub { margin: 2px 0 0; color: var(--muted); font-size: 1.1rem; }
+.notes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 2rem 2.5rem; margin-bottom: 2rem; }
+.notes > * { min-width: 0; }
+.idea {
+    padding: 1rem 1.2rem;
+    background: var(--soft);
+    border-left: 10px solid var(--accent);
+    border-radius: 6px 18px 18px 6px;
+    font-size: 1.1rem;
+}
+.steps { padding-left: 1.3rem; margin: 0 0 1rem; }
+.steps li { margin-bottom: 0.35rem; }
+.props { display: grid; }
+.prop { padding: 0.7rem 0; border-bottom: 2px dashed var(--line); }
+.prop:first-child { padding-top: 0; }
+.prop p { margin: 0.3rem 0 0; }
+.mission {
+    margin-top: 1.2rem;
+    padding: 0.7rem 1rem;
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    background: var(--surface);
+}
+.mission summary { cursor: pointer; font-weight: 800; }
+.mission p { margin: 0.6rem 0 0; }
+
+/* ===== LABS (the interactive toys) ===== */
+.lab {
+    margin-bottom: 1.6rem;
+    padding: clamp(1rem, 3vw, 1.5rem);
+    background: var(--surface);
+    border: 3px solid var(--ink);
+    border-radius: 22px;
+    box-shadow: 7px 7px 0 var(--accent);
+}
+.lab h3 { font-size: 1.5rem; margin-bottom: 0.9rem; }
+.controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px 24px; margin-bottom: 14px; }
+.ctl { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.lbl, .ctl label { font-weight: 800; font-size: 0.95rem; display: flex; justify-content: space-between; gap: 8px; }
+.lbl code, .ctl label code { font-size: 0.95em; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button, .btn {
+    min-height: 40px;
+    padding: 4px 13px;
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    font: 700 0.86rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    cursor: pointer;
+}
+.btn { font-family: "Nunito", sans-serif; font-size: 0.95rem; }
+.seg button:hover, .btn:hover { border-color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--ink); }
+.counter { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.check { display: flex; align-items: center; gap: 10px; font-weight: 700; min-height: 40px; }
+.check input { width: 22px; height: 22px; accent-color: var(--accent); }
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 16px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--track, var(--line));
+    cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--ink);
+    border-radius: 50%;
+    background: var(--accent, var(--ink));
+}
+input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border: 3px solid var(--ink);
+    border-radius: 50%;
+    background: var(--accent, var(--ink));
+}
+input[type="range"].hue { --track: linear-gradient(to right, hsl(0 100% 50%), hsl(60 100% 50%), hsl(120 100% 50%), hsl(180 100% 50%), hsl(240 100% 50%), hsl(300 100% 50%), hsl(360 100% 50%)); }
+.stage { padding: 12px; background: var(--soft); border: 2px dashed var(--ink); border-radius: 14px; }
+.say {
+    margin: 0.9rem 0 0;
+    padding: 0.6rem 0.9rem;
+    max-width: none;
+    background: var(--soft);
+    border-left: 8px solid var(--accent);
+    border-radius: 4px 12px 12px 4px;
+}
+pre.code {
+    margin: 0.9rem 0 0;
+    padding: 14px 16px;
+    overflow-x: auto;
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    tab-size: 2;
+}
+pre.code .p { color: var(--code-prop); }
+pre.code .v { color: var(--code-val); }
+pre.code .s { color: var(--code-sel); }
+pre.code .c { color: var(--code-com); }
+pre.code .rule { display: block; padding: 2px 8px; margin: 2px -8px; border-radius: 6px; opacity: 0.55; }
+pre.code .rule.on { opacity: 1; background: rgba(126, 231, 196, 0.18); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.4rem; align-items: start; }
+.two > * { min-width: 0; }
+
+/* toy blocks (flex + grid) */
+.toy {
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--on-accent);
+    border-radius: 10px;
+    color: var(--on-accent);
+    font: 800 1.2rem "Baloo 2", sans-serif;
+}
+.toy:nth-child(4n+1) { background: var(--flex); }
+.toy:nth-child(4n+2) { background: var(--grid); }
+.toy:nth-child(4n+3) { background: var(--colour); }
+.toy:nth-child(4n+4) { background: var(--media); }
+.blk { min-width: 52px; padding: var(--py, 12px) var(--px, 18px); }
+.blk:nth-child(5n+1) { --py: 10px; --px: 16px; }
+.blk:nth-child(5n+2) { --py: 26px; --px: 22px; }
+.blk:nth-child(5n+3) { --py: 16px; --px: 14px; }
+.blk:nth-child(5n+4) { --py: 34px; --px: 26px; }
+.blk:nth-child(5n+5) { --py: 20px; --px: 18px; }
+#fbox { display: flex; height: 260px; padding: 8px; overflow: auto; background: var(--surface); border-radius: 8px; }
+#gbox { display: grid; padding: 8px; background: var(--surface); border-radius: 8px; }
+#gbox .toy { min-height: 56px; }
+.areas { display: grid; gap: 8px; padding: 8px; background: var(--surface); border-radius: 8px; }
+.areas div { display: grid; place-items: center; min-height: 46px; border: 2px solid var(--on-accent); border-radius: 8px; color: var(--on-accent); font-weight: 800; }
+.a-top { grid-area: top; background: var(--flex); }
+.a-side { grid-area: side; background: var(--colour); }
+.a-main { grid-area: main; background: var(--grid); min-height: 90px !important; }
+.a-foot { grid-area: foot; background: var(--media); }
+
+/* axis diagrams */
+.dg { margin: 0; min-width: 0; }
+.dg figcaption { margin-top: 0.6rem; font-size: 0.95rem; line-height: 1.5; }
+.diagram { display: block; width: 100%; height: auto; }
+.dg-box { fill: var(--surface); stroke: var(--ink); stroke-width: 2.5; stroke-dasharray: 7 5; }
+.dg-b { stroke: var(--on-accent); stroke-width: 2.5; }
+.dg-b1 { fill: var(--flex); }
+.dg-b2 { fill: var(--grid); }
+.dg-b3 { fill: var(--colour); }
+.dg-n { fill: var(--on-accent); font: 800 18px "Baloo 2", sans-serif; text-anchor: middle; }
+.dg-ax-main { stroke: var(--flex); stroke-width: 5; marker-end: url(#mk-main); }
+.dg-ax-cross { stroke: var(--grid); stroke-width: 5; stroke-dasharray: 9 6; marker-end: url(#mk-cross); }
+.mk-main { fill: var(--flex); }
+.mk-cross { fill: var(--grid); }
+.dg-t { fill: var(--ink); font: 800 14px "Nunito", sans-serif; text-anchor: middle; }
+.dg-s { fill: var(--muted); font: 700 11.5px "Nunito", sans-serif; }
+.dg-mono { fill: var(--ink); font: 700 14px ui-monospace, Menlo, Consolas, monospace; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0.8rem 0 0; font-weight: 700; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend svg { width: 44px; height: 10px; }
+
+/* grid reference + alignment toy */
+.ref-h { font: 800 1.3rem "Baloo 2", sans-serif; margin: 1.6rem 0 0.2rem; }
+.table-wrap { overflow-x: auto; margin: 0.5rem 0 0; }
+table.ref { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 0.96rem; }
+.ref th, .ref td { padding: 0.6rem 0.7rem; text-align: left; vertical-align: top; border-bottom: 2px dashed var(--line); }
+.ref th { background: var(--soft); border-bottom: 3px solid var(--ink); font-weight: 800; }
+.ref td:first-child { white-space: nowrap; }
+.ref code { display: inline-block; margin: 2px 2px; }
+#xbox { display: grid; grid-template-columns: repeat(3, 76px); grid-template-rows: repeat(2, 64px); gap: 8px; height: 260px; padding: 8px; overflow: auto; background: var(--surface); border-radius: 8px; }
+#xbox .toy { padding: 6px 10px; }
+
+/* grid playground */
+.pg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 1.6rem; align-items: start; }
+.pg > * { min-width: 0; }
+.pg-stage { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); }
+.pg-controls .controls { grid-template-columns: 1fr; }
+.pg .seg button { border-radius: 14px; }
+.txt { width: 100%; min-height: 42px; padding: 6px 12px; border: 2px solid var(--ink); border-radius: 12px; background: var(--surface); color: var(--ink); font: 700 0.95rem ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.txt[aria-invalid="true"] { border-color: #e11d48; box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.25); }
+.hint { margin: 0; min-height: 1.4em; max-width: none; font-size: 0.88rem; color: var(--muted); }
+#pbox { display: grid; height: 340px; padding: 8px; overflow: auto; background: var(--surface); border-radius: 8px; }
+#pbox .toy { min-height: 44px; padding: 8px 10px; cursor: pointer; }
+#pbox .toy.sel { outline: 4px dashed var(--ink); outline-offset: -4px; }
+@media (max-width: 820px) {
+    .pg { grid-template-columns: 1fr; }
+    .pg-stage { order: -1; z-index: 5; padding-bottom: 6px; background: var(--surface); }
+    #pbox { height: 210px; }
+}
+
+/* colour lab */
+.checker { background: var(--checker); border-radius: 14px; padding: 10px; }
+.sample {
+    display: grid;
+    place-items: center;
+    min-height: 160px;
+    padding: 12px;
+    border: 8px solid #14213d;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #14213d;
+    font: 800 2.2rem "Baloo 2", sans-serif;
+    text-align: center;
+}
+.forms { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; margin: 0.9rem 0 0; }
+.forms div { padding: 0.5rem 0.8rem; background: var(--soft); border-radius: 10px; }
+.forms dt { font-weight: 800; font-size: 0.85rem; color: var(--muted); }
+.forms dd { margin: 0; font: 700 0.92rem ui-monospace, "SF Mono", Menlo, Consolas, monospace; word-break: break-word; }
+.names { display: flex; flex-wrap: wrap; gap: 8px; margin: 0.4rem 0 1rem; padding: 0; list-style: none; }
+.names li { padding: 4px 14px; border: 2px solid #14213d; border-radius: 999px; font: 800 0.9rem ui-monospace, Menlo, Consolas, monospace; color: #14213d; }
+.light-stage { position: relative; width: min(100%, 280px); height: 250px; margin-inline: auto; background: #000; border-radius: 16px; overflow: hidden; }
+.disc { position: absolute; width: 150px; height: 150px; border-radius: 50%; mix-blend-mode: screen; opacity: 0.14; transition: opacity 0.2s; }
+.disc.on { opacity: 1; }
+.disc-r { background: #ff0000; left: calc(50% - 125px); top: 18px; }
+.disc-g { background: #00ff00; left: calc(50% - 25px); top: 18px; }
+.disc-b { background: #0000ff; left: calc(50% - 75px); top: 90px; }
+.lamps { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0.4rem; }
+.lamp { min-height: 44px; padding: 4px 18px; border: 3px solid var(--ink); border-radius: 999px; font: 800 1rem "Nunito", sans-serif; cursor: pointer; opacity: 0.5; }
+.lamp[aria-pressed="true"] { opacity: 1; box-shadow: 3px 3px 0 var(--ink); }
+.lamp-r { background: #ff0000; color: #ffffff; }
+.lamp-g { background: #00ff00; color: #14213d; }
+.lamp-b { background: #0000ff; color: #ffffff; }
+.mix-swatch { display: inline-block; width: 1.4em; height: 1.4em; vertical-align: -0.3em; border: 2px solid var(--ink); border-radius: 6px; margin-right: 4px; }
+
+/* media lab */
+.device::after { content: "a computer"; }
+.device { display: inline-block; padding: 0 14px; border: 2px solid var(--ink); border-radius: 999px; background: var(--media); color: var(--on-accent); font-weight: 800; }
+@media (max-width: 900px) { .device::after { content: "a tablet"; } }
+@media (max-width: 600px) { .device::after { content: "a phone"; } }
+.frame-wrap { overflow-x: auto; padding-bottom: 6px; }
+.frame { border: 3px solid var(--ink); border-radius: 12px; background: var(--surface); overflow: hidden; }
+.mini-head { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--media); color: var(--on-accent); font-weight: 800; }
+.mini-links { display: flex; gap: 12px; font-size: 0.85rem; }
+.mini-burger { display: none; font-size: 1.3rem; line-height: 1; }
+.mini-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
+.mini-cards div { display: grid; place-items: center; min-height: 52px; background: var(--media-soft); border: 2px solid var(--ink); border-radius: 8px; font-weight: 800; font-size: 0.85rem; }
+.frame[data-size="tablet"] .mini-cards, .frame[data-size="phone"] .mini-cards { grid-template-columns: repeat(2, 1fr); }
+.frame[data-size="phone"] .mini-cards { grid-template-columns: 1fr; }
+.frame[data-size="phone"] .mini-links { display: none; }
+.frame[data-size="phone"] .mini-burger { display: block; }
+
+/* ===== FOOTER ===== */
+footer { padding-block: 2.5rem 3rem; border-top: 3px solid var(--ink); background: var(--surface); }
+footer p { margin: 0 0 0.4rem; }
+
+/* ===== OUR OWN MEDIA QUERIES ===== */
+@media (max-width: 820px) {
+    .notes, .two { grid-template-columns: 1fr; }
+    .bar .wrap { gap: 8px; }
+    .brand { font-size: 1.15rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+    <div class="wrap">
+        <span class="brand">CSS notes</span>
+        <nav aria-label="Jump to a lesson">
+            <a class="c-flex" href="#flexbox">Flexbox</a>
+            <a class="c-grid" href="#grid">Grid</a>
+            <a class="c-colour" href="#colour">Colour</a>
+            <a class="c-media" href="#media-queries">Media queries</a>
+        </nav>
+        <button class="theme-btn" id="theme" type="button">Dark mode</button>
+    </div>
+</div>
+
+<header class="hero wrap">
+    <h1>Make boxes behave.</h1>
+    <p class="lead">Four CSS tools decide where things go and what they look like. Play with each one, watch the code change, and you will see how it works.</p>
+    <ul class="tiles">
+        <li><a class="tile c-flex" href="#flexbox"><span class="tile-ico" aria-hidden="true">🚂</span><strong>Flexbox</strong><span>Line things up in a row or a stack.</span></a></li>
+        <li><a class="tile c-grid" href="#grid"><span class="tile-ico" aria-hidden="true">🧁</span><strong>Grid</strong><span>Put things in rows and columns, like a muffin tray.</span></a></li>
+        <li><a class="tile c-colour" href="#colour"><span class="tile-ico" aria-hidden="true">🎨</span><strong>Colour</strong><span>Mix any colour you can think of.</span></a></li>
+        <li><a class="tile c-media" href="#media-queries"><span class="tile-ico" aria-hidden="true">📱</span><strong>Media queries</strong><span>Make a page fit phones, tablets and computers.</span></a></li>
+    </ul>
+    <details class="peek">
+        <summary>Peek: this row of tiles is built with flexbox</summary>
+<pre class="code" data-css>.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+.tiles li {
+  /* grow: 1, shrink: 1, start at 220px wide */
+  flex: 1 1 220px;
+}</pre>
+    </details>
+</header>
+
+<main class="wrap">
+
+<!-- ================= FLEXBOX ================= -->
+<section class="lesson c-flex" id="flexbox" aria-labelledby="h-flex">
+    <div class="lesson-head">
+        <span class="badge" aria-hidden="true">🚂</span>
+        <div><h2 id="h-flex">Flexbox</h2><p class="sub">Line things up, like friends sitting on a bench.</p></div>
+    </div>
+
+    <div class="notes">
+        <div>
+            <p class="idea"><strong>The big idea.</strong> Imagine friends on a bench. You decide if they sit in a row or in a stack, how much space is between them, and if they huddle on the left, on the right or in the middle. Flexbox lets you tell the browser all of that.</p>
+            <p><strong>How to start</strong></p>
+            <ol class="steps">
+                <li>Pick a parent box that holds the things you want to line up.</li>
+                <li>Write <code>display: flex;</code> on the parent.</li>
+                <li>The children inside are now <em>flex items</em>. Use the properties on the right to move them.</li>
+            </ol>
+            <details class="mission">
+                <summary>Mission: put every block in the exact middle of the box</summary>
+                <p>Use <code>justify-content: center</code> and <code>align-items: center</code> together. One centres along the main line and the other centres across it.</p>
+            </details>
+        </div>
+        <div class="props">
+            <div class="prop"><code>display: flex</code><p>Turns the parent into a flex box. Its children line up in a row.</p></div>
+            <div class="prop"><code>flex-direction</code><p><code>row</code> puts items side by side. <code>column</code> puts them one under the other. Add <code>-reverse</code> to flip the order, so the last item comes first.</p></div>
+            <div class="prop"><code>justify-content</code><p>Where items sit along the <strong>main line</strong>, the way they are lined up. <code>space-between</code> pushes the first and last items to the edges. <code>space-around</code> gives every item the same space on both sides. <code>space-evenly</code> makes every gap exactly equal.</p></div>
+            <div class="prop"><code>align-items</code><p>Where items sit on the <strong>cross line</strong>, the other way. <code>stretch</code> makes them fill it. <code>baseline</code> lines up the bottoms of their first lines of text, like writing on a ruled line.</p></div>
+            <div class="prop"><code>gap</code><p>The empty space between items.</p></div>
+            <div class="prop"><code>flex-wrap</code><p>With <code>wrap</code>, items that do not fit start a new line instead of squeezing. <code>wrap-reverse</code> stacks the new lines the opposite way.</p></div>
+            <div class="prop"><code>flex-grow</code><p>A greedy item! A number above 0 lets it grow to fill all the leftover space.</p></div>
+            <div class="prop"><code>align-self</code><p>Written on <strong>one child</strong>. It lets that item ignore <code>align-items</code> and choose its own spot on the cross axis. Values: <code>auto</code> (do what the parent says), <code>flex-start</code>, <code>center</code>, <code>flex-end</code>, <code>stretch</code>, <code>baseline</code>.</p></div>
+        </div>
+    </div>
+
+    <div class="lab">
+        <h3>Picture: the main axis and the cross axis</h3>
+        <p>Every flex box has two invisible lines. The <strong>main axis</strong> is the direction the items line up in. The <strong>cross axis</strong> is the other direction, at a right angle to it. <code>flex-direction</code> decides which way the main axis points.</p>
+        <div class="two">
+            <figure class="dg">
+                <svg class="diagram" viewBox="0 0 380 260" role="img" aria-labelledby="dg-row-title">
+                    <title id="dg-row-title">With flex-direction row, the main axis runs left to right and the cross axis runs top to bottom</title>
+                    <defs>
+                        <marker id="mk-main" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path class="mk-main" d="M0 0 L10 5 L0 10 z"/></marker>
+                        <marker id="mk-cross" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path class="mk-cross" d="M0 0 L10 5 L0 10 z"/></marker>
+                    </defs>
+                    <text class="dg-mono" x="10" y="26">flex-direction: row</text>
+                    <rect class="dg-box" x="10" y="40" width="360" height="210" rx="14"/>
+                    <rect class="dg-b dg-b1" x="66" y="74" width="76" height="60" rx="8"/><text class="dg-n" x="104" y="109">1</text>
+                    <rect class="dg-b dg-b2" x="156" y="74" width="76" height="90" rx="8"/><text class="dg-n" x="194" y="124">2</text>
+                    <rect class="dg-b dg-b3" x="246" y="74" width="76" height="44" rx="8"/><text class="dg-n" x="284" y="101">3</text>
+                    <line class="dg-ax-cross" x1="48" y1="62" x2="48" y2="176"/>
+                    <text class="dg-s" x="48" y="56" text-anchor="middle">start</text>
+                    <text class="dg-s" x="48" y="200" text-anchor="middle">end</text>
+                    <text class="dg-t" transform="rotate(-90 30 123)" x="30" y="123">Cross axis</text>
+                    <line class="dg-ax-main" x1="58" y1="212" x2="352" y2="212"/>
+                    <text class="dg-s" x="58" y="236" text-anchor="start">start</text>
+                    <text class="dg-t" x="205" y="236">Main axis</text>
+                    <text class="dg-s" x="352" y="236" text-anchor="end">end</text>
+                </svg>
+                <figcaption><strong>Row</strong> (the default). Main axis: left to right. Cross axis: top to bottom. <code>justify-content</code> slides blocks left and right. <code>align-items</code> slides them up and down.</figcaption>
+            </figure>
+            <figure class="dg">
+                <svg class="diagram" viewBox="0 0 380 260" role="img" aria-labelledby="dg-col-title">
+                    <title id="dg-col-title">With flex-direction column, the main axis runs top to bottom and the cross axis runs left to right</title>
+                    <text class="dg-mono" x="10" y="26">flex-direction: column</text>
+                    <rect class="dg-box" x="10" y="40" width="360" height="210" rx="14"/>
+                    <rect class="dg-b dg-b1" x="66" y="60" width="130" height="38" rx="8"/><text class="dg-n" x="131" y="85">1</text>
+                    <rect class="dg-b dg-b2" x="66" y="108" width="200" height="38" rx="8"/><text class="dg-n" x="166" y="133">2</text>
+                    <rect class="dg-b dg-b3" x="66" y="156" width="90" height="38" rx="8"/><text class="dg-n" x="111" y="181">3</text>
+                    <line class="dg-ax-main" x1="48" y1="62" x2="48" y2="176"/>
+                    <text class="dg-s" x="48" y="56" text-anchor="middle">start</text>
+                    <text class="dg-s" x="48" y="200" text-anchor="middle">end</text>
+                    <text class="dg-t" transform="rotate(-90 30 123)" x="30" y="123">Main axis</text>
+                    <line class="dg-ax-cross" x1="58" y1="212" x2="352" y2="212"/>
+                    <text class="dg-s" x="58" y="236" text-anchor="start">start</text>
+                    <text class="dg-t" x="205" y="236">Cross axis</text>
+                    <text class="dg-s" x="352" y="236" text-anchor="end">end</text>
+                </svg>
+                <figcaption><strong>Column</strong>. Main axis: top to bottom. Cross axis: left to right. <code>justify-content</code> slides blocks up and down. <code>align-items</code> slides them left and right.</figcaption>
+            </figure>
+        </div>
+        <p class="legend" aria-label="Key">
+            <span><svg viewBox="0 0 44 10" aria-hidden="true"><line x1="0" y1="5" x2="44" y2="5" style="stroke:var(--flex);stroke-width:5"/></svg> Solid pink line = main axis</span>
+            <span><svg viewBox="0 0 44 10" aria-hidden="true"><line x1="0" y1="5" x2="44" y2="5" style="stroke:var(--grid);stroke-width:5;stroke-dasharray:9 6"/></svg> Dashed blue line = cross axis</span>
+        </p>
+        <p class="say"><strong>Easy to remember:</strong> <code>justify-content</code> works <em>along</em> the main axis. <code>align-items</code> works <em>across</em>, on the cross axis. The main axis flips when you switch between row and column, so the two properties swap jobs. With <code>row-reverse</code> or <code>column-reverse</code> the main arrow points the other way, so start and end swap places.</p>
+    </div>
+
+    <div class="lab">
+        <h3>Try it: boss the blocks around</h3>
+        <div class="controls">
+            <div class="ctl"><span class="lbl"><code>flex-direction</code></span>
+                <div class="seg" id="f-dir" role="group" aria-label="flex-direction">
+                    <button type="button" data-v="row" aria-pressed="true">row</button>
+                    <button type="button" data-v="row-reverse" aria-pressed="false">row-reverse</button>
+                    <button type="button" data-v="column" aria-pressed="false">column</button>
+                    <button type="button" data-v="column-reverse" aria-pressed="false">column-reverse</button>
+                </div></div>
+            <div class="ctl"><span class="lbl"><code>justify-content</code></span>
+                <div class="seg" id="f-jc" role="group" aria-label="justify-content">
+                    <button type="button" data-v="flex-start" aria-pressed="true">flex-start</button>
+                    <button type="button" data-v="center" aria-pressed="false">center</button>
+                    <button type="button" data-v="flex-end" aria-pressed="false">flex-end</button>
+                    <button type="button" data-v="space-between" aria-pressed="false">space-between</button>
+                    <button type="button" data-v="space-around" aria-pressed="false">space-around</button>
+                    <button type="button" data-v="space-evenly" aria-pressed="false">space-evenly</button>
+                </div></div>
+            <div class="ctl"><span class="lbl"><code>align-items</code></span>
+                <div class="seg" id="f-ai" role="group" aria-label="align-items">
+                    <button type="button" data-v="flex-start" aria-pressed="true">flex-start</button>
+                    <button type="button" data-v="center" aria-pressed="false">center</button>
+                    <button type="button" data-v="flex-end" aria-pressed="false">flex-end</button>
+                    <button type="button" data-v="stretch" aria-pressed="false">stretch</button>
+                    <button type="button" data-v="baseline" aria-pressed="false">baseline</button>
+                </div></div>
+            <div class="ctl"><span class="lbl"><code>flex-wrap</code></span>
+                <div class="seg" id="f-wrap" role="group" aria-label="flex-wrap">
+                    <button type="button" data-v="nowrap" aria-pressed="true">nowrap</button>
+                    <button type="button" data-v="wrap" aria-pressed="false">wrap</button>
+                    <button type="button" data-v="wrap-reverse" aria-pressed="false">wrap-reverse</button>
+                </div></div>
+            <div class="ctl"><label for="f-gap"><code>gap</code> <span><output id="f-gapv">10</output>px</span></label>
+                <input type="range" id="f-gap" min="0" max="40" value="10"></div>
+            <div class="ctl"><span class="lbl">Blocks in the box</span>
+                <div class="counter">
+                    <button class="btn" type="button" id="f-less">Remove a block</button>
+                    <button class="btn" type="button" id="f-more">Add a block</button>
+                </div>
+                <label class="check"><input type="checkbox" id="f-grow"> Make block 2 greedy (<code>flex-grow: 1</code>)</label></div>
+            <div class="ctl"><span class="lbl"><code>align-self</code> on block 2 only</span>
+                <div class="seg" id="f-self" role="group" aria-label="align-self for block 2">
+                    <button type="button" data-v="auto" aria-pressed="true">auto</button>
+                    <button type="button" data-v="flex-start" aria-pressed="false">flex-start</button>
+                    <button type="button" data-v="center" aria-pressed="false">center</button>
+                    <button type="button" data-v="flex-end" aria-pressed="false">flex-end</button>
+                    <button type="button" data-v="stretch" aria-pressed="false">stretch</button>
+                    <button type="button" data-v="baseline" aria-pressed="false">baseline</button>
+                </div></div>
+        </div>
+        <div class="stage"><div id="fbox" role="img" aria-label="A box of coloured numbered blocks laid out with flexbox"></div></div>
+        <p class="say" id="f-say" aria-live="polite"></p>
+        <pre class="code" id="f-code"></pre>
+    </div>
+</section>
+
+<!-- ================= GRID ================= -->
+<section class="lesson c-grid" id="grid" aria-labelledby="h-grid">
+    <div class="lesson-head">
+        <span class="badge" aria-hidden="true">🧁</span>
+        <div><h2 id="h-grid">Grid</h2><p class="sub">Rows and columns, like a muffin tray or a chocolate bar.</p></div>
+    </div>
+
+    <div class="notes">
+        <div>
+            <p class="idea"><strong>The big idea.</strong> A muffin tray has rows and columns of little holes. A grid is the same. You say how many columns you want, and the items fill the holes one by one, left to right, then start the next row.</p>
+            <p><strong>Flex or grid?</strong> Flexbox lines things up in <em>one</em> direction at a time. Grid handles rows <em>and</em> columns together. Use flex for a menu bar. Use grid for a whole page or a photo gallery.</p>
+            <details class="mission">
+                <summary>Mission: make 4 columns, a 20px gap, and block 1 two columns wide</summary>
+                <p>Press <strong>4</strong> under columns, drag the gap slider to 20, and tick the box for block 1. Check that the code on the screen matches what you built.</p>
+            </details>
+        </div>
+        <div class="props">
+            <div class="prop"><code>display: grid</code><p>Turns the parent into a grid.</p></div>
+            <div class="prop"><code>grid-template-columns</code><p>Says how many columns there are and how wide each one is.</p></div>
+            <div class="prop"><code>fr</code><p><code>fr</code> stands for <strong>fraction</strong>. It is a fraction of the available free space in the grid container. So <code>2fr</code> gets twice as much space as <code>1fr</code>.</p></div>
+            <div class="prop"><code>repeat(3, 1fr)</code><p>A shortcut for <code>1fr 1fr 1fr</code>. Three equal columns.</p></div>
+            <div class="prop"><code>gap</code><p>The space between rows and columns.</p></div>
+            <div class="prop"><code>grid-column: span 2</code><p>This item is greedy. It takes up two columns.</p></div>
+            <div class="prop"><code>grid-template-areas</code><p>Draw your page with words, then give each part a name. See the page-layout toy below.</p></div>
+        </div>
+    </div>
+
+    <div class="lab">
+        <h3>Try it: build a tray</h3>
+        <div class="controls">
+            <div class="ctl"><span class="lbl"><code>columns</code></span>
+                <div class="seg" id="g-cols" role="group" aria-label="Number of columns">
+                    <button type="button" data-v="1" aria-pressed="false">1</button>
+                    <button type="button" data-v="2" aria-pressed="false">2</button>
+                    <button type="button" data-v="3" aria-pressed="true">3</button>
+                    <button type="button" data-v="4" aria-pressed="false">4</button>
+                    <button type="button" data-v="5" aria-pressed="false">5</button>
+                </div></div>
+            <div class="ctl"><span class="lbl">Column sizes</span>
+                <div class="seg" id="g-size" role="group" aria-label="Column sizes">
+                    <button type="button" data-v="equal" aria-pressed="true">all equal</button>
+                    <button type="button" data-v="wide" aria-pressed="false">first one wide</button>
+                </div></div>
+            <div class="ctl"><label for="g-gap"><code>gap</code> <span><output id="g-gapv">10</output>px</span></label>
+                <input type="range" id="g-gap" min="0" max="30" value="10"></div>
+            <div class="ctl"><span class="lbl">Greedy item</span>
+                <label class="check"><input type="checkbox" id="g-span"> Block 1 takes 2 columns</label></div>
+        </div>
+        <div class="stage"><div id="gbox" role="img" aria-label="Nine coloured numbered blocks laid out with grid"></div></div>
+        <p class="say" id="g-say" aria-live="polite"></p>
+        <pre class="code" id="g-code"></pre>
+    </div>
+
+    <div class="lab">
+        <h3>Try it: draw a web page with names</h3>
+        <p>First you draw the page with words. Then every part says which name it lives in.</p>
+        <div class="controls">
+            <div class="ctl"><span class="lbl">Sidebar goes on the</span>
+                <div class="seg" id="a-side" role="group" aria-label="Sidebar position">
+                    <button type="button" data-v="left" aria-pressed="true">left</button>
+                    <button type="button" data-v="right" aria-pressed="false">right</button>
+                </div></div>
+        </div>
+        <div class="stage"><div class="areas" id="areas" role="img" aria-label="A page layout with a top bar, a sidebar, a main area and a footer">
+            <div class="a-top">top</div><div class="a-side">side</div><div class="a-main">main</div><div class="a-foot">foot</div>
+        </div></div>
+        <pre class="code" id="a-code"></pre>
+    </div>
+
+    <div class="lab">
+        <h3>Try it: move things inside the grid</h3>
+        <p>This grid has 3 narrow columns and 2 short rows inside a bigger box, so there is spare room to play with. <code>justify-items</code> and <code>align-items</code> move each block <em>inside its own cell</em>. <code>justify-content</code> and <code>align-content</code> move the <em>whole grid</em> inside the box.</p>
+        <div class="controls">
+            <div class="ctl"><span class="lbl"><code>justify-items</code></span>
+                <div class="seg" id="x-ji" role="group" aria-label="justify-items">
+                    <button type="button" data-v="start" aria-pressed="false">start</button>
+                    <button type="button" data-v="center" aria-pressed="false">center</button>
+                    <button type="button" data-v="end" aria-pressed="false">end</button>
+                    <button type="button" data-v="stretch" aria-pressed="true">stretch</button>
+                </div></div>
+            <div class="ctl"><span class="lbl"><code>align-items</code></span>
+                <div class="seg" id="x-ai" role="group" aria-label="align-items">
+                    <button type="button" data-v="start" aria-pressed="false">start</button>
+                    <button type="button" data-v="center" aria-pressed="false">center</button>
+                    <button type="button" data-v="end" aria-pressed="false">end</button>
+                    <button type="button" data-v="stretch" aria-pressed="true">stretch</button>
+                </div></div>
+            <div class="ctl"><span class="lbl"><code>justify-content</code></span>
+                <div class="seg" id="x-jc" role="group" aria-label="justify-content">
+                    <button type="button" data-v="start" aria-pressed="true">start</button>
+                    <button type="button" data-v="center" aria-pressed="false">center</button>
+                    <button type="button" data-v="end" aria-pressed="false">end</button>
+                    <button type="button" data-v="space-between" aria-pressed="false">space-between</button>
+                    <button type="button" data-v="space-around" aria-pressed="false">space-around</button>
+                    <button type="button" data-v="space-evenly" aria-pressed="false">space-evenly</button>
+                </div></div>
+            <div class="ctl"><span class="lbl"><code>align-content</code></span>
+                <div class="seg" id="x-ac" role="group" aria-label="align-content">
+                    <button type="button" data-v="start" aria-pressed="true">start</button>
+                    <button type="button" data-v="center" aria-pressed="false">center</button>
+                    <button type="button" data-v="end" aria-pressed="false">end</button>
+                    <button type="button" data-v="space-between" aria-pressed="false">space-between</button>
+                    <button type="button" data-v="space-around" aria-pressed="false">space-around</button>
+                    <button type="button" data-v="space-evenly" aria-pressed="false">space-evenly</button>
+                </div></div>
+        </div>
+        <div class="stage"><div id="xbox" role="img" aria-label="A small grid of six numbered blocks inside a bigger box"></div></div>
+        <pre class="code" id="x-code"></pre>
+    </div>
+
+    <div class="lab" id="playground">
+        <h3>Grid playground: change anything and watch</h3>
+        <p>Change the controls and watch the box. Tap a block, in the box or in the list, to change just that one block. The code at the bottom always matches what you see.</p>
+        <div class="pg">
+            <div class="pg-controls">
+                <h4 class="ref-h" style="margin-top:0">The grid box (the parent)</h4>
+                <div class="controls">
+                    <div class="ctl"><label for="p-cols"><code>grid-template-columns</code></label>
+                        <input class="txt" id="p-cols" type="text" spellcheck="false" autocomplete="off" aria-describedby="p-colh">
+                        <div class="seg" id="p-colp" role="group" aria-label="Column presets" data-opts="repeat(3, 1fr)|1fr 2fr 1fr|repeat(3, 100px)|100px 1fr|repeat(auto-fill, minmax(90px, 1fr))|repeat(auto-fit, minmax(90px, 1fr))"></div>
+                        <p class="hint" id="p-colh" aria-live="polite"></p></div>
+                    <div class="ctl"><label for="p-rows"><code>grid-template-rows</code></label>
+                        <input class="txt" id="p-rows" type="text" spellcheck="false" autocomplete="off" aria-describedby="p-rowh">
+                        <div class="seg" id="p-rowp" role="group" aria-label="Row presets" data-opts="none|repeat(2, 90px)|60px 120px|minmax(70px, auto)"></div>
+                        <p class="hint" id="p-rowh" aria-live="polite"></p></div>
+                    <div class="ctl"><span class="lbl"><code>grid-auto-rows</code></span>
+                        <div class="seg" id="p-arows" role="group" aria-label="grid-auto-rows" data-opts="auto|50px|100px"></div></div>
+                    <div class="ctl"><span class="lbl"><code>grid-auto-flow</code></span>
+                        <div class="seg" id="p-flow" role="group" aria-label="grid-auto-flow" data-opts="row|column|row dense|column dense"></div></div>
+                    <div class="ctl"><label for="p-rg"><code>row-gap</code> <span><output id="p-rgv">10</output>px</span></label>
+                        <input type="range" id="p-rg" min="0" max="40" value="10"></div>
+                    <div class="ctl"><label for="p-cg"><code>column-gap</code> <span><output id="p-cgv">10</output>px</span></label>
+                        <input type="range" id="p-cg" min="0" max="40" value="10"></div>
+                    <div class="ctl"><span class="lbl"><code>justify-items</code></span>
+                        <div class="seg" id="p-ji" role="group" aria-label="justify-items" data-opts="start|center|end|stretch"></div></div>
+                    <div class="ctl"><span class="lbl"><code>align-items</code></span>
+                        <div class="seg" id="p-ai" role="group" aria-label="align-items" data-opts="start|center|end|stretch"></div></div>
+                    <div class="ctl"><span class="lbl"><code>justify-content</code></span>
+                        <div class="seg" id="p-jc" role="group" aria-label="justify-content" data-opts="normal|start|center|end|space-between|space-around|space-evenly|stretch"></div></div>
+                    <div class="ctl"><span class="lbl"><code>align-content</code></span>
+                        <div class="seg" id="p-ac" role="group" aria-label="align-content" data-opts="normal|start|center|end|space-between|space-around|space-evenly|stretch"></div></div>
+                    <div class="ctl"><span class="lbl">Blocks in the box (<output id="p-nv">9</output>)</span>
+                        <div class="counter">
+                            <button class="btn" type="button" id="p-less">Remove a block</button>
+                            <button class="btn" type="button" id="p-more">Add a block</button>
+                        </div></div>
+                </div>
+
+                <h4 class="ref-h">One block (the child)</h4>
+                <div class="controls">
+                    <div class="ctl"><span class="lbl">Block I am changing</span>
+                        <div class="seg" id="p-pick" role="group" aria-label="Pick a block"></div></div>
+                    <div class="ctl"><span class="lbl"><code>grid-column</code></span>
+                        <div class="seg" id="p-ccol" role="group" aria-label="grid-column" data-opts="auto|span 2|span 3|1 / -1|2 / 4"></div></div>
+                    <div class="ctl"><span class="lbl"><code>grid-row</code></span>
+                        <div class="seg" id="p-crow" role="group" aria-label="grid-row" data-opts="auto|span 2|span 3|1 / 3"></div></div>
+                    <div class="ctl"><span class="lbl"><code>justify-self</code></span>
+                        <div class="seg" id="p-cjs" role="group" aria-label="justify-self" data-opts="auto|start|center|end|stretch"></div></div>
+                    <div class="ctl"><span class="lbl"><code>align-self</code></span>
+                        <div class="seg" id="p-cas" role="group" aria-label="align-self" data-opts="auto|start|center|end|stretch"></div></div>
+                    <div class="ctl"><label for="p-order"><code>order</code> <span><output id="p-orderv">0</output></span></label>
+                        <input type="range" id="p-order" min="-2" max="5" value="0"></div>
+                </div>
+                <button class="btn" type="button" id="p-reset">Reset everything</button>
+            </div>
+            <div class="pg-stage">
+                <div class="stage"><div id="pbox" role="img" aria-label="A grid of numbered blocks that changes as you use the controls"></div></div>
+                <p class="say" id="p-tip" aria-live="polite"></p>
+            </div>
+        </div>
+        <pre class="code" id="p-code"></pre>
+        <details class="mission">
+            <summary>Missions to try in the playground</summary>
+            <ol class="steps">
+                <li>Make block 1 stretch across the whole top row: pick block 1 and press <code>1 / -1</code> under <code>grid-column</code>.</li>
+                <li>Press <code>repeat(3, 100px)</code>, then try every <code>justify-content</code> button. Now the columns are narrower than the box, so the whole grid can slide.</li>
+                <li>Remove blocks until only 3 are left. Compare <code>repeat(auto-fill, ...)</code> with <code>repeat(auto-fit, ...)</code>. What happens to the empty columns?</li>
+                <li>Pick block 5 and drag <code>order</code> to -2. Which block does it jump in front of, and what number does it still show?</li>
+                <li>Type your own value in the columns box, like <code>80px 1fr 2fr</code>. If the box turns red, the value is not valid yet.</li>
+            </ol>
+        </details>
+    </div>
+
+    <div class="lab">
+        <h3>All the grid properties and their values</h3>
+        <p>Grid properties come in two groups: the ones you write on the <strong>parent</strong> (the grid container) and the ones you write on a <strong>child</strong> (a grid item). Swipe the tables sideways on a small screen.</p>
+
+        <h4 class="ref-h">On the parent (grid container)</h4>
+        <div class="table-wrap">
+        <table class="ref">
+            <thead><tr><th scope="col">Property</th><th scope="col">What it does</th><th scope="col">Values you can use</th></tr></thead>
+            <tbody>
+                <tr><td><code>display</code></td><td>Turns the box into a grid.</td><td><code>grid</code> (a block-sized grid) <code>inline-grid</code> (a grid that sits inside a line of text)</td></tr>
+                <tr><td><code>grid-template-columns</code></td><td>Says how many columns there are and how wide each is.</td><td><code>none</code> <code>100px</code> <code>10rem</code> <code>25%</code> <code>1fr</code> <code>auto</code> <code>min-content</code> <code>max-content</code> <code>minmax(100px, 1fr)</code> <code>fit-content(200px)</code> <code>repeat(3, 1fr)</code> <code>repeat(auto-fill, 100px)</code> <code>repeat(auto-fit, minmax(100px, 1fr))</code> <code>[start] 1fr [end]</code> (named lines) <code>subgrid</code></td></tr>
+                <tr><td><code>grid-template-rows</code></td><td>Says how many rows there are and how tall each is.</td><td>The same values as <code>grid-template-columns</code>.</td></tr>
+                <tr><td><code>grid-template-areas</code></td><td>Draws the layout with names, one quoted line per row.</td><td><code>none</code> or quoted rows like <code>"top top" "side main"</code>. A dot <code>.</code> means an empty cell.</td></tr>
+                <tr><td><code>grid-template</code></td><td>One-line shorthand for rows, columns and areas.</td><td><code>none</code> <code>100px 1fr / 1fr 2fr</code> (rows, then a slash, then columns) or areas with row heights.</td></tr>
+                <tr><td><code>grid-auto-columns</code></td><td>The size of extra columns that the grid has to make by itself.</td><td><code>auto</code> <code>100px</code> <code>1fr</code> <code>min-content</code> <code>max-content</code> <code>minmax(50px, 1fr)</code></td></tr>
+                <tr><td><code>grid-auto-rows</code></td><td>The size of extra rows that the grid has to make by itself.</td><td>The same values as <code>grid-auto-columns</code>.</td></tr>
+                <tr><td><code>grid-auto-flow</code></td><td>Which way new items fill the grid.</td><td><code>row</code> (the default) <code>column</code> <code>dense</code> <code>row dense</code> <code>column dense</code></td></tr>
+                <tr><td><code>gap</code> <code>row-gap</code> <code>column-gap</code></td><td>The empty space between rows and between columns.</td><td><code>normal</code> <code>10px</code> <code>1rem</code> <code>5%</code>. Two numbers, like <code>gap: 10px 20px</code>, mean row gap first, then column gap.</td></tr>
+                <tr><td><code>justify-items</code></td><td>Moves every item left or right <em>inside its own cell</em>.</td><td><code>start</code> <code>end</code> <code>center</code> <code>stretch</code> (the default) <code>baseline</code></td></tr>
+                <tr><td><code>align-items</code></td><td>Moves every item up or down <em>inside its own cell</em>.</td><td><code>start</code> <code>end</code> <code>center</code> <code>stretch</code> (the default) <code>baseline</code></td></tr>
+                <tr><td><code>place-items</code></td><td>Shorthand: <code>align-items</code> then <code>justify-items</code>.</td><td><code>center</code> <code>start end</code> <code>center stretch</code></td></tr>
+                <tr><td><code>justify-content</code></td><td>Moves the <em>whole grid</em> left or right inside the box, when the columns are narrower than the box.</td><td><code>start</code> <code>end</code> <code>center</code> <code>stretch</code> <code>space-between</code> <code>space-around</code> <code>space-evenly</code></td></tr>
+                <tr><td><code>align-content</code></td><td>Moves the <em>whole grid</em> up or down inside the box, when the rows are shorter than the box.</td><td><code>start</code> <code>end</code> <code>center</code> <code>stretch</code> <code>space-between</code> <code>space-around</code> <code>space-evenly</code></td></tr>
+                <tr><td><code>place-content</code></td><td>Shorthand: <code>align-content</code> then <code>justify-content</code>.</td><td><code>center</code> <code>space-between center</code></td></tr>
+                <tr><td><code>grid</code></td><td>A giant shorthand for the template and auto properties. Hard to read, so beginners usually skip it.</td><td><code>none</code> <code>auto-flow / 1fr 1fr</code> <code>100px 1fr / auto-flow</code></td></tr>
+            </tbody>
+        </table>
+        </div>
+
+        <h4 class="ref-h">On a child (grid item)</h4>
+        <div class="table-wrap">
+        <table class="ref">
+            <thead><tr><th scope="col">Property</th><th scope="col">What it does</th><th scope="col">Values you can use</th></tr></thead>
+            <tbody>
+                <tr><td><code>grid-column-start</code> <code>grid-column-end</code></td><td>Which column line the item starts and ends on. Lines are numbered from 1, and the line on the far left is line 1.</td><td><code>auto</code> <code>2</code> <code>-1</code> (counts from the end) <code>span 2</code> <code>name</code> (a named line)</td></tr>
+                <tr><td><code>grid-column</code></td><td>Shorthand: start / end.</td><td><code>1 / 3</code> <code>2 / span 2</code> <code>1 / -1</code> (all the way across)</td></tr>
+                <tr><td><code>grid-row-start</code> <code>grid-row-end</code></td><td>Which row line the item starts and ends on.</td><td><code>auto</code> <code>2</code> <code>-1</code> <code>span 2</code> <code>name</code></td></tr>
+                <tr><td><code>grid-row</code></td><td>Shorthand: start / end.</td><td><code>1 / 3</code> <code>span 2</code> <code>1 / -1</code></td></tr>
+                <tr><td><code>grid-area</code></td><td>Puts the item in a named area, or sets all four lines at once.</td><td><code>main</code> (a name from <code>grid-template-areas</code>) <code>1 / 2 / 3 / 4</code> (row-start / column-start / row-end / column-end)</td></tr>
+                <tr><td><code>justify-self</code></td><td>Moves <em>this one item</em> left or right inside its cell.</td><td><code>auto</code> <code>start</code> <code>end</code> <code>center</code> <code>stretch</code> <code>baseline</code></td></tr>
+                <tr><td><code>align-self</code></td><td>Moves <em>this one item</em> up or down inside its cell.</td><td><code>auto</code> <code>start</code> <code>end</code> <code>center</code> <code>stretch</code> <code>baseline</code></td></tr>
+                <tr><td><code>place-self</code></td><td>Shorthand: <code>align-self</code> then <code>justify-self</code>.</td><td><code>center</code> <code>start end</code></td></tr>
+                <tr><td><code>order</code></td><td>Changes the order items are placed. Lower numbers go first.</td><td><code>-1</code> <code>0</code> (the default) <code>3</code></td></tr>
+            </tbody>
+        </table>
+        </div>
+
+        <h4 class="ref-h">Special words and functions</h4>
+        <div class="table-wrap">
+        <table class="ref">
+            <thead><tr><th scope="col">Word</th><th scope="col">What it means</th></tr></thead>
+            <tbody>
+                <tr><td><code>fr</code></td><td>A fraction of the available free space in the grid container.</td></tr>
+                <tr><td><code>auto</code></td><td>Size to fit the content, and share out any space left over.</td></tr>
+                <tr><td><code>min-content</code></td><td>As small as the content can get, like the longest single word.</td></tr>
+                <tr><td><code>max-content</code></td><td>As wide as the content wants to be, with no line breaks.</td></tr>
+                <tr><td><code>minmax(min, max)</code></td><td>At least <em>min</em> but never more than <em>max</em>.</td></tr>
+                <tr><td><code>repeat(count, size)</code></td><td>Repeats the same size many times. <code>repeat(3, 1fr)</code> means <code>1fr 1fr 1fr</code>.</td></tr>
+                <tr><td><code>auto-fill</code></td><td>Inside <code>repeat()</code>: makes as many columns as fit, even empty ones.</td></tr>
+                <tr><td><code>auto-fit</code></td><td>Like <code>auto-fill</code>, but empty columns shrink away so the real items stretch out.</td></tr>
+                <tr><td><code>fit-content(size)</code></td><td>As big as the content, but never bigger than <em>size</em>.</td></tr>
+                <tr><td><code>span n</code></td><td>Cross <em>n</em> columns or rows. <code>span 2</code> means two.</td></tr>
+                <tr><td><code>subgrid</code></td><td>A grid inside a grid that reuses its parent’s rows or columns.</td></tr>
+                <tr><td><code>dense</code></td><td>Inside <code>grid-auto-flow</code>: fills holes by moving later, smaller items up.</td></tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+</section>
+
+<!-- ================= COLOUR ================= -->
+<section class="lesson c-colour" id="colour" aria-labelledby="h-col">
+    <div class="lesson-head">
+        <span class="badge" aria-hidden="true">🎨</span>
+        <div><h2 id="h-col">Colour</h2><p class="sub">Mix any colour you can imagine.</p></div>
+    </div>
+
+    <div class="notes">
+        <div>
+            <p class="idea"><strong>The big idea.</strong> Your screen is covered in tiny lights that glow red, green and blue. Mix different amounts and you get every colour. CSS gives you a few ways to write the same colour down. They all light up the same dots.</p>
+            <p><strong>One tricky thing:</strong> CSS spells it the American way, <code>color</code>, without the “u”.</p>
+            <p><strong>Where colours go</strong></p>
+            <ul class="steps">
+                <li><code>color</code> paints the <em>text</em>.</li>
+                <li><code>background-color</code> paints the <em>inside</em> of the box.</li>
+                <li><code>border-color</code> paints the <em>frame</em> around the box.</li>
+            </ul>
+            <details class="mission">
+                <summary>Mission: make a see-through orange for a background</summary>
+                <p>Set the hue near 30, saturation near 100%, lightness near 50%, then drag see-through down to about 50%. Look at the checkerboard to see through it.</p>
+            </details>
+        </div>
+        <div class="props">
+            <div class="prop"><code>tomato</code><p>A <strong>name</strong>. There are about 140. Easy to remember, but you can only pick from the list.</p></div>
+            <div class="prop"><code>#ff6347</code><p>A <strong>hex</strong> code. Two characters each for red, green and blue.</p></div>
+            <div class="prop"><code>rgb(255, 99, 71)</code><p>How much red, green and blue, each from 0 (none) to 255 (full).</p></div>
+            <div class="prop"><code>hsl(9, 100%, 64%)</code><p><strong>Hue</strong> is the spot on the colour wheel (0 to 360). <strong>Saturation</strong> is how vivid. <strong>Lightness</strong> goes from black to white. This is the easiest one to play with.</p></div>
+            <div class="prop"><code>hsl(9 100% 64% / 0.5)</code><p>The last number is <strong>alpha</strong>: 1 is solid, 0 is invisible, 0.5 is see-through.</p></div>
+        </div>
+    </div>
+
+    <div class="lab">
+        <h3>Try it: mix a colour</h3>
+        <div class="two">
+            <div>
+                <div class="ctl"><label for="c-h">Hue <span><output id="c-hv"></output>°</span></label><input class="hue" type="range" id="c-h" min="0" max="360" value="262"></div>
+                <div class="ctl"><label for="c-s">Saturation <span><output id="c-sv"></output>%</span></label><input type="range" id="c-s" min="0" max="100" value="80"></div>
+                <div class="ctl"><label for="c-l">Lightness <span><output id="c-lv"></output>%</span></label><input type="range" id="c-l" min="0" max="100" value="55"></div>
+                <div class="ctl"><label for="c-a">See-through (alpha) <span><output id="c-av"></output></span></label><input type="range" id="c-a" min="0" max="100" value="100"></div>
+            </div>
+            <div>
+                <div class="checker"><div class="sample" id="sample">Hello, CSS!</div></div>
+                <div class="ctl" style="margin-top:10px"><span class="lbl">Use my colour for</span>
+                    <div class="seg" id="c-use" role="group" aria-label="What to colour">
+                        <button type="button" data-v="text" aria-pressed="false">text</button>
+                        <button type="button" data-v="background" aria-pressed="true">background</button>
+                        <button type="button" data-v="border" aria-pressed="false">border</button>
+                    </div></div>
+            </div>
+        </div>
+        <p class="say" id="c-say" aria-live="polite"></p>
+        <pre class="code" id="c-code"></pre>
+        <p style="margin:1rem 0 0.2rem"><strong>The same colour, written three ways:</strong></p>
+        <dl class="forms">
+            <div><dt>HSL</dt><dd id="f-hsl"></dd></div>
+            <div><dt>RGB</dt><dd id="f-rgb"></dd></div>
+            <div><dt>Hex</dt><dd id="f-hex"></dd></div>
+        </dl>
+    </div>
+
+    <div class="lab">
+        <h3>Try it: mix light like a screen does</h3>
+        <div class="two">
+            <div class="light-stage" role="img" aria-label="Three overlapping circles of red, green and blue light">
+                <div class="disc disc-r"></div><div class="disc disc-g"></div><div class="disc disc-b"></div>
+            </div>
+            <div>
+                <div class="lamps" role="group" aria-label="Switch lights on and off">
+                    <button class="lamp lamp-r" type="button" data-k="r" aria-pressed="true">Red</button>
+                    <button class="lamp lamp-g" type="button" data-k="g" aria-pressed="true">Green</button>
+                    <button class="lamp lamp-b" type="button" data-k="b" aria-pressed="false">Blue</button>
+                </div>
+                <p class="say" id="l-say" aria-live="polite"></p>
+                <pre class="code" id="l-code"></pre>
+            </div>
+        </div>
+        <p style="margin:1rem 0 0">Screens mix <em>light</em>, which works differently from mixing paint. Red and green paint make brown, but red and green light make yellow!</p>
+    </div>
+
+    <p><strong>A few colour names you can type right now:</strong></p>
+    <ul class="names">
+        <li style="background:tomato">tomato</li>
+        <li style="background:gold">gold</li>
+        <li style="background:mediumseagreen">mediumseagreen</li>
+        <li style="background:dodgerblue">dodgerblue</li>
+        <li style="background:orchid">orchid</li>
+        <li style="background:coral">coral</li>
+        <li style="background:slateblue;color:#fff;border-color:#14213d">slateblue</li>
+        <li style="background:hotpink">hotpink</li>
+    </ul>
+</section>
+
+<!-- ================= MEDIA QUERIES ================= -->
+<section class="lesson c-media" id="media-queries" aria-labelledby="h-media">
+    <div class="lesson-head">
+        <span class="badge" aria-hidden="true">📱</span>
+        <div><h2 id="h-media">Media queries</h2><p class="sub">Pages that change shape to fit the screen.</p></div>
+    </div>
+
+    <div class="notes">
+        <div>
+            <p class="idea"><strong>The big idea.</strong> A phone, a tablet and a big computer have screens of different sizes. A media query asks the screen a question, like “are you narrower than 600 pixels?” If the answer is yes, the extra styles inside switch on.</p>
+            <p>It works like a rule at school: <em>“If it is raining, wear a coat.”</em> No rain, no coat.</p>
+            <details class="mission">
+                <summary>Mission: make the boxes stack in one column on phones</summary>
+                <p>Put your grid or flex rule for one column inside <code>@media (max-width: 600px) { ... }</code>. Now it only happens on narrow screens.</p>
+            </details>
+        </div>
+        <div class="props">
+            <div class="prop"><code>@media</code><p>Starts the question. The styles inside the curly braces are the answer for “yes”.</p></div>
+            <div class="prop"><code>(max-width: 600px)</code><p>“Is the screen <em>at most</em> 600px wide?” Great for phones.</p></div>
+            <div class="prop"><code>(min-width: 600px)</code><p>“Is the screen <em>at least</em> 600px wide?” Great for bigger screens.</p></div>
+            <div class="prop"><code>Last rule wins</code><p>If two rules both say yes, the one written <em>lower down</em> in your code wins.</p></div>
+            <div class="prop"><code>(prefers-color-scheme: dark)</code><p>“Does this person like dark mode?” This very page asks that question!</p></div>
+            <div class="prop"><code>(prefers-reduced-motion: reduce)</code><p>“Does this person want less movement?” Switch animations off to be kind.</p></div>
+            <div class="prop"><code>&lt;meta name="viewport" ...&gt;</code><p>A line in your HTML <code>&lt;head&gt;</code> that tells phones to use their real width. Without it, phones pretend to be big and your query never fires.</p></div>
+        </div>
+    </div>
+
+    <div class="lab">
+        <h3>Try it: what is asking the screen right now?</h3>
+        <p>You are looking at this page on <span class="device"></span>. Your window is <strong><output id="vw">0</output> px</strong> wide.</p>
+        <p>Drag your browser window wider and narrower and watch the words change. On a phone, turn it sideways. This is a real media query, not a pretend one:</p>
+<pre class="code" data-css>.device::after { content: "a computer"; }
+
+@media (max-width: 900px) {
+  .device::after { content: "a tablet"; }
+}
+@media (max-width: 600px) {
+  .device::after { content: "a phone"; }
+}</pre>
+    </div>
+
+    <div class="lab">
+        <h3>Try it: shrink a pretend screen</h3>
+        <div class="controls">
+            <div class="ctl"><label for="m-w">Pretend screen width <span><output id="m-wv">760</output>px</span></label>
+                <input type="range" id="m-w" min="260" max="900" value="760"></div>
+        </div>
+        <div class="stage">
+            <div class="frame-wrap" id="frameWrap">
+                <div class="frame" id="frame" data-size="computer" role="img" aria-label="A small pretend website that changes its layout as the screen gets narrower">
+                    <div class="mini-head"><span>My website</span><span class="mini-links"><span>Home</span><span>About</span><span>Contact</span></span><span class="mini-burger" aria-hidden="true">☰</span></div>
+                    <div class="mini-cards"><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div></div>
+                </div>
+            </div>
+        </div>
+        <p class="say" id="m-say" aria-live="polite"></p>
+        <p style="margin:0.8rem 0 0;font-size:0.95rem;color:var(--muted)">The code below is a real media query. Highlighted rules are switched on for the pretend screen. The real browser watches the real window, so this toy uses the slider to pretend. On a small phone, scroll sideways inside the toy.</p>
+        <pre class="code" id="m-code"></pre>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <div class="wrap">
+        <p><strong>You did it!</strong> Go back and change one thing in each toy. Then try writing the same code in your own file and see it work.</p>
+        <p style="color:var(--muted)">Made for curious kids and the grown-ups helping them.</p>
+    </div>
+</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/* ---------- tiny CSS colouriser for the code boxes ---------- */
+function hlDecl(d) {
+    return d.replace(/([a-z-]+)(\s*:\s*)([^;]*)(;?)/gi, (m, p, c, v, e) =>
+        '<span class="p">' + p + '</span>' + c + '<span class="v">' + v + '</span>' + e);
+}
+function hl(src) {
+    return esc(src).split('\n').map(line => {
+        if (/^\s*\/\*/.test(line)) return '<span class="c">' + line + '</span>';
+        const open = line.indexOf('{');
+        if (open > -1) {
+            const close = line.lastIndexOf('}');
+            const sel = line.slice(0, open);
+            if (close > open) return '<span class="s">' + sel + '</span>{' + hlDecl(line.slice(open + 1, close)) + '}' + line.slice(close + 1);
+            return '<span class="s">' + sel + '</span>{' + line.slice(open + 1);
+        }
+        if (/^\s*\}/.test(line)) return line;
+        return hlDecl(line);
+    }).join('\n');
+}
+document.querySelectorAll('pre[data-css]').forEach(p => { p.innerHTML = hl(p.textContent); });
+
+/* ---------- button groups ---------- */
+function seg(id, cb) {
+    const el = $(id);
+    el.addEventListener('click', e => {
+        const b = e.target.closest('button');
+        if (!b) return;
+        el.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+        cb(b.dataset.v);
+    });
+}
+
+/* ---------- theme button ---------- */
+const root = document.documentElement;
+const themeBtn = $('#theme');
+const dark = matchMedia('(prefers-color-scheme: dark)');
+const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : dark.matches;
+function syncTheme() { themeBtn.textContent = isDark() ? 'Light mode' : 'Dark mode'; }
+themeBtn.addEventListener('click', () => { root.dataset.theme = isDark() ? 'light' : 'dark'; syncTheme(); });
+dark.addEventListener('change', syncTheme);
+syncTheme();
+
+/* ================= FLEXBOX ================= */
+const F = { dir: 'row', jc: 'flex-start', ai: 'flex-start', wrap: 'nowrap', gap: 10, n: 5, grow: false, self: 'auto' };
+function flex() {
+    const box = $('#fbox');
+    Object.assign(box.style, { flexDirection: F.dir, justifyContent: F.jc, alignItems: F.ai, flexWrap: F.wrap, gap: F.gap + 'px' });
+    while (box.children.length < F.n) {
+        const d = document.createElement('div');
+        d.className = 'toy blk';
+        d.textContent = box.children.length + 1;
+        box.appendChild(d);
+    }
+    while (box.children.length > F.n) box.lastElementChild.remove();
+    [...box.children].forEach((c, i) => { c.style.flexGrow = (F.grow && i === 1) ? 1 : 0; c.style.alignSelf = (i === 1) ? F.self : 'auto'; });
+    const row = F.dir.indexOf('row') === 0;
+    const rev = F.dir.indexOf('reverse') > -1;
+    const mainWay = row ? (rev ? 'right to left' : 'left to right') : (rev ? 'bottom to top' : 'top to bottom');
+    let say = '<code>justify-content</code> moves the blocks along the <b>main line</b> (' + mainWay +
+        '). <code>align-items</code> moves them along the <b>cross line</b> (' + (row ? 'top to bottom' : 'left to right') + ').';
+    if (rev) say += ' Because of <code>-reverse</code>, the order is flipped, so <code>flex-start</code> is now at the other end.';
+    if (F.ai === 'baseline' && !row) say += ' <code>baseline</code> only shows its magic in a row, so here it looks like <code>flex-start</code>.';
+    if (F.wrap === 'wrap-reverse') say += ' With <code>wrap-reverse</code>, new lines are added the opposite way. Add lots of blocks to see it.';
+    if (F.self !== 'auto' && F.n >= 2) say += ' Block 2 uses its own <code>align-self</code>, so it ignores <code>align-items</code>.';
+    $('#f-say').innerHTML = say;
+    let code = '.box {\n  display: flex;\n  flex-direction: ' + F.dir + ';\n  justify-content: ' + F.jc + ';\n  align-items: ' + F.ai +
+        ';\n  flex-wrap: ' + F.wrap + ';\n  gap: ' + F.gap + 'px;\n}';
+    if (F.n >= 2 && (F.grow || F.self !== 'auto')) {
+        code += '\n.box :nth-child(2) {';
+        if (F.grow) code += '\n  flex-grow: 1;';
+        if (F.self !== 'auto') code += '\n  align-self: ' + F.self + ';';
+        code += '\n}';
+    }
+    $('#f-code').innerHTML = hl(code);
+}
+seg('#f-dir', v => { F.dir = v; flex(); });
+seg('#f-jc', v => { F.jc = v; flex(); });
+seg('#f-ai', v => { F.ai = v; flex(); });
+seg('#f-wrap', v => { F.wrap = v; flex(); });
+seg('#f-self', v => { F.self = v; flex(); });
+$('#f-gap').addEventListener('input', e => { F.gap = +e.target.value; $('#f-gapv').textContent = F.gap; flex(); });
+$('#f-more').addEventListener('click', () => { F.n = Math.min(12, F.n + 1); flex(); });
+$('#f-less').addEventListener('click', () => { F.n = Math.max(1, F.n - 1); flex(); });
+$('#f-grow').addEventListener('change', e => { F.grow = e.target.checked; flex(); });
+flex();
+
+/* ================= GRID ================= */
+const G = { cols: 3, size: 'equal', gap: 10, span: false };
+(function () {
+    const box = $('#gbox');
+    for (let i = 1; i <= 9; i++) { const d = document.createElement('div'); d.className = 'toy'; d.textContent = i; box.appendChild(d); }
+})();
+function grid() {
+    const box = $('#gbox');
+    const wide = G.size === 'wide' && G.cols >= 2;
+    const tmpl = wide ? ['2fr'].concat(Array(G.cols - 1).fill('1fr')).join(' ') : 'repeat(' + G.cols + ', 1fr)';
+    box.style.gridTemplateColumns = tmpl;
+    box.style.gap = G.gap + 'px';
+    const canSpan = G.cols >= 2;
+    $('#g-span').disabled = !canSpan;
+    const spanOn = G.span && canSpan;
+    box.firstElementChild.style.gridColumn = spanOn ? 'span 2' : '';
+    let say = G.cols + (G.cols === 1 ? ' column. ' : ' columns. ') + 'Blocks fill the first row, then start a new row.';
+    if (wide) say += ' The first column is 2fr, so it is twice as wide as each 1fr column.';
+    if (spanOn) say += ' Block 1 takes up two columns.';
+    if (!canSpan) say += ' (A block needs at least 2 columns before it can span 2.)';
+    $('#g-say').textContent = say;
+    let code = '.box {\n  display: grid;\n  grid-template-columns: ' + tmpl + ';\n  gap: ' + G.gap + 'px;\n}';
+    if (spanOn) code += '\n.wide {\n  grid-column: span 2;\n}';
+    $('#g-code').innerHTML = hl(code);
+}
+seg('#g-cols', v => { G.cols = +v; grid(); });
+seg('#g-size', v => { G.size = v; grid(); });
+$('#g-gap').addEventListener('input', e => { G.gap = +e.target.value; $('#g-gapv').textContent = G.gap; grid(); });
+$('#g-span').addEventListener('change', e => { G.span = e.target.checked; grid(); });
+grid();
+
+/* page-layout toy */
+function areas(side) {
+    const left = side === 'left';
+    const cols = left ? '110px 1fr' : '1fr 110px';
+    const row2 = left ? '"side main"' : '"main side"';
+    const el = $('#areas');
+    el.style.gridTemplateColumns = cols;
+    el.style.gridTemplateAreas = '"top top" ' + row2 + ' "foot foot"';
+    $('#a-code').innerHTML = hl('.page {\n  display: grid;\n  grid-template-columns: ' + cols + ';\n  grid-template-areas:\n    "top top"\n    ' + row2 + '\n    "foot foot";\n  gap: 8px;\n}\n.top  { grid-area: top; }\n.side { grid-area: side; }\n.main { grid-area: main; }\n.foot { grid-area: foot; }');
+}
+seg('#a-side', areas);
+areas('left');
+
+/* alignment toy */
+const X = { ji: 'stretch', ai: 'stretch', jc: 'start', ac: 'start' };
+(function () {
+    const b = $('#xbox');
+    for (let i = 1; i <= 6; i++) { const d = document.createElement('div'); d.className = 'toy'; d.textContent = i; b.appendChild(d); }
+})();
+function xgrid() {
+    Object.assign($('#xbox').style, { justifyItems: X.ji, alignItems: X.ai, justifyContent: X.jc, alignContent: X.ac });
+    $('#x-code').innerHTML = hl('.box {\n  display: grid;\n  grid-template-columns: repeat(3, 76px);\n  grid-template-rows: repeat(2, 64px);\n  justify-items: ' + X.ji + ';\n  align-items: ' + X.ai + ';\n  justify-content: ' + X.jc + ';\n  align-content: ' + X.ac + ';\n}');
+}
+seg('#x-ji', v => { X.ji = v; xgrid(); });
+seg('#x-ai', v => { X.ai = v; xgrid(); });
+seg('#x-jc', v => { X.jc = v; xgrid(); });
+seg('#x-ac', v => { X.ac = v; xgrid(); });
+
+/* ================= GRID PLAYGROUND ================= */
+const PD = { cols: 'repeat(3, 1fr)', rows: 'none', autoRows: 'auto', flow: 'row', rg: 10, cg: 10, ji: 'stretch', ai: 'stretch', jc: 'normal', ac: 'normal', n: 9 };
+const P = Object.assign({}, PD);
+const newItem = () => ({ col: 'auto', row: 'auto', js: 'auto', as: 'auto', order: 0 });
+let items = Array.from({ length: 12 }, newItem);
+let sel = 0;
+const pBind = { '#p-colp': 'cols', '#p-rowp': 'rows', '#p-arows': 'autoRows', '#p-flow': 'flow', '#p-ji': 'ji', '#p-ai': 'ai', '#p-jc': 'jc', '#p-ac': 'ac' };
+const cBind = { '#p-ccol': 'col', '#p-crow': 'row', '#p-cjs': 'js', '#p-cas': 'as' };
+
+[...Object.keys(pBind), ...Object.keys(cBind)].forEach(id => {
+    const el = $(id);
+    el.dataset.opts.split('|').forEach(v => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.dataset.v = v; b.textContent = v; b.setAttribute('aria-pressed', 'false');
+        el.appendChild(b);
+    });
+});
+function mark(id, val) {
+    $(id).querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === String(val) ? 'true' : 'false'));
+}
+function buildPick() {
+    const el = $('#p-pick');
+    el.innerHTML = '';
+    for (let i = 0; i < P.n; i++) {
+        const b = document.createElement('button');
+        b.type = 'button'; b.dataset.v = i; b.textContent = i + 1;
+        b.setAttribute('aria-pressed', i === sel ? 'true' : 'false');
+        el.appendChild(b);
+    }
+}
+function addBlock() {
+    const box = $('#pbox');
+    const i = box.children.length;
+    const d = document.createElement('div');
+    d.className = 'toy';
+    d.textContent = i + 1;
+    d.addEventListener('click', () => { sel = i; buildPick(); psync(); prender(); });
+    box.appendChild(d);
+}
+function psync() {
+    Object.entries(pBind).forEach(([id, k]) => mark(id, P[k]));
+    Object.entries(cBind).forEach(([id, k]) => mark(id, items[sel][k]));
+    $('#p-cols').value = P.cols; $('#p-rows').value = P.rows;
+    ['#p-cols', '#p-rows'].forEach(id => $(id).setAttribute('aria-invalid', 'false'));
+    $('#p-colh').textContent = ''; $('#p-rowh').textContent = '';
+    $('#p-rg').value = P.rg; $('#p-rgv').textContent = P.rg;
+    $('#p-cg').value = P.cg; $('#p-cgv').textContent = P.cg;
+    $('#p-nv').textContent = P.n;
+    $('#p-order').value = items[sel].order; $('#p-orderv').textContent = items[sel].order;
+}
+function pcode() {
+    const L = ['.box {', '  display: grid;', '  grid-template-columns: ' + P.cols + ';'];
+    if (P.rows !== 'none') L.push('  grid-template-rows: ' + P.rows + ';');
+    if (P.autoRows !== 'auto') L.push('  grid-auto-rows: ' + P.autoRows + ';');
+    if (P.flow !== 'row') L.push('  grid-auto-flow: ' + P.flow + ';');
+    L.push('  gap: ' + (P.rg === P.cg ? P.rg + 'px' : P.rg + 'px ' + P.cg + 'px') + ';');
+    if (P.ji !== 'stretch') L.push('  justify-items: ' + P.ji + ';');
+    if (P.ai !== 'stretch') L.push('  align-items: ' + P.ai + ';');
+    if (P.jc !== 'normal') L.push('  justify-content: ' + P.jc + ';');
+    if (P.ac !== 'normal') L.push('  align-content: ' + P.ac + ';');
+    L.push('}');
+    items.slice(0, P.n).forEach((it, i) => {
+        const d = [];
+        if (it.col !== 'auto') d.push('  grid-column: ' + it.col + ';');
+        if (it.row !== 'auto') d.push('  grid-row: ' + it.row + ';');
+        if (it.js !== 'auto') d.push('  justify-self: ' + it.js + ';');
+        if (it.as !== 'auto') d.push('  align-self: ' + it.as + ';');
+        if (it.order !== 0) d.push('  order: ' + it.order + ';');
+        if (d.length) { L.push('.box :nth-child(' + (i + 1) + ') {'); d.forEach(x => L.push(x)); L.push('}'); }
+    });
+    $('#p-code').innerHTML = hl(L.join('\n'));
+}
+function prender() {
+    const box = $('#pbox');
+    while (box.children.length < P.n) addBlock();
+    while (box.children.length > P.n) box.lastElementChild.remove();
+    Object.assign(box.style, {
+        gridTemplateColumns: P.cols, gridTemplateRows: P.rows, gridAutoRows: P.autoRows, gridAutoFlow: P.flow,
+        rowGap: P.rg + 'px', columnGap: P.cg + 'px',
+        justifyItems: P.ji, alignItems: P.ai, justifyContent: P.jc, alignContent: P.ac
+    });
+    [...box.children].forEach((c, i) => {
+        const it = items[i];
+        c.style.gridColumn = it.col === 'auto' ? '' : it.col;
+        c.style.gridRow = it.row === 'auto' ? '' : it.row;
+        c.style.justifySelf = it.js === 'auto' ? '' : it.js;
+        c.style.alignSelf = it.as === 'auto' ? '' : it.as;
+        c.style.order = it.order;
+        c.classList.toggle('sel', i === sel);
+    });
+    let tip = 'Change any control. The code below always matches the box. The block with the dashed outline is the one you are editing.';
+    if (P.jc !== 'normal' && P.jc !== 'stretch' && /fr/.test(P.cols)) tip = 'justify-content has nothing to move, because the fr columns already fill the whole box. Try the preset repeat(3, 100px).';
+    else if (P.flow.indexOf('dense') > -1) tip = 'dense fills holes. Pick a block, give it grid-column: span 2, and watch later blocks jump up to fill the gaps.';
+    else if (P.flow === 'column') tip = 'With column, blocks fill down each column first. Add a rows value like repeat(2, 90px) to see it clearly.';
+    else if (items.slice(0, P.n).some(it => it.order !== 0)) tip = 'order changes where a block appears, but the number on it stays the same.';
+    $('#p-tip').textContent = tip;
+    pcode();
+}
+
+Object.entries(pBind).forEach(([id, k]) => $(id).addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    P[k] = b.dataset.v; psync(); prender();
+}));
+Object.entries(cBind).forEach(([id, k]) => $(id).addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    items[sel][k] = b.dataset.v; psync(); prender();
+}));
+$('#p-pick').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    sel = +b.dataset.v; buildPick(); psync(); prender();
+});
+function bindText(id, prop, key, presetId, hintId) {
+    const el = $(id);
+    el.addEventListener('input', () => {
+        const v = el.value.trim();
+        const ok = v !== '' && CSS.supports(prop, v);
+        el.setAttribute('aria-invalid', ok ? 'false' : 'true');
+        $(hintId).textContent = ok ? 'Looks good.' : 'Not a valid value yet. Check the commas, brackets and units like px or fr.';
+        if (ok) { P[key] = v; mark(presetId, v); prender(); }
+    });
+}
+bindText('#p-cols', 'grid-template-columns', 'cols', '#p-colp', '#p-colh');
+bindText('#p-rows', 'grid-template-rows', 'rows', '#p-rowp', '#p-rowh');
+$('#p-rg').addEventListener('input', e => { P.rg = +e.target.value; $('#p-rgv').textContent = P.rg; prender(); });
+$('#p-cg').addEventListener('input', e => { P.cg = +e.target.value; $('#p-cgv').textContent = P.cg; prender(); });
+$('#p-order').addEventListener('input', e => { items[sel].order = +e.target.value; $('#p-orderv').textContent = items[sel].order; prender(); });
+function setCount(n) {
+    P.n = Math.max(1, Math.min(12, n));
+    if (sel >= P.n) sel = P.n - 1;
+    buildPick(); psync(); prender();
+}
+$('#p-more').addEventListener('click', () => setCount(P.n + 1));
+$('#p-less').addEventListener('click', () => setCount(P.n - 1));
+$('#p-reset').addEventListener('click', () => {
+    Object.assign(P, PD);
+    items = Array.from({ length: 12 }, newItem);
+    sel = 0;
+    buildPick(); psync(); prender();
+});
+buildPick(); psync(); prender();
+xgrid();
+
+/* ================= COLOUR ================= */
+function hslToRgb(h, s, l) {
+    s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return [0, 8, 4].map(n => Math.round(255 * f(n)));
+}
+const lum = rgb => {
+    const c = rgb.map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+};
+const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+const onWhite = (rgb, a) => rgb.map(v => Math.round(v * a + 255 * (1 - a)));
+
+const C = { h: 262, s: 80, l: 55, a: 100, use: 'background' };
+function colour() {
+    const h = C.h, s = C.s, l = C.l, a = C.a / 100;
+    const rgb = hslToRgb(h, s, l);
+    const hsl = a < 1 ? 'hsl(' + h + ' ' + s + '% ' + l + '% / ' + a + ')' : 'hsl(' + h + ', ' + s + '%, ' + l + '%)';
+    const rgbS = a < 1 ? 'rgb(' + rgb.join(' ') + ' / ' + a + ')' : 'rgb(' + rgb.join(', ') + ')';
+    const hex = '#' + rgb.map(x => x.toString(16).padStart(2, '0')).join('') + (a < 1 ? Math.round(a * 255).toString(16).padStart(2, '0') : '');
+    $('#c-hv').textContent = h; $('#c-sv').textContent = s; $('#c-lv').textContent = l; $('#c-av').textContent = a;
+    $('#c-s').style.setProperty('--track', 'linear-gradient(to right, hsl(' + h + ' 0% ' + l + '%), hsl(' + h + ' 100% ' + l + '%))');
+    $('#c-l').style.setProperty('--track', 'linear-gradient(to right, hsl(' + h + ' ' + s + '% 0%), hsl(' + h + ' ' + s + '% 50%), hsl(' + h + ' ' + s + '% 100%))');
+    $('#c-a').style.setProperty('--track', 'linear-gradient(to right, hsl(' + h + ' ' + s + '% ' + l + '% / 0), hsl(' + h + ' ' + s + '% ' + l + '% / 1)), var(--checker)');
+    $('#f-hsl').textContent = hsl; $('#f-rgb').textContent = rgbS; $('#f-hex').textContent = hex;
+
+    const sm = $('#sample');
+    sm.style.cssText = '';
+    const flat = onWhite(rgb, a);
+    let code, say;
+    if (C.use === 'text') {
+        sm.style.color = hsl;
+        const cr = contrast(flat, [255, 255, 255]);
+        say = cr >= 4.5 ? 'Easy to read on a white page. Good choice!' : 'Hard to read on a white page. Try making it darker.';
+        code = '.sample {\n  color: ' + hsl + ';\n}';
+    } else if (C.use === 'background') {
+        sm.style.background = hsl;
+        const w = contrast(flat, [255, 255, 255]), d = contrast(flat, [20, 33, 61]);
+        const useWhite = w >= d;
+        sm.style.color = useWhite ? '#ffffff' : '#14213d';
+        say = 'The words turned ' + (useWhite ? 'white' : 'dark') + ' because that is easier to read on this colour.' + (Math.max(w, d) < 4.5 ? ' Even so, it is a little hard to read here.' : '');
+        code = '.sample {\n  background-color: ' + hsl + ';\n}';
+    } else {
+        sm.style.borderColor = hsl;
+        say = 'A border is a frame around the box. The frame is the part that changed colour.';
+        code = '.sample {\n  border: 8px solid;\n  border-color: ' + hsl + ';\n}';
+    }
+    $('#c-say').textContent = say;
+    $('#c-code').innerHTML = hl(code);
+}
+[['#c-h', 'h'], ['#c-s', 's'], ['#c-l', 'l'], ['#c-a', 'a']].forEach(([id, k]) => {
+    $(id).addEventListener('input', e => { C[k] = +e.target.value; colour(); });
+});
+seg('#c-use', v => { C.use = v; colour(); });
+colour();
+
+/* RGB light mixer */
+const Lt = { r: true, g: true, b: false };
+const lightNames = { r: 'Red', g: 'Green', b: 'Blue', rg: 'Yellow', rb: 'Magenta (pink-purple)', gb: 'Cyan (light blue)', rgb: 'White' };
+function lights() {
+    ['r', 'g', 'b'].forEach(k => document.querySelector('.disc-' + k).classList.toggle('on', Lt[k]));
+    const key = ['r', 'g', 'b'].filter(k => Lt[k]).join('');
+    const parts = ['r', 'g', 'b'].filter(k => Lt[k]).map(k => lightNames[k].split(' ')[0]);
+    const val = ['r', 'g', 'b'].map(k => Lt[k] ? 255 : 0);
+    const col = 'rgb(' + val.join(', ') + ')';
+    const result = key ? lightNames[key] : 'Black';
+    $('#l-say').innerHTML = '<span class="mix-swatch" style="background:' + col + '"></span>' +
+        (key ? parts.join(' + ') + ' light = <b>' + result + '</b>' : 'No light at all = <b>Black</b>');
+    $('#l-code').innerHTML = hl('.pixel {\n  background-color: ' + col + ';\n}');
+}
+document.querySelectorAll('.lamp').forEach(b => b.addEventListener('click', () => {
+    Lt[b.dataset.k] = !Lt[b.dataset.k];
+    b.setAttribute('aria-pressed', Lt[b.dataset.k] ? 'true' : 'false');
+    lights();
+}));
+lights();
+
+/* ================= MEDIA QUERIES ================= */
+const vw = $('#vw');
+const showVw = () => { vw.textContent = window.innerWidth; };
+addEventListener('resize', showVw);
+showVw();
+
+function media() {
+    const w = +$('#m-w').value;
+    const size = w <= 420 ? 'phone' : w <= 640 ? 'tablet' : 'computer';
+    const frame = $('#frame');
+    frame.style.width = w + 'px';
+    frame.dataset.size = size;
+    $('#m-wv').textContent = w;
+    const base = '.cards {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n}';
+    const r1 = '@media (max-width: 640px) {\n  .cards { grid-template-columns: repeat(2, 1fr); }\n}';
+    const r2 = '@media (max-width: 420px) {\n  .cards { grid-template-columns: 1fr; }\n  .links { display: none; }\n  .menu-button { display: block; }\n}';
+    $('#m-code').innerHTML =
+        '<span class="rule on">' + hl(base) + '</span>' +
+        '<span class="rule' + (w <= 640 ? ' on' : '') + '">' + hl(r1) + '</span>' +
+        '<span class="rule' + (w <= 420 ? ' on' : '') + '">' + hl(r2) + '</span>';
+    const say = {
+        computer: 'Wide screen (' + w + 'px): 3 columns and a full menu. Only the first rule is on.',
+        tablet: 'Medium screen (' + w + 'px): the 640px rule is on, so there are 2 columns.',
+        phone: 'Narrow screen (' + w + 'px): both rules are on and the last one wins. There is 1 column, and the menu became a button.'
+    };
+    $('#m-say').textContent = say[size];
+}
+$('#m-w').addEventListener('input', media);
+media();
+</script>
+</body>
+</html>
